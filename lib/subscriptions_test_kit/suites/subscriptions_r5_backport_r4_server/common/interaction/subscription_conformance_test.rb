@@ -11,8 +11,8 @@ module SubscriptionsTestKit
         The Subscription resource is used to request notifications for a specific client about a specific topic
         Conceptually, a subscription is a concrete request for a single client to receive notifications per a single
         topic. In order to support topic-based subscriptions in R4, this guide defines several extensions for use on the
-        [R4 Subscription resource](http://hl7.org/fhir/subscription.html). A list of extensions defined by this guide can
-        be found on the [Artifacts](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#3) page.
+        [R4 Subscription resource](http://hl7.org/fhir/R4/subscription.html). A list of extensions defined by this guide can
+        be found on the [Subscriptions R5 Backport IG's Artifacts page](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#5).
 
         This test accepts a Subscription resource as an input and verifies that it is conformant to the 
         [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html).

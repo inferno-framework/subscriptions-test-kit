@@ -129,9 +129,9 @@ for the content type used in the *Workflow Subscription Resource* input.
 
 Examples of Subscriptions that can be used in each of these inputs can be found within the
 test kit source code:
-- [`empty` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/subscriptions_test_kit/docs/samples/Subscription_empty.json)
-- [`id-only` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/subscriptions_test_kit/docs/samples/Subscription_id-only.json)
-- [`full-resource` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/subscriptions_test_kit/docs/samples/Subscription_full-resource.json)
+- [`empty` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/docs/samples/Subscription_empty.json)
+- [`id-only` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/docs/samples/Subscription_id-only.json)
+- [`full-resource` Notification example](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/docs/samples/Subscription_full-resource.json)
 
 ### Unsupported Subscription creation element values
 
@@ -159,7 +159,7 @@ input, modify the corresponding element with the provided value, and expect that
 This test kit is still in draft form and does not test all of the requirements and features
 described in the Subscriptions IG. You can find information on the requirements
 that the test kit covers and does not cover in the [Requirements 
-Coverage](lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
+Coverage](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
 CSV document.
 
 Specific limitations to highlight include

@@ -11,7 +11,7 @@ module SubscriptionsTestKit
         Verify that the received Notifications are conformant to the
         [R4 Topic-Based Subscription Notification Bundle](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html)
         profile, including additional requirements around the `empty` content type ([example empty
-        Subscription](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/subscriptions_test_kit/docs/samples/Subscription_empty.json)).
+        Subscription](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/docs/samples/Subscription_empty.json)).
       )
       run_as_group
       optional

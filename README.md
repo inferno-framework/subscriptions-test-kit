@@ -35,7 +35,8 @@ requirements and may change how these are tested.
 This test is still in draft form and does not test all of the requirements and features
 described in the Subscriptions IG. You can find information on the requirements
 that the kit covers and does not cover in the [Requirements 
-Coverage](lib/subscriptions_test_kit/docs/generated/Requirements_Coverage.csv) CSV document.
+Coverage](lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
+CSV document.
 
 Specific limitations to highlight include
 - Inferno supports only the `rest-hook` channel type. Support for other channels may be added in the future.

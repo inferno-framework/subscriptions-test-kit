@@ -108,7 +108,7 @@ instance that the client sends to Inferno, then a value can be provided here.
 This test kit is still in draft form and does not test all of the requirements and features
 described in the Subscriptions IG. You can find information on the requirements
 that the test kit covers and does not cover in the [Requirements 
-Coverage](lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
+Coverage](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
 CSV document.
 
 Specific limitations to highlight include

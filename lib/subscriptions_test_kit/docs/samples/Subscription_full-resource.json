@@ -1,0 +1,37 @@
+
+{
+    "resourceType" : "Subscription",
+    "meta" : {
+      "profile" : ["http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"]
+    },
+    "status" : "requested",
+    "end" : "2020-12-31T12:00:00Z",
+    "reason" : "R4 Topic-Based Workflow Subscription for Patient Admission",
+    "criteria" : "http://inferno.healthit.gov/suites/custom/subscriptions_r5_backport_r4_client/topics/patient-admission",
+    "_criteria" : {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria",
+        "valueString" : "Encounter?patient=Patient/123"
+      }]
+    },
+    "channel" : {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout",
+        "valueUnsignedInt" : 60
+      },
+      {
+        "url" : "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count",
+        "valuePositiveInt" : 20
+      }],
+      "type" : "rest-hook",
+      "header": ["Authorization: Bearer SAMPLE_TOKEN"],
+      "endpoint" : "http://inferno.healthit.gov/suites/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+      "payload" : "application/json",
+      "_payload" : {
+        "extension" : [{
+          "url" : "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content",
+          "valueCode" : "full-resource"
+        }]
+      }
+    }
+  }

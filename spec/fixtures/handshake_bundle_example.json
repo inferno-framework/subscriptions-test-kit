@@ -1,0 +1,56 @@
+{
+  "resourceType": "Bundle",
+  "id": "r4-notification-handshake",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4"
+    ]
+  },
+  "type": "history",
+  "timestamp": "2020-05-29T11:44:13.1882432-05:00",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:63c28e8a-f402-43e4-beb2-75b1c0f6833f",
+      "resource": {
+        "resourceType": "Parameters",
+        "id": "63c28e8a-f402-43e4-beb2-75b1c0f6833f",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4"
+          ]
+        },
+        "parameter": [
+          {
+            "name": "subscription",
+            "valueReference": {
+              "reference": "https://fhirserver.org/fhir/Subscription/admission"
+            }
+          },
+          {
+            "name": "topic",
+            "valueCanonical": "http://fhirserver.org/topics/patient-admission"
+          },
+          {
+            "name": "status",
+            "valueCode": "requested"
+          },
+          {
+            "name": "type",
+            "valueCode": "handshake"
+          },
+          {
+            "name": "events-since-subscription-start",
+            "valueString": "0"
+          }
+        ]
+      },
+      "request": {
+        "method": "GET",
+        "url": "https://fhirserver.org/fhir/Subscription/123/$status"
+      },
+      "response": {
+        "status": "200"
+      }
+    }
+  ]
+}

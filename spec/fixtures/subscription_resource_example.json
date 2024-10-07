@@ -1,0 +1,63 @@
+{
+  "resourceType": "Subscription",
+  "id": "123",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"
+    ]
+  },
+  "status": "requested",
+  "end": "2020-12-31T12:00:00Z",
+  "reason": "R4/B Example Topic-Based Subscription for Patient Admission via Zulip",
+  "criteria": "http://fhirserver.org/topics/patient-admission",
+  "_criteria": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria",
+        "valueString": "Encounter?patient=Patient/123"
+      }
+    ]
+  },
+  "channel": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period",
+        "valueUnsignedInt": 86400
+      },
+      {
+        "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout",
+        "valueUnsignedInt": 60
+      },
+      {
+        "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count",
+        "valuePositiveInt": 20
+      }
+    ],
+    "type": "rest-hook",
+    "_type": {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-channel-type",
+          "valueCoding": {
+            "system": "http://fhirserver.org/subscription-channel-type",
+            "code": "zulip",
+            "display": "Zulip Notification Channel"
+          }
+        }
+      ]
+    },
+    "header": [
+      "Authorization: Bearer SAMPLE_TOKEN"
+    ],
+    "endpoint": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+    "payload": "application/json",
+    "_payload": {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content",
+          "valueCode": "full-resource"
+        }
+      ]
+    }
+  }
+}

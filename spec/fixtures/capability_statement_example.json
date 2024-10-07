@@ -1,0 +1,186 @@
+{
+  "resourceType": "CapabilityStatement",
+  "id": "r4-capabilitystatement-example-server",
+  "text": {
+    "status": "extensions",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2/><div><p>R4 example of a CapabilityStatement advertising support for topic-based subscriptions and a few topics.</p>\n</div><table><tr><td>Mode</td><td>SERVER</td></tr><tr><td>Description</td><td/></tr><tr><td>Transaction</td><td></td></tr><tr><td>System History</td><td></td></tr><tr><td>System Search</td><td></td></tr></table><table><tr><th><b>Resource Type</b></th><th><b>Profile</b></th><th><b title=\"GET a resource (read interaction)\">Read</b></th><th><b title=\"GET all set of resources of the type (search interaction)\">Search</b></th><th><b title=\"PUT a new resource version (update interaction)\">Update</b></th><th><b title=\"POST a new resource (create interaction)\">Create</b></th><th><b title=\"DELETE a resource (delete interaction)\">Delete</b></th></tr><tr><td>Subscription</td><td>Supported profiles:<br/>  <a href=\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription\">http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription</a></td><td>y</td><td></td><td>y</td><td>y</td><td>y</td></tr><tr><td>Patient</td><td> </td><td>y</td><td></td><td>y</td><td>y</td><td>y</td></tr><tr><td>Encounter</td><td> </td><td>y</td><td></td><td>y</td><td>y</td><td>y</td></tr><tr><td>Observation</td><td> </td><td>y</td><td></td><td>y</td><td>y</td><td>y</td></tr></table></div>"
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-wg",
+      "valueCode": "fhir"
+    }
+  ],
+  "url": "http://hl7.org/fhir/uv/subscriptions-backport/CapabilityStatement/r4-capabilitystatement-example-server",
+  "version": "1.1.0",
+  "status": "active",
+  "date": "2020-11-30",
+  "publisher": "HL7 FHIR Infrastructure WG",
+  "contact": [
+    {
+      "name": "HL7 FHIR Infrastructure WG",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://hl7.org/Special/committees/fiwg"
+        }
+      ]
+    },
+    {
+      "name": "Gino Canessa",
+      "telecom": [
+        {
+          "system": "email",
+          "value": "mailto:gino.canessa@microsoft.com"
+        }
+      ]
+    },
+    {
+      "name": "Eric Haas",
+      "telecom": [
+        {
+          "system": "email",
+          "value": "mailto:ehaas@healthedatainc.com"
+        }
+      ]
+    }
+  ],
+  "description": "R4 example of a CapabilityStatement advertising support for topic-based subscriptions and a few topics.",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001",
+          "display": "World"
+        }
+      ]
+    }
+  ],
+  "kind": "requirements",
+  "instantiates": [
+    "http://hl7.org/fhir/uv/subscriptions-backport/CapabilityStatement/backport-subscription-server-r4"
+  ],
+  "fhirVersion": "4.0.1",
+  "format": [
+    "xml",
+    "json"
+  ],
+  "implementationGuide": [
+    "http://hl7.org/fhir/uv/subscriptions-backport/ImplementationGuide/hl7.fhir.uv.subscriptions-backport"
+  ],
+  "rest": [
+    {
+      "mode": "server",
+      "resource": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical",
+              "valueCanonical": "http://fhirserver.org/topics/patient-admission"
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical",
+              "valueCanonical": "http://fhirserver.org/topics/patient-discharge"
+            }
+          ],
+          "type": "Subscription",
+          "supportedProfile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"
+          ],
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "delete"
+            }
+          ],
+          "searchParam": [
+            {
+              "name": "url",
+              "definition": "http://hl7.org/fhir/SearchParameter/Subscription-url",
+              "type": "uri"
+            },
+            {
+              "name": "status",
+              "definition": "http://hl7.org/fhir/SearchParameter/Subscription-status",
+              "type": "token"
+            }
+          ],
+          "operation": [
+            {
+              "name": "$status",
+              "definition": "http://hl7.org/fhir/uv/subscriptions-backport/OperationDefinition/backport-subscription-status"
+            },
+            {
+              "name": "$events",
+              "definition": "http://hl7.org/fhir/uv/subscriptions-backport/OperationDefinition/backport-subscription-events"
+            },
+            {
+              "name": "$get-ws-binding-token",
+              "definition": "http://hl7.org/fhir/uv/subscriptions-backport/OperationDefinition/backport-subscription-get-ws-binding-token"
+            }
+          ]
+        },
+        {
+          "type": "Patient",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "delete"
+            }
+          ]
+        },
+        {
+          "type": "Encounter",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "delete"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "delete"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

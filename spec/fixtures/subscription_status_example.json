@@ -1,0 +1,64 @@
+{
+  "resourceType": "Bundle",
+  "id": "r4-subscription-status-bundle",
+  "type": "searchset",
+  "total": 1,
+  "timestamp": "2020-05-29T11:44:13.1882432-05:00",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:2d5afc69-6ef2-420f-a8d1-8500c99eb96c",
+      "resource": {
+        "resourceType": "Parameters",
+        "id": "backport-subscription-status-r4",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4"
+          ]
+        },
+        "parameter": [
+          {
+            "name": "subscription",
+            "valueReference": {
+              "reference": "https://example.org/fhir/Subscription/123"
+            }
+          },
+          {
+            "name": "topic",
+            "valueCanonical": "http://fhirserver.org/topics/patient-admission"
+          },
+          {
+            "name": "status",
+            "valueCode": "active"
+          },
+          {
+            "name": "type",
+            "valueCode": "event-notification"
+          },
+          {
+            "name": "events-since-subscription-start",
+            "valueString": "2"
+          },
+          {
+            "name": "notification-event",
+            "part": [
+              {
+                "name": "event-number",
+                "valueString": "2"
+              },
+              {
+                "name": "timestamp",
+                "valueInstant": "2020-05-29T11:44:13.1882432-05:00"
+              },
+              {
+                "name": "focus",
+                "valueReference": {
+                  "reference": "https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

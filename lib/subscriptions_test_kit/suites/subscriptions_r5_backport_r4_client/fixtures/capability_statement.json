@@ -1,0 +1,57 @@
+{
+  "resourceType": "CapabilityStatement",
+  "name": "InfernoSubscriptionsTestKitClientSuiteSimulatedServerCapabilityStatement",
+  "status": "active",
+  "date": "2024-09-05",
+  "description": "CapabilityStatement describing the features of the simulated FHIR Subscription server run as a part of the Subscriptions Client Test Suite.",
+  "kind": "instance",
+  "fhirVersion": "4.0.1",
+  "format": [
+    "json"
+  ],
+  "software": {
+    "name": "Inferno Subscriptions Test Kit Client Suite"
+  },
+  "implementation": {
+    "description": "Simulation of a FHIR Subscription server run as a part of the Subscriptions Client Test Suite"
+  },
+  "instantiates": [
+    "http://hl7.org/fhir/uv/subscriptions-backport/CapabilityStatement/backport-subscription-server-r4#1.1.0"
+  ],
+  "implementationGuide": [
+    "http://hl7.org/fhir/uv/subscriptions-backport/ImplementationGuide/hl7.fhir.uv.subscriptions-backport"
+  ],
+  "rest": [
+    {
+      "mode": "server",
+      "resource": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical",
+              "valueCanonical": "https://inferno.healthit.gov/suites/custom/subscriptions_r5_backport_r4_client/topics/patient-admission"
+            }
+          ],
+          "type": "Subscription",
+          "supportedProfile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"
+          ],
+          "interaction": [
+            {
+              "code": "read"
+            },
+            {
+              "code": "create"
+            }
+          ],
+          "operation": [
+            {
+              "name": "$status",
+              "definition": "http://hl7.org/fhir/uv/subscriptions-backport/OperationDefinition/backport-subscription-status"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

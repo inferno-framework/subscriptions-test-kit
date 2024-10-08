@@ -3,7 +3,6 @@ PATH
   specs:
     subscriptions_test_kit (0.9.0)
       inferno_core (~> 0.4.43)
-      roo (~> 2.10.1)
 
 GEM
   remote: https://rubygems.org/
@@ -312,6 +311,7 @@ DEPENDENCIES
   debug
   factory_bot (~> 6.1)
   rack-test
+  roo (~> 2.10.1)
   rspec (~> 3.10)
   subscriptions_test_kit!
   webmock (~> 3.11)

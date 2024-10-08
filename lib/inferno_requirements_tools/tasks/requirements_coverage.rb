@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'CSV'
-require 'roo'
 require_relative '../ext/inferno_core/runnable'
 
 module InfernoRequirementsTools

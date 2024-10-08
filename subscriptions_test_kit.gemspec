@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/inferno-framework/subscriptions-test-kit'
   spec.license       = 'Apache-2.0'
   spec.add_dependency 'inferno_core', '~> 0.4.43'
-  spec.add_dependency 'roo', '~> 2.7.1'
+  spec.add_dependency 'roo', '~> 2.10.1'
   spec.add_development_dependency 'database_cleaner-sequel', '~> 1.8'
   spec.add_development_dependency 'factory_bot', '~> 6.1'
   spec.add_development_dependency 'rspec', '~> 3.10'

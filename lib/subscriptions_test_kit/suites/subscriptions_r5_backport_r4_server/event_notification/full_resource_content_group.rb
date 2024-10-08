@@ -1,5 +1,5 @@
-require_relative '../../common/interaction_group'
-require_relative '../../common/interaction_verification_group'
+require_relative '../common/interaction_group'
+require_relative '../common/interaction_verification_group'
 require_relative 'full_resource_content/full_resource_conformance_test'
 
 module SubscriptionsTestKit

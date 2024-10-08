@@ -1,4 +1,4 @@
-require_relative '../../common/subscription_creation'
+require_relative '../common/subscription_creation'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server

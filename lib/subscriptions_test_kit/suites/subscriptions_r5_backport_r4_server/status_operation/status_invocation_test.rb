@@ -1,4 +1,4 @@
-require_relative '../../common/subscription_status_operation'
+require_relative '../common/subscription_status_operation'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server

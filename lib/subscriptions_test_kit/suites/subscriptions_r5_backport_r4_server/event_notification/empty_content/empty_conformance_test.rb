@@ -1,4 +1,4 @@
-require_relative '../../../../../common/notification_conformance_verification'
+require_relative '../../../../common/notification_conformance_verification'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server

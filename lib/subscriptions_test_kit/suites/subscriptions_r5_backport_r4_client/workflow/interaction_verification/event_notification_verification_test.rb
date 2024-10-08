@@ -7,7 +7,7 @@ module SubscriptionsTestKit
     class EventNotificationVerificationTest < Inferno::Test
       include SubscriptionSimulationUtils
 
-      id :subscriptions_r5_backport_r4_client_event_notification_verification
+      id :subscriptions_r4_client_event_notification_verification
       title 'Rest-Hook Event Notification Verification'
       description %(
         This test verifies that the client's response to the event notification

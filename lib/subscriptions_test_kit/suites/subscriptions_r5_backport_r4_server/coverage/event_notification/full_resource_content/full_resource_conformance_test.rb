@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class FullResourceConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_full_resource_conformance
+      id :subscriptions_r4_server_full_resource_conformance
       title 'Subscription Full-Resource Notification Verification'
       description %(
         This test takes the received notification bundle and ensures it is conformant to the

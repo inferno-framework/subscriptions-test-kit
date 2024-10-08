@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class HeartbeatConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_heartbeat_conformance
+      id :subscriptions_r4_server_heartbeat_conformance
       title 'Subscription Heartbeat Verification'
       description %(
         When a Subscription is created for a REST Hook channel type, the server Server may send notifications of type

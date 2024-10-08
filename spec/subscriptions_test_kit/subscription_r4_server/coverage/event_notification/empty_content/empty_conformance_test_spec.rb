@@ -5,7 +5,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::EmptyConfo
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r5_backport_r4_server_empty_conformance') }
+  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_empty_conformance') }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 

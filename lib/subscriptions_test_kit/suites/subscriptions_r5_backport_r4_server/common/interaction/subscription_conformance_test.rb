@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class SubscriptionConformanceTest < Inferno::Test
       include SubscriptionConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_subscription_conformance
+      id :subscriptions_r4_server_subscription_conformance
       title '[USER INPUT VERIFICATION] Verify Subscription to Send to Server'
       description %(
         The Subscription resource is used to request notifications for a specific client about a specific topic

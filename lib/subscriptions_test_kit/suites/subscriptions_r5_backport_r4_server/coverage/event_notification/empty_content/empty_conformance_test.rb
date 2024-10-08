@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class EmptyConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_empty_conformance
+      id :subscriptions_r4_server_empty_conformance
       title 'Subscription Empty Notification Verification'
       description %(
         This test takes the received empty notification bundle and ensures it is conformant to the

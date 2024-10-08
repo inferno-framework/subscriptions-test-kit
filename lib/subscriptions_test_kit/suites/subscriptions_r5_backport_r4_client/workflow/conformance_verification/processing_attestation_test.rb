@@ -7,7 +7,7 @@ module SubscriptionsTestKit
     class ProcessingAttestationTest < Inferno::Test
       include URLs
 
-      id :subscriptions_r5_backport_r4_client_processing_attestation
+      id :subscriptions_r4_client_processing_attestation
       title 'Client Processes Event Notification'
       description %(
         This test asks the tester to attest that the event notification sent by Inferno

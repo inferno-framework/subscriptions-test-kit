@@ -6,7 +6,7 @@ module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     class SubscriptionVerificationTest < Inferno::Test
       include SubscriptionConformanceVerification
-      id :subscriptions_r5_backport_r4_client_subscription_verification
+      id :subscriptions_r4_client_subscription_verification
       title 'Client Subscription Conformance Verification'
       description %(
         This test verifies that the Subscription created by the client under test

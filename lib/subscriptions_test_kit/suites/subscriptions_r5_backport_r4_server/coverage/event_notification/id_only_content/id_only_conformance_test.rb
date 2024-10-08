@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class IdOnlyConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_id_only_conformance
+      id :subscriptions_r4_server_id_only_conformance
       title 'Subscription Id-Only Notification Verification'
       description %(
         This test takes the received notification bundle and ensures it is conformant to the

@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class RejectSubscriptionsTest < Inferno::Test
       include SubscriptionCreation
 
-      id :subscriptions_r5_backport_r4_server_reject_subscriptions
+      id :subscriptions_r4_server_reject_subscriptions
       title 'Server Handles Unsupported Subscriptions'
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does not

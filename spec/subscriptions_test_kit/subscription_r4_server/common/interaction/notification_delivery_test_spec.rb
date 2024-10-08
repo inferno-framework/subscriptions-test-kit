@@ -7,8 +7,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   include RequestHelpers
 
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r5_backport_r4_server_notification_delivery') }
-  let(:test_group) { Inferno::Repositories::TestGroups.new.find('subscriptions_r5_backport_r4_server_interaction') }
+  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_notification_delivery') }
+  let(:test_group) { Inferno::Repositories::TestGroups.new.find('subscriptions_r4_server_interaction') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }

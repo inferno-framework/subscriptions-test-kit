@@ -1,7 +1,7 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class CSConformanceTest < Inferno::Test
-      id :subscriptions_r5_backport_r4_server_cs_conformance
+      id :subscriptions_r4_server_cs_conformance
       title 'Capability Statement Conformance Verification'
       description %(
         This test attempts to retreive the server's Capability Statement in order to verify that it

@@ -4,7 +4,7 @@ require_relative 'handshake_heartbeat/heartbeat_conformance_test'
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class HandshakeHeartbeatGroup < Inferno::TestGroup
-      id :subscriptions_r5_backport_r4_server_handshake_heartbeat
+      id :subscriptions_r4_server_handshake_heartbeat
       title 'Backport Subscription Handshake and Heartbeat Notification Verification'
       description %(
         Verify that the any received Handshake or Heartbeat Notifications are conformant to the
@@ -12,8 +12,8 @@ module SubscriptionsTestKit
         profile.
       )
 
-      test from: :subscriptions_r5_backport_r4_server_handshake_conformance
-      test from: :subscriptions_r5_backport_r4_server_heartbeat_conformance
+      test from: :subscriptions_r4_server_handshake_conformance
+      test from: :subscriptions_r4_server_heartbeat_conformance
     end
   end
 end

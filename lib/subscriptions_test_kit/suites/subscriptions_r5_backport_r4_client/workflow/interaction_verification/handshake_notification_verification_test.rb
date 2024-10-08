@@ -7,7 +7,7 @@ module SubscriptionsTestKit
     class HandshakeNotificationVerificationTest < Inferno::Test
       include SubscriptionSimulationUtils
 
-      id :subscriptions_r5_backport_r4_client_handshake_notification_verification
+      id :subscriptions_r4_client_handshake_notification_verification
       title 'Rest-Hook Handshake Notification Verification'
       description %(
         This test verifies that the client's response to the handshake notification

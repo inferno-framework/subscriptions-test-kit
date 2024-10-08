@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class HandshakeConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_handshake_conformance
+      id :subscriptions_r4_server_handshake_conformance
       title 'Subscription Handshake Verification'
       description %(
         When a Subscription is created for a REST Hook channel type, the server SHALL set initial status to requested,

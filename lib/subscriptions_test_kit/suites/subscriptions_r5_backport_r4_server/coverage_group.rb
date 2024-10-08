@@ -8,18 +8,18 @@ module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     module Coverage
       class GroupForCoverage < Inferno::TestGroup
-        id :subscriptions_r5_backport_r4_server_coverage
+        id :subscriptions_r4_server_coverage
         title 'Demonstrate coverage of all Subscription Backport IG requirements'
         description %(
           Demonstrate that the server covers all requirements placed on
           servers by the IG.
         )
 
-        group from: :subscriptions_r5_backport_r4_server_capability_statement
-        group from: :subscriptions_r5_backport_r4_server_event_notification
-        group from: :subscriptions_r5_backport_r4_server_handshake_heartbeat
-        group from: :subscriptions_r5_backport_r4_server_status_operation
-        group from: :subscriptions_r5_backport_r4_server_subscription_rejection
+        group from: :subscriptions_r4_server_capability_statement
+        group from: :subscriptions_r4_server_event_notification
+        group from: :subscriptions_r4_server_handshake_heartbeat
+        group from: :subscriptions_r4_server_status_operation
+        group from: :subscriptions_r4_server_subscription_rejection
       end
     end
   end

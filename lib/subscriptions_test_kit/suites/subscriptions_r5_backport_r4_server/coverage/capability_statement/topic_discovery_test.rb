@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class TopicDiscoveryTest < Inferno::Test
       include SubscriptionConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_topic_discovery
+      id :subscriptions_r4_server_topic_discovery
       title 'Attempt topic discovery'
       description %(
         This test attempts to perform topic discovery with the server. In order to allow for [discovery of supported

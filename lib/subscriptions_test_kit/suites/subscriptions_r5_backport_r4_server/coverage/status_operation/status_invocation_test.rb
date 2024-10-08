@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class StatusInvocationTest < Inferno::Test
       include SubscriptionStatusOperation
 
-      id :subscriptions_r5_backport_r4_server_status_invocation
+      id :subscriptions_r4_server_status_invocation
       title 'Server supports subscription $status operation'
       description %(
         In order to claim conformance with this guide, a server: SHALL support the [$status operation](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/OperationDefinition-backport-subscription-status.html)

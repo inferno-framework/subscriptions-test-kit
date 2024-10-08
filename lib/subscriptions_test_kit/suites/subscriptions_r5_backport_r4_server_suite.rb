@@ -72,8 +72,8 @@ module SubscriptionsTestKit
         SubscriptionsR5BackportR4ServerSuite.extract_token_from_query_params(request)
       end
 
-      group from: :subscriptions_r5_backport_r4_server_workflow
-      group from: :subscriptions_r5_backport_r4_server_coverage
+      group from: :subscriptions_r4_server_workflow
+      group from: :subscriptions_r4_server_coverage
     end
   end
 end

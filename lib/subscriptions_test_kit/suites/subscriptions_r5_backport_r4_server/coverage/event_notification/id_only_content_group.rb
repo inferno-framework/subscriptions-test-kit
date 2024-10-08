@@ -5,7 +5,7 @@ require_relative 'id_only_content/id_only_conformance_test'
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class IdOnlyContentGroup < Inferno::TestGroup
-      id :subscriptions_r5_backport_r4_server_id_only_content
+      id :subscriptions_r4_server_id_only_content
       title 'Id Only Notification Verification'
       description %(
         Verify that the received Notifications are conformant to the
@@ -18,8 +18,8 @@ module SubscriptionsTestKit
 
       input_order :url, :credentials, :access_token, :id_only_subscription_resource
 
-      group from: :subscriptions_r5_backport_r4_server_interaction do
-        id :subscriptions_r5_backport_r4_server_id_only_content_interaction
+      group from: :subscriptions_r4_server_interaction do
+        id :subscriptions_r4_server_id_only_content_interaction
         optional
 
         config(
@@ -44,14 +44,14 @@ module SubscriptionsTestKit
           }
         )
       end
-      group from: :subscriptions_r5_backport_r4_server_interaction_verification do
-        id :subscriptions_r5_backport_r4_server_id_only_content_interaction_verification
+      group from: :subscriptions_r4_server_interaction_verification do
+        id :subscriptions_r4_server_id_only_content_interaction_verification
         optional
 
         config(
           options: { subscription_type: 'id-only' }
         )
-        test from: :subscriptions_r5_backport_r4_server_id_only_conformance
+        test from: :subscriptions_r4_server_id_only_conformance
       end
     end
   end

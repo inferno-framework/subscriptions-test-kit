@@ -4,7 +4,7 @@ require_relative 'capability_statement/topic_discovery_test'
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class CapabilityStatementGroup < Inferno::TestGroup
-      id :subscriptions_r5_backport_r4_server_capability_statement
+      id :subscriptions_r4_server_capability_statement
       title 'Capability Statement Verification'
       description %(
         Verify the Backport Subscriptions Server has a conformant Capability Statement and that it declares support for the
@@ -14,8 +14,8 @@ module SubscriptionsTestKit
 
       run_as_group
 
-      test from: :subscriptions_r5_backport_r4_server_cs_conformance
-      test from: :subscriptions_r5_backport_r4_server_topic_discovery
+      test from: :subscriptions_r4_server_cs_conformance
+      test from: :subscriptions_r4_server_topic_discovery
     end
   end
 end

@@ -1,7 +1,7 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class CreationResponseConformanceTest < Inferno::Test
-      id :subscriptions_r5_backport_r4_server_creation_response_conformance
+      id :subscriptions_r4_server_creation_response_conformance
       title 'Verify Subscription Creation Response'
       description %(
         This test ensures that the server responded to the Subscription creation test with the new created Subscription

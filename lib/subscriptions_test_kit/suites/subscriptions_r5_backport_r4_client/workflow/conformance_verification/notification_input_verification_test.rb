@@ -7,7 +7,7 @@ module SubscriptionsTestKit
     class NotificationInputVerificationTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_client_notification_input_verification
+      id :subscriptions_r4_client_notification_input_verification
       title '[USER INPUT VERIFICATION] Notification Bundle Input Conformance Verification'
       description %(
         This test verifies that the notification bundle provided by the tester is conformant

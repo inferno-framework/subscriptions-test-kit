@@ -4,7 +4,7 @@ require_relative 'common/interaction_verification_group'
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class WorkflowGroup < Inferno::TestGroup
-      id :subscriptions_r5_backport_r4_server_workflow
+      id :subscriptions_r4_server_workflow
       title 'Demonstrate the subscription workflow'
       description %(
         Demonstrate the ability of the server to accept a request for the
@@ -20,8 +20,8 @@ module SubscriptionsTestKit
 
       input_order :url, :credentials, :access_token, :subscription_resource
 
-      group from: :subscriptions_r5_backport_r4_server_interaction
-      group from: :subscriptions_r5_backport_r4_server_interaction_verification
+      group from: :subscriptions_r4_server_interaction
+      group from: :subscriptions_r4_server_interaction_verification
     end
   end
 end

@@ -7,7 +7,7 @@ module SubscriptionsTestKit
       include SubscriptionCreation
       include URLs
 
-      id :subscriptions_r5_backport_r4_server_notification_delivery
+      id :subscriptions_r4_server_notification_delivery
       title 'Send Subscription and Receive Notification Requests from Server'
       description %(
         This test sends a request to create the Subscription resource to the Subscriptions Backport FHIR Server.

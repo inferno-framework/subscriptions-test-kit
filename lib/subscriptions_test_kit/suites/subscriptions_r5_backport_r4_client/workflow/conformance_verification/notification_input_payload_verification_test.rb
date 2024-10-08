@@ -11,7 +11,7 @@ module SubscriptionsTestKit
       include SubscriptionConformanceVerification
       include SubscriptionSimulationUtils
 
-      id :subscriptions_r5_backport_r4_client_notification_input_payload_verification
+      id :subscriptions_r4_client_notification_input_payload_verification
       title '[USER INPUT VERIFICATION] Notification Bundle Input Conformance Verification for Payload Content'
       description 'This test verifies that the notification bundle from the test input meets the requirements '\
                   'of the payload indicated in the subscription created by the client under test.'

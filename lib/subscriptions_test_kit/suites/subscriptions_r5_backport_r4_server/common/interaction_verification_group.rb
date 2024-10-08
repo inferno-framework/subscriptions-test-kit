@@ -3,7 +3,7 @@ require_relative 'interaction_verification/notification_conformance_test'
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class InteractionVerificationGroup < Inferno::TestGroup
-      id :subscriptions_r5_backport_r4_server_interaction_verification
+      id :subscriptions_r4_server_interaction_verification
       title 'Subscription Workflow Interaction Verification'
       description %(
         Inferno takes the received event-notification Bundle and verifies that it is conformant to the
@@ -13,7 +13,7 @@ module SubscriptionsTestKit
 
       run_as_group
 
-      test from: :subscriptions_r5_backport_r4_server_notification_conformance
+      test from: :subscriptions_r4_server_notification_conformance
     end
   end
 end

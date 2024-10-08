@@ -5,7 +5,7 @@ module SubscriptionsTestKit
     class NotificationConformanceTest < Inferno::Test
       include NotificationConformanceVerification
 
-      id :subscriptions_r5_backport_r4_server_notification_conformance
+      id :subscriptions_r4_server_notification_conformance
       title 'Subscription Notification Verification'
       description %(
         As described in [Topic-Based Subscription Components](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/components.html#subscription-notifications),

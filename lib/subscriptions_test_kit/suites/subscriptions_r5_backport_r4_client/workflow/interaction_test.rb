@@ -3,7 +3,7 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     class InteractionTest < Inferno::Test
-      id :subscriptions_r5_backport_r4_client_interaction
+      id :subscriptions_r4_client_interaction
       description %(
         During this test, the client under test will interact with Inferno following the Subscription
         workflow over a `rest-hook` channel. This includes the following steps

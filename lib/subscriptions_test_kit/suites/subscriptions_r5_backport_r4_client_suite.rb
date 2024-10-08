@@ -60,7 +60,7 @@ module SubscriptionsTestKit
         request.query_parameters['test_run_identifier']
       end
 
-      group from: :subscriptions_r5_backport_r4_client_workflow
+      group from: :subscriptions_r4_client_workflow
     end
   end
 end

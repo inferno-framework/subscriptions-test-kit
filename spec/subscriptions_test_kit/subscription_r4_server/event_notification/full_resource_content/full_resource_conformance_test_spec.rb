@@ -1,5 +1,5 @@
-require_relative '../../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
-                 'coverage/event_notification/full_resource_content/full_resource_conformance_test'
+require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
+                 'event_notification/full_resource_content/full_resource_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::FullResourceConformanceTest do
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
@@ -10,13 +10,13 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::FullResour
 
   let(:full_resource_notification_bundle) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../../..', 'fixtures', 'full_resource_notification_bundle_example.json'
+                           __dir__, '../../../..', 'fixtures', 'full_resource_notification_bundle_example.json'
                          )))
   end
 
   let(:subscription_resource) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../../..', 'fixtures', 'subscription_resource_example.json'
+                           __dir__, '../../../..', 'fixtures', 'subscription_resource_example.json'
                          )))
   end
 

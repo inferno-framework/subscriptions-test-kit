@@ -1,5 +1,5 @@
-require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
-                 'coverage/capability_statement/cs_conformance_test'
+require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
+                 'capability_statement/cs_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConformanceTest do
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
@@ -9,7 +9,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
 
   let(:capability_statement) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../../', 'fixtures', 'capability_statement_example.json'
+                           __dir__, '../../../', 'fixtures', 'capability_statement_example.json'
                          )))
   end
 

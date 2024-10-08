@@ -1,5 +1,5 @@
-require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
-                 'coverage/subscription_rejection/reject_subscriptions_test'
+require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
+                 'subscription_rejection/reject_subscriptions_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubscriptionsTest do
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
@@ -9,7 +9,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
 
   let(:subscription_resource) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../..', 'fixtures', 'subscription_resource_example.json'
+                           __dir__, '../../..', 'fixtures', 'subscription_resource_example.json'
                          )))
   end
 

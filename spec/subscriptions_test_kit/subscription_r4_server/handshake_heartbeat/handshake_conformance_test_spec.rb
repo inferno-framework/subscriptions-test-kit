@@ -1,5 +1,5 @@
-require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
-                 'coverage/handshake_heartbeat/heartbeat_conformance_test'
+require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
+                 'handshake_heartbeat/heartbeat_conformance_test'
 
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HandshakeConformanceTest do
@@ -11,13 +11,13 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HandshakeC
 
   let(:handshake_bundle) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../..', 'fixtures', 'handshake_bundle_example.json'
+                           __dir__, '../../..', 'fixtures', 'handshake_bundle_example.json'
                          )))
   end
 
   let(:subscription_resource) do
     JSON.parse(File.read(File.join(
-                           __dir__, '../../../..', 'fixtures', 'subscription_resource_example.json'
+                           __dir__, '../../..', 'fixtures', 'subscription_resource_example.json'
                          )))
   end
 

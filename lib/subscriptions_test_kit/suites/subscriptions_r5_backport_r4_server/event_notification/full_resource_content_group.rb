@@ -33,7 +33,8 @@ module SubscriptionsTestKit
                 A Subscription resource in JSON format that Inferno will send to the server under test
                 so that it can demonstrate its ability to send a full-resource Notification.
                 The instance must be conformant to the R4/B Topic-Based Subscription profile.
-                Inferno may modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
+                Inferno may modify the Subscription before submission, e.g., to point to Inferno's notification
+                endpoint.
             ),
               optional: true
             },

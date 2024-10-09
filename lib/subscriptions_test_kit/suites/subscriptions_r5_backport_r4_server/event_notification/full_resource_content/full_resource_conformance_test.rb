@@ -12,8 +12,8 @@ module SubscriptionsTestKit
         [R4 Topic-Based Subscription Notification Bundle](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html)
         profle.
 
-        With the content type of full-resource, the resources involved in triggering the notification are included in the
-        notification bundle.
+        With the content type of full-resource, the resources involved in triggering the notification are included in
+        the notification bundle.
 
         When the content type is full-resource, notification bundles SHALL include references to the
         appropriate focus resources in the SubscriptionStatus.notificationEvent.focus element.

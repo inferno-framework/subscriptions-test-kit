@@ -51,6 +51,9 @@ module InfernoRequirementsTools
       INPUT_FILE = File.join('lib', TEST_KIT_CODE_FOLDER, 'requirements', INPUT_FILE_NAME).freeze
       NOT_TESTED_FILE_NAME = "#{TEST_KIT_ID}_out_of_scope_requirements.csv".freeze
       NOT_TESTED_FILE = File.join('lib', TEST_KIT_CODE_FOLDER, 'requirements', NOT_TESTED_FILE_NAME).freeze
+      OUTPUT_HEADERS = INPUT_HEADERS + TEST_SUITES.flat_map do |suite|
+                                         ["#{suite.title} #{SHORT_ID_HEADER}", "#{suite.title} #{FULL_ID_HEADER}"]
+                                       end
       OUTPUT_FILE_NAME = "#{TEST_KIT_ID}_requirements_coverage.csv".freeze
       OUTPUT_FILE = File.join('lib', TEST_KIT_CODE_FOLDER, 'requirements', 'generated', OUTPUT_FILE_NAME).freeze
 
@@ -95,22 +98,17 @@ module InfernoRequirementsTools
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def new_csv
         @new_csv ||=
           CSV.generate(+"\xEF\xBB\xBF") do |csv|
-            output_headers = TEST_SUITES.each_with_object(INPUT_HEADERS.dup) do |suite, headers|
-              headers << "#{suite.title} #{SHORT_ID_HEADER}"
-              headers << "#{suite.title} #{FULL_ID_HEADER}"
-            end
-
-            csv << output_headers
+            csv << OUTPUT_HEADERS
             input_rows.each do |row| # NOTE: use row order from source file
               next if row['Conformance'] == 'DEPRECATED' # filter out deprecated rows
 
-              row_actor = row['Actor']
               TEST_SUITES.each do |suite|
                 suite_actor = SUITE_ID_TO_ACTOR_MAP[suite.id]
-                if row_actor&.include?(suite_actor)
+                if row['Actor']&.include?(suite_actor)
                   set_and_req_id = "#{row['Req Set']}@#{row['ID']}"
                   suite_requirement_items = inferno_requirements_map[set_and_req_id]&.filter do |item|
                     item[:suite_id] == suite.id
@@ -134,6 +132,7 @@ module InfernoRequirementsTools
             end
           end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def input_requirement_ids
         @input_requirement_ids ||= input_rows.map { |row| "#{row['Req Set']}@#{row['ID']}" }
@@ -234,6 +233,8 @@ module InfernoRequirementsTools
       # ---------------+------------+----------
       # req-id-1       | short-id-1 | full-id-1
       # req-id-2       | short-id-2 | full-id-2
+      #
+      # rubocop:disable Metrics/CyclomaticComplexity
       def output_requirements_map_table(requirements_map)
         headers = %w[requirement_id short_id full_id]
         col_widths = headers.map(&:length)
@@ -259,6 +260,7 @@ module InfernoRequirementsTools
         end
         puts
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
     end
   end
 end

@@ -15,8 +15,8 @@ module SubscriptionsTestKit
         With the content type of id-only, the resources involved in triggering the notification are only available
         through other channels, but notifications include URLs which can be used to access those resources.
 
-        When the content type is id-only, notification bundles SHALL include references to the appropriate focus resources
-        in the SubscriptionStatus.notificationEvent.focus element.
+        When the content type is id-only, notification bundles SHALL include references to the appropriate focus
+        resources in the SubscriptionStatus.notificationEvent.focus element.
 
         Additionally, notification bundles MAY contain, in addition to the SubscriptionStatus used to convey status
         information, at least one Bundle.entry for each resource relevant to the notification.

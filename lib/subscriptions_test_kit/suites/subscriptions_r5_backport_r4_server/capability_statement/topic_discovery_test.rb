@@ -97,8 +97,8 @@ module SubscriptionsTestKit
           )
         else
           add_message('warning', %(
-            No Subscription requests have been made in previous tests. Run the Subscription workflow tests first in order
-            to verify topics found in the SubscriptionTopic Canonical extension))
+            No Subscription requests have been made in previous tests. Run the Subscription workflow tests first in
+            order to verify topics found in the SubscriptionTopic Canonical extension))
         end
       end
     end

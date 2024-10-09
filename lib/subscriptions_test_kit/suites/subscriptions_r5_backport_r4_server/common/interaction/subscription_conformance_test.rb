@@ -11,21 +11,22 @@ module SubscriptionsTestKit
         The Subscription resource is used to request notifications for a specific client about a specific topic
         Conceptually, a subscription is a concrete request for a single client to receive notifications per a single
         topic. In order to support topic-based subscriptions in R4, this guide defines several extensions for use on the
-        [R4 Subscription resource](http://hl7.org/fhir/R4/subscription.html). A list of extensions defined by this guide can
-        be found on the [Subscriptions R5 Backport IG's Artifacts page](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#5).
+        [R4 Subscription resource](http://hl7.org/fhir/R4/subscription.html). A list of extensions defined by this guide
+        can be found on the
+        [Subscriptions R5 Backport IG's Artifacts page](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#5).
 
         This test accepts a Subscription resource as an input and verifies that it is conformant to the
         [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html).
 
         The Subscription channel should have it's fields populated with the following information:
           - The `endpoint` field must be set to
-          `#{Inferno::Application['base_url']}/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener`.
+          `#{Inferno::Application['base_url']}/custom/subscriptions_r5_backport_r4_server#{SUBSCRIPTION_CHANNEL_PATH}`.
           The test will add the correct url to this field if it is not properly set.
           - The `type` field must be set to `rest-hook`, as the Inferno subscription workflow tests use a `rest-hook`
           subscription channel to receive incoming notifications. The test will add the correct type to this field if it
           is not properly set.
-          - The `payload` field must be set to `application/json`, as Inferno will only accept resources in requests with
-          this content type.
+          - The `payload` field must be set to `application/json`, as Inferno will only accept resources in requests
+          with this content type.
           - The `header` field must include the `Authorization` header with a Bearer token set to the inputted Inferno
           access token.
       )
@@ -41,8 +42,8 @@ module SubscriptionsTestKit
               so that it can demonstrate its ability to perform the Subscription creation and Notification
               response workflow. The instance must be conformant to the R4/B Topic-Based Subscription profile.
               Inferno may modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
-              This input is also used by the unsupported Subscription test as the base on which to add unsupported element
-              values to test for server rejection.
+              This input is also used by the unsupported Subscription test as the base on which to add unsupported
+              element values to test for server rejection.
             )
       input :access_token,
             title: 'Notification Access Token',

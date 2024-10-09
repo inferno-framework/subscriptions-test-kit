@@ -33,8 +33,8 @@ module SubscriptionsTestKit
 
       def derive_status_bundle(notification_json, subscription_url, status_code, event_count, request_url)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code, event_count,
-                                                         'query-status')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code,
+                                                         event_count, 'query-status')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         FHIR::Bundle.new(

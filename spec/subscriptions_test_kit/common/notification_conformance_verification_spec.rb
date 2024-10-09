@@ -693,7 +693,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       expect(entity_result_message_type(test)).to eq('info')
     end
 
-    it 'produces info message if id-only notification bundle contains parameter.topic field' do
+    it 'produces info message if id-only notification bundle does not contain parameter.topic field' do
       id_only_notification_bundle['entry'].first['resource']['parameter'].delete_at(1)
       result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
       expect(result.result).to eq('pass')

@@ -14,8 +14,8 @@ module SubscriptionsTestKit
         resources, one per Subscription being queried. The Bundle type is "searchset". The status of the Subscription
         should be set to 'active' after a successful handshake with the rest-hook endpoint.
 
-        This test ensures the server supports the $status operation by performing the operation and ensuring it receives a
-        valid response.
+        This test ensures the server supports the $status operation by performing the operation and ensuring it receives
+        a valid response.
       )
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@20',

@@ -22,7 +22,8 @@ module SubscriptionsTestKit
         - General changes for all notification types
           - update the `subscription` parameter entry reference.
           - update the `status` parameter entry based on the previous interactions.
-          - update the `type` parameter entry based on the notification type (e.g., `event-notification` or `handshake`).
+          - update the `type` parameter entry based on the notification type (e.g., `event-notification` or
+            `handshake`).
           - update the number of notifications sent in the `events-since-subscription-start` parameter entry.
         - `handshake`-specific changes:
           - clear the `events` parameter entry.
@@ -49,10 +50,10 @@ module SubscriptionsTestKit
             optional: true,
             title: 'Client Notification Access Token',
             description: %(
-              The bearer token that Inferno will send on requests to the client under test's rest-hook notification endpoint. Not
-              needed if the client under test will create a Subscription with an appropriate header value in the
-              `channel.header` element. If a value for the `authorization` header is provided in `channel.header`, this
-              value will override it.
+              The bearer token that Inferno will send on requests to the client under test's rest-hook notification
+              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value
+              in the `channel.header` element. If a value for the `authorization` header is provided in
+              `channel.header`, this value will override it.
             )
       input :notification_bundle,
             title: 'Event Notification Bundle',

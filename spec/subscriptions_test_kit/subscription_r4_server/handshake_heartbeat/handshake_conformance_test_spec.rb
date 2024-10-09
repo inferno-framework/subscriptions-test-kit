@@ -157,8 +157,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HandshakeC
                      body: subscription_resource, status: 201)
 
       subscription_resource['id'] = 'subscription_resource_2'
-      create_request(name: 'subscription_create', direction: 'outgoing', tags: ['subscription_creation', 'Full-Resource'],
-                     body: subscription_resource, status: 201)
+      create_request(name: 'subscription_create', direction: 'outgoing',
+                     tags: ['subscription_creation', 'Full-Resource'], body: subscription_resource, status: 201)
 
       create_request(name: 'subscription_handshake', direction: 'incoming', tags: ['handshake', subscription_id],
                      body: handshake_bundle)

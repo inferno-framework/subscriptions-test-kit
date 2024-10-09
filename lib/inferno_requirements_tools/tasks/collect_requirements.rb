@@ -52,23 +52,26 @@ module InfernoRequirementsTools
       PLANNED_NOT_TESTED_OUTPUT_FILE =
         File.join('lib', TEST_KIT_CODE_FOLDER, 'requirements', PLANNED_NOT_TESTED_OUTPUT_FILE_NAME).freeze
 
-      def input_file_map
-        @input_file_map ||= {}
+      def available_input_worksheets
+        @available_input_worksheets ||= Dir.glob(File.join(@input_directory, '*.xlsx')).reject { |f| f.include?('~$') }
       end
 
-      def input_rows
-        @input_rows ||= {}
-      end
+      # Of the form:
+      # {
+      #   req_set_id_1: [row1, row2, row 3, ...],
+      #   req_set_id_2: [row1, row2, row 3, ...]
+      # }
+      def input_requirement_sets
+        @input_requirement_sets ||= INPUT_SETS.each_with_object({}) do |req_set_id, hash|
+          req_set_file = available_input_worksheets.find { |worksheet_file| worksheet_file.include?(req_set_id) }
 
-      def input_rows_for_set(req_set_id)
-        input_rows[req_set_id] = extract_input_rows_for_set(req_set_id) unless input_rows.key?(req_set_id)
-        input_rows[req_set_id]
-      end
-
-      def extract_input_rows_for_set(req_set_id)
-        CSV.parse(Roo::Spreadsheet.open(input_file_map[req_set_id]).sheet('Requirements').to_csv,
-                  headers: true).map do |row|
-          row.to_h.slice(*INPUT_HEADERS)
+          hash[req_set_id] =
+            unless req_set_file.nil?
+              CSV.parse(Roo::Spreadsheet.open(req_set_file).sheet('Requirements').to_csv,
+                        headers: true).map do |row|
+                row.to_h.slice(*INPUT_HEADERS)
+              end
+            end
         end
       end
 
@@ -77,12 +80,11 @@ module InfernoRequirementsTools
           CSV.generate(+"\xEF\xBB\xBF") do |csv| # start with an unnecessary BOM to make viewing in excel easier
             csv << REQUIREMENTS_OUTPUT_HEADERS
 
-            INPUT_SETS.each do |req_set_id|
-              input_rows = input_rows_for_set(req_set_id)
-              input_rows.each do |row| # NOTE: use row order from source file
-                row['Req Set'] = req_set_id
-
-                csv << REQUIREMENTS_OUTPUT_HEADERS.map { |header| row.key?(header) ? row[header] : row["#{header}*"] }
+            input_requirement_sets.each do |req_set_id, input_rows|
+              input_rows.each do |input_row| # NOTE: use row order from source file
+                csv << REQUIREMENTS_OUTPUT_HEADERS.map do |header|
+                  header == 'Req Set' ? req_set_id : input_row[header] || input_row["#{header}*"]
+                end
               end
             end
           end
@@ -97,19 +99,13 @@ module InfernoRequirementsTools
           CSV.generate(+"\xEF\xBB\xBF") do |csv| # start with an unnecessary BOM to make viewing in excel easier
             csv << PLANNED_NOT_TESTED_OUTPUT_HEADERS
 
-            INPUT_SETS.each do |req_set_id|
-              input_rows = input_rows_for_set(req_set_id)
-              input_rows.each do |row| # NOTE: use row order from source file
-                not_verifiable = row['Verifiable?']&.downcase == 'no' || row['Verifiable?']&.downcase == 'false'
-                not_tested = row['Planning To Test?']&.downcase == 'no' || row['Planning To Test?']&.downcase == 'false'
-                next unless not_verifiable || not_tested
-
-                csv << [
-                  req_set_id,
-                  row['ID*'],
-                  not_verifiable ? 'Not Verifiable' : 'Not Tested',
-                  not_verifiable ? row['Verifiability Details'] : row['Planning To Test Details']
-                ]
+            input_requirement_sets.each do |req_set_id, input_rows|
+              input_rows.each do |row|
+                if spreadsheet_value_falsy?(row['Verifiable?'])
+                  csv << [req_set_id, row['ID*'], 'Not Verifiable', row['Verifiability Details']]
+                elsif spreadsheet_value_falsy?(row['Planning To Test?'])
+                  csv << [req_set_id, row['ID*'], 'Not Tested', row['Planning To Test Details']]
+                end
               end
             end
           end
@@ -119,22 +115,9 @@ module InfernoRequirementsTools
         @old_planned_not_tested_csv ||= File.read(PLANNED_NOT_TESTED_OUTPUT_FILE)
       end
 
-      def check_for_req_set_files(input_directory)
-        available_worksheets = Dir.glob(File.join(input_directory, '*.xlsx')).reject { |f| f.include?('~$') }
-
-        INPUT_SETS.each do |req_set_id|
-          req_set_file = available_worksheets&.find { |worksheet_file| worksheet_file.include?(req_set_id) }
-
-          if req_set_file&.empty?
-            puts "Could not find input file for set #{req_set_id} in directory #{input_directory}. Aborting requirements collection..."
-            exit(1)
-          end
-          input_file_map[req_set_id] = req_set_file
-        end
-      end
-
       def run(input_directory)
-        check_for_req_set_files(input_directory)
+        @input_directory = input_directory
+        check_presence_of_input_files
 
         update_requirements =
           if File.exist?(REQUIREMENTS_OUTPUT_FILE)
@@ -178,7 +161,8 @@ module InfernoRequirementsTools
       end
 
       def run_check(input_directory)
-        check_for_req_set_files(input_directory)
+        @input_directory = input_directory
+        check_presence_of_input_files
 
         requirements_ok =
           if File.exist?(REQUIREMENTS_OUTPUT_FILE)
@@ -217,6 +201,22 @@ module InfernoRequirementsTools
 
         MESSAGE
         exit(1)
+      end
+
+      def check_presence_of_input_files
+        input_requirement_sets.each do |req_set_id, rows|
+          next unless rows.nil?
+
+          puts %(
+            Could not find input file for set #{req_set_id} in directory #{input_directory}. Aborting requirements
+            collection..."
+          )
+          exit(1)
+        end
+      end
+
+      def spreadsheet_value_falsy?(str)
+        str&.downcase == 'no' || str&.downcase == 'false'
       end
     end
   end

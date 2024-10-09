@@ -29,9 +29,9 @@ module SubscriptionsTestKit
         if subscription.present?
           mime_type = subscription&.channel&.payload
           unless ALLOWED_MIME_TYPES.include?(mime_type)
-            add_message('warning', %(Subscription specified '#{mime_type}' for `Subscription.channel.payload`, but Inferno
-                                    only supports: #{ALLOWED_MIME_TYPES.map { |type| "'#{type}'" }.join(', ')}.
-                                    Handshake notification was sent with Content-Type: '#{DEFAULT_MIME_TYPE}'.))
+            add_message('warning', %(Subscription specified '#{mime_type}' for `Subscription.channel.payload`, but
+                                     Inferno only supports: #{ALLOWED_MIME_TYPES.map { |type| "'#{type}'" }.join(', ')}.
+                                     Handshake notification was sent with Content-Type: '#{DEFAULT_MIME_TYPE}'.))
           end
         end
       end

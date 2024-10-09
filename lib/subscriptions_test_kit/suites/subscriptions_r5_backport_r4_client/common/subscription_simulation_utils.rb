@@ -132,6 +132,7 @@ module SubscriptionsTestKit
         end
 
         subscription.valueReference = FHIR::Reference.new(reference: subscription_url)
+        subscription
       end
 
       def find_parameter(subscription_status, parameter_name)

@@ -117,7 +117,7 @@ module InfernoRequirementsTools
                   end
                   short_ids = suite_requirement_items&.map { |item| item[:short_id] }
                   full_ids = suite_requirement_items&.map { |item| item[:full_id] }
-                  if short_ids.blank? && not_tested_requirements_map.has_key?(set_and_req_id)
+                  if short_ids.blank? && not_tested_requirements_map.key?(set_and_req_id)
                     row["#{suite.title} #{SHORT_ID_HEADER}"] = 'Not Tested'
                     row["#{suite.title} #{FULL_ID_HEADER}"] = 'Not Tested'
                   else
@@ -141,9 +141,7 @@ module InfernoRequirementsTools
 
       # The requirements present in Inferno that aren't in the input spreadsheet
       def unmatched_requirements_map
-        @unmatched_requirements_map ||= inferno_requirements_map.filter do |requirement_id, _|
-          !input_requirement_ids.include?(requirement_id)
-        end
+        @unmatched_requirements_map ||= inferno_requirements_map.except(*input_requirement_ids)
       end
 
       def old_csv

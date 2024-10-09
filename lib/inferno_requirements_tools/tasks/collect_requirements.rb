@@ -61,7 +61,7 @@ module InfernoRequirementsTools
       end
 
       def input_rows_for_set(req_set_id)
-        input_rows[req_set_id] = extract_input_rows_for_set(req_set_id) unless input_rows.has_key?(req_set_id)
+        input_rows[req_set_id] = extract_input_rows_for_set(req_set_id) unless input_rows.key?(req_set_id)
         input_rows[req_set_id]
       end
 

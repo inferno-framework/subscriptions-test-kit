@@ -66,7 +66,8 @@ module InfernoRequirementsTools
       end
 
       def extract_input_rows_for_set(req_set_id)
-        CSV.parse(Roo::Spreadsheet.open(input_file_map[req_set_id]).sheet('Requirements').to_csv, headers: true).map do |row|
+        CSV.parse(Roo::Spreadsheet.open(input_file_map[req_set_id]).sheet('Requirements').to_csv,
+                  headers: true).map do |row|
           row.to_h.slice(*INPUT_HEADERS)
         end
       end
@@ -81,7 +82,7 @@ module InfernoRequirementsTools
               input_rows.each do |row| # NOTE: use row order from source file
                 row['Req Set'] = req_set_id
 
-                csv << REQUIREMENTS_OUTPUT_HEADERS.map { |header| row.key?(header) ? row[header] : row["#{header}*"]}
+                csv << REQUIREMENTS_OUTPUT_HEADERS.map { |header| row.key?(header) ? row[header] : row["#{header}*"] }
               end
             end
           end
@@ -98,7 +99,7 @@ module InfernoRequirementsTools
 
             INPUT_SETS.each do |req_set_id|
               input_rows = input_rows_for_set(req_set_id)
-              input_rows.each do |row| # note: use row order from source file
+              input_rows.each do |row| # NOTE: use row order from source file
                 not_verifiable = row['Verifiable?']&.downcase == 'no' || row['Verifiable?']&.downcase == 'false'
                 not_tested = row['Planning To Test?']&.downcase == 'no' || row['Planning To Test?']&.downcase == 'false'
                 next unless not_verifiable || not_tested

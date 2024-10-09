@@ -32,7 +32,7 @@ module SubscriptionsTestKit
       existing_subscription_request = requests.find { |r| r.status == 201 }
       if existing_subscription_request.present?
         subscription_hash = JSON.parse(existing_subscription_request.response_body)
-        error_text = 'Inferno only supports one subscription per test run. Subscription already created with '\
+        error_text = 'Inferno only supports one subscription per test run. Subscription already created with ' \
                      "ID #{subscription_hash['id']}"
         response.body = operation_outcome('error', 'business-rule', error_text).to_json
         return

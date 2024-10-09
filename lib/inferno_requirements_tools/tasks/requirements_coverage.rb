@@ -56,7 +56,7 @@ module InfernoRequirementsTools
 
       def input_rows
         @input_rows ||=
-          CSV.parse(File.open(INPUT_FILE, "r:bom|utf-8"), headers: true).map do |row|
+          CSV.parse(File.open(INPUT_FILE, 'r:bom|utf-8'), headers: true).map do |row|
             row.to_h.slice(*INPUT_HEADERS)
           end
       end
@@ -66,12 +66,12 @@ module InfernoRequirementsTools
       end
 
       def load_not_tested_requirements
-        return {} unless File.exists?(NOT_TESTED_FILE)
+        return {} unless File.exist?(NOT_TESTED_FILE)
 
         not_tested_requirements = {}
-        CSV.parse(File.open(NOT_TESTED_FILE, "r:bom|utf-8"), headers: true).each do |row|
+        CSV.parse(File.open(NOT_TESTED_FILE, 'r:bom|utf-8'), headers: true).each do |row|
           row_hash = row.to_h
-          not_tested_requirements[ "#{row_hash['Req Set']}@#{row_hash['ID']}"] = row_hash
+          not_tested_requirements["#{row_hash['Req Set']}@#{row_hash['ID']}"] = row_hash
         end
 
         not_tested_requirements
@@ -104,14 +104,17 @@ module InfernoRequirementsTools
             end
 
             csv << output_headers
-            input_rows.each do |row| # note: use row order from source file
+            input_rows.each do |row| # NOTE: use row order from source file
               next if row['Conformance'] == 'DEPRECATED' # filter out deprecated rows
+
               row_actor = row['Actor']
               TEST_SUITES.each do |suite|
                 suite_actor = SUITE_ID_TO_ACTOR_MAP[suite.id]
                 if row_actor&.include?(suite_actor)
                   set_and_req_id = "#{row['Req Set']}@#{row['ID']}"
-                  suite_requirement_items = inferno_requirements_map[set_and_req_id]&.filter { |item| item[:suite_id] == suite.id}
+                  suite_requirement_items = inferno_requirements_map[set_and_req_id]&.filter do |item|
+                    item[:suite_id] == suite.id
+                  end
                   short_ids = suite_requirement_items&.map { |item| item[:short_id] }
                   full_ids = suite_requirement_items&.map { |item| item[:full_id] }
                   if short_ids.blank? && not_tested_requirements_map.has_key?(set_and_req_id)

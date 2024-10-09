@@ -31,7 +31,7 @@ module SubscriptionsTestKit
               type: 'textarea',
               description: %(
                 A Subscription resource in JSON format that Inferno will send to the server under test
-                so that it can demonstrate its ability to send an empty Notification. 
+                so that it can demonstrate its ability to send an empty Notification.
                 The instance must be conformant to the R4/B Topic-Based Subscription profile.
                 Inferno may modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
             ),

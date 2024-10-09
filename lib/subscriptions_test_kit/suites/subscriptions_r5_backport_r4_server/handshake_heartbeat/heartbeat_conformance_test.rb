@@ -26,7 +26,9 @@ module SubscriptionsTestKit
       def heartbeat_period?(subscription_extensions)
         return false if subscription_extensions.blank?
 
-        heartbeat = subscription_extensions.find { |extension| extension['url'].ends_with?('/backport-heartbeat-period') }
+        heartbeat = subscription_extensions.find do |extension|
+          extension['url'].ends_with?('/backport-heartbeat-period')
+        end
 
         return false if heartbeat.blank?
 
@@ -63,7 +65,7 @@ module SubscriptionsTestKit
           subscription_id = tags.first
 
           assert(subscription_request_ids.include?(subscription_id),
-                'If `heartbeatPeriod` field is not present in the Subscription, heartbeat should not be sent.')
+                 'If `heartbeatPeriod` field is not present in the Subscription, heartbeat should not be sent.')
 
           notification_verification(request.request_body, 'heartbeat', subscription_id:)
           no_error_verification('Received heartbeats are not conformant.')

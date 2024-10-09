@@ -32,9 +32,11 @@ module SubscriptionsTestKit
 
       unless subscription_status_entry.request.present? &&
              (
-               subscription_id ?
-                 subscription_status_entry.request.url.end_with?("Subscription/#{subscription_id}/$status") :
+               if subscription_id
+                 subscription_status_entry.request.url.end_with?("Subscription/#{subscription_id}/$status")
+               else
                  subscription_status_entry.request.url.match?(%r{Subscription/[^/]+/\$status\z})
+               end
              )
 
         add_message('error',

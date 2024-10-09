@@ -41,9 +41,10 @@ module SubscriptionsTestKit
 
         requests = load_tagged_requests('handshake')
         if requests.empty?
-          omit_if subscription_request_ids.empty?, 'No handshake requests were required or received in a previous tests.'
+          omit_if subscription_request_ids.empty?,
+                  'No handshake requests were required or received in a previous tests.'
           assert(subscription_request_ids.empty?,
-                'Handshake requests are required if a Subscription channel type is `rest-hook`')
+                 'Handshake requests are required if a Subscription channel type is `rest-hook`')
         end
 
         requests = requests.uniq(&:request_body)
@@ -60,7 +61,7 @@ module SubscriptionsTestKit
 
         no_error_verification('Received handshakes are not conformant.')
         assert(subscription_request_ids.empty?,
-              'Did not receive a handshake notification for some `rest-hook` subscriptions')
+               'Did not receive a handshake notification for some `rest-hook` subscriptions')
       end
     end
   end

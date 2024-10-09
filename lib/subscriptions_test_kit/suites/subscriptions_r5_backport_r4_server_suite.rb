@@ -15,7 +15,8 @@ module SubscriptionsTestKit
       title 'Subscriptions R5 Backport IG v1.1.0 FHIR R4 Server Test Suite'
       short_title 'Subscriptions R4 Server'
       version VERSION
-      description File.read(File.join(__dir__, '..', 'docs', 'subscriptions_r5_backport_r4_server_suite_description.md'))
+      description File.read(File.join(__dir__, '..', 'docs',
+                                      'subscriptions_r5_backport_r4_server_suite_description.md'))
 
       links [
         {
@@ -35,7 +36,7 @@ module SubscriptionsTestKit
           url: 'https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/'
         }
       ]
-      
+
       # These inputs will be available to all tests in this suite
       input :url,
             title: 'FHIR Server Base URL',

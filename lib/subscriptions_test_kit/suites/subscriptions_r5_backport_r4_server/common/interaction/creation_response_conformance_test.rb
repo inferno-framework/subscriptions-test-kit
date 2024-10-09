@@ -43,7 +43,7 @@ module SubscriptionsTestKit
           assert_resource_type('Subscription', resource: subscription)
 
           assert(subscription.channel.type == 'rest-hook' && subscription.status == 'requested',
-                "The Subscription resource should have it's status set to 'requested', was '#{subscription.status}'")
+                 "The Subscription resource should have it's status set to 'requested', was '#{subscription.status}'")
         end
       end
     end

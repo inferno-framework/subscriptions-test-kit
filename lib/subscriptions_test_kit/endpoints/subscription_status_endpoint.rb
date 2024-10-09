@@ -64,7 +64,7 @@ module SubscriptionsTestKit
     end
 
     def base_subscription_url
-      request.url.sub(%r{(#{Regexp.escape(FHIR_SUBSCRIPTION_PATH)}).*}, '\1')
+      request.url.sub(/(#{Regexp.escape(FHIR_SUBSCRIPTION_PATH)}).*/, '\1')
     end
   end
 end

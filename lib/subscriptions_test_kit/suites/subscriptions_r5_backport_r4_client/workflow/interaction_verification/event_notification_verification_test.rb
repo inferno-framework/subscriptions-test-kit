@@ -23,7 +23,8 @@ module SubscriptionsTestKit
         # The SendSubscriptionNotifications job saves a nil status if the request fails entirely
         assert(request.status.present?, "Handshake notification request failed with error: #{request.response_body}")
 
-        assert(request.status.between?(200, 299), "Event notification was not successful, status code #{request.status}")
+        assert(request.status.between?(200, 299),
+               "Event notification was not successful, status code #{request.status}")
 
         subscription = find_subscription(test_session_id)
         if subscription.present?

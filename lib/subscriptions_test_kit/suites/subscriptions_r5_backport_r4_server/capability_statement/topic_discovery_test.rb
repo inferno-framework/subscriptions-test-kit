@@ -59,7 +59,7 @@ module SubscriptionsTestKit
         assert(rest_subscription.present?, 'Capability Statement missing `Subscription` resource in `rest` field')
 
         assert(rest_subscription.extension.present?,
-              'Capability Statement missing the `extension` field on the Subscription resource')
+               'Capability Statement missing the `extension` field on the Subscription resource')
         subscription_topic_extension = rest_subscription.extension.select do |elem|
           elem.url == capability_statement_subscriptiontopic_extension
         end

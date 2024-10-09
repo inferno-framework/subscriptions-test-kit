@@ -243,7 +243,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
       "Subscription.criteria value(s) not found in Capability Statement's SubscriptionTopic Canonical extension"
     )
     expect(entity_result_message(test)).to match(
-      "The SubscriptionTopic Canonical extension should include the Subscription Topic URLs found"
+      'The SubscriptionTopic Canonical extension should include the Subscription Topic URLs found'
     )
   end
 end

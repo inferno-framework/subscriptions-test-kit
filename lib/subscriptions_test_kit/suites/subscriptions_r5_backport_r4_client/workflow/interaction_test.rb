@@ -17,7 +17,7 @@ module SubscriptionsTestKit
         Afterwards, Inferno will no longer respond to requests.
 
         To create the handshake and event notifications, Inferno uses the contents of the *Event
-        Notification Bundle* input. The provided notification will be modified as appropriate for 
+        Notification Bundle* input. The provided notification will be modified as appropriate for
         the request Inferno is making:
         - General changes for all notification types
           - update the `subscription` parameter entry reference.
@@ -28,8 +28,8 @@ module SubscriptionsTestKit
           - clear the `events` parameter entry.
           - clear the `errors` parameter entry.
 
-        While the provided Notification must be conformant to the 
-        [R4 Topic-Based Subscription Notification Bundle 
+        While the provided Notification must be conformant to the
+        [R4 Topic-Based Subscription Notification Bundle
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html)
         for the tests to pass, the tests can run as long as the notification meets the
         following minimal requirements:
@@ -67,7 +67,9 @@ module SubscriptionsTestKit
 
       run do
         minimally_validate_notification(notification_bundle)
-        assert(messages.none? { |m| m[:type] == 'error' }, 'Notification Bundle input is invalid for use by Inferno, see error message(s)')
+        assert(messages.none? do |m|
+                 m[:type] == 'error'
+               end, 'Notification Bundle input is invalid for use by Inferno, see error message(s)')
 
         wait(
           identifier: access_token,
@@ -118,7 +120,7 @@ module SubscriptionsTestKit
         # Require the subscription param, just because we need something to later identify the subscription status
         # bundle entry. Note we could just as easily use a different required param, like status or type.
         subscription_param = subscription_status.parameter&.find { |p| p.name == 'subscription' }
-        assert(subscription_param.present?, 'Subscription status entry in notification bundle input must contain a'\
+        assert(subscription_param.present?, 'Subscription status entry in notification bundle input must contain a' \
                                             'subscription parameter')
       rescue Inferno::Exceptions::AssertionException => e
         add_message('error', e.message)

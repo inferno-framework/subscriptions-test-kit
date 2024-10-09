@@ -21,7 +21,7 @@ module SubscriptionsTestKit
           - The Subscription contains a payload type not implemented by the server
           - The Subscription contains an unsupported channel and payload type combination
 
-        The test will pass if the server either 
+        The test will pass if the server either
         1. rejects the Subscription by responding with a non-201 response, or
         2. updates the Subscription resource to remove or replace the unsupported value.
       )
@@ -67,7 +67,7 @@ module SubscriptionsTestKit
       input :unsupported_subscription_channel_payload_combo,
             title: 'Unsupported Subscription Channel and Payload Combination',
             description: %(
-              A channel (`channel.type`) and payload type (`content` extension under the `channel.payload` element) 
+              A channel (`channel.type`) and payload type (`content` extension under the `channel.payload` element)
               combination not implemented by the server to test for Subscription
               rejection. Provide in the json format e.g. {channel: <'channel_type'>, payload: <'payload_type'>}.
             ),
@@ -92,13 +92,13 @@ module SubscriptionsTestKit
             'unsupported_title' => 'unsupported filter criteria',
             'field_path' => ['_criteria'],
             'field_value' => if unsupported_subscription_filter.nil?
-                              unsupported_subscription_filter
-                            else
-                              { 'extension' => [{
-                                url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
-                                valueString: unsupported_subscription_filter
-                              }] }
-                            end
+                               unsupported_subscription_filter
+                             else
+                               { 'extension' => [{
+                                 url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
+                                 valueString: unsupported_subscription_filter
+                               }] }
+                             end
           },
           {
             'unsupported_title' => 'unsupported channel type',
@@ -143,7 +143,7 @@ module SubscriptionsTestKit
           subscription_field[field_name] = unsupported_info['field_value']
 
           send_unsupported_subscription(subscription, unsupported_info['unsupported_title'], [unsupported_info['field_path']],
-                                    [unsupported_info['field_value']])
+                                        [unsupported_info['field_value']])
 
           if original_field_value.nil?
             subscription_field.delete(field_name)
@@ -170,7 +170,7 @@ module SubscriptionsTestKit
             payload_path = ['channel', 'payload']
 
             send_unsupported_subscription(subscription, 'unsupported channel and payload combination', [channel_path, payload_path],
-                                      [channel_value, payload_value])
+                                          [channel_value, payload_value])
           end
         end
 

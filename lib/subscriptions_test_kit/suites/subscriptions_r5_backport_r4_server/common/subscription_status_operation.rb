@@ -17,7 +17,8 @@ module SubscriptionsTestKit
         assert_resource_type('Bundle')
 
         unless resource.type == 'searchset'
-          add_message('error', "Bundle returned from $status operation should be type 'searchset', was #{resource.type}")
+          add_message('error',
+                      "Bundle returned from $status operation should be type 'searchset', was #{resource.type}")
         end
 
         assert_valid_resource
@@ -39,7 +40,7 @@ module SubscriptionsTestKit
           entry.resource.resourceType == 'Parameters' && subscription_ref_found?(entry, subscription_id)
         end
         assert(subscription_status_entry,
-              "No Subscription status with id #{subscription_id} returned from $status operation")
+               "No Subscription status with id #{subscription_id} returned from $status operation")
 
         subscription_status_resource = subscription_status_entry.resource
         assert_valid_resource(resource: subscription_status_resource,

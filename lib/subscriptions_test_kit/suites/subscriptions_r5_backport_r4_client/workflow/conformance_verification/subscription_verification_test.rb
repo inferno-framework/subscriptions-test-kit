@@ -10,7 +10,7 @@ module SubscriptionsTestKit
       title 'Client Subscription Conformance Verification'
       description %(
         This test verifies that the Subscription created by the client under test
-        is conformant to the [R4/B Topic-Based Subscription 
+        is conformant to the [R4/B Topic-Based Subscription
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
         and meets other requirements placed on it by the IG.
       )

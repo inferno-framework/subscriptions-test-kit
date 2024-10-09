@@ -14,7 +14,7 @@ module SubscriptionsTestKit
         [R4 Subscription resource](http://hl7.org/fhir/R4/subscription.html). A list of extensions defined by this guide can
         be found on the [Subscriptions R5 Backport IG's Artifacts page](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#5).
 
-        This test accepts a Subscription resource as an input and verifies that it is conformant to the 
+        This test accepts a Subscription resource as an input and verifies that it is conformant to the
         [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html).
 
         The Subscription channel should have it's fields populated with the following information:
@@ -61,7 +61,7 @@ module SubscriptionsTestKit
         no_error_verification('Subscription resource is not conformant.')
 
         assert(subscription['criteria'].present?,
-              'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.')
+               'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.')
         output subscription_topic: subscription['criteria']
 
         subscription = server_check_channel(subscription, access_token)

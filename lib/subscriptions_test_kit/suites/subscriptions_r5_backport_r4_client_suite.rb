@@ -13,7 +13,8 @@ module SubscriptionsTestKit
       title 'Subscriptions R5 Backport IG v1.1.0 FHIR R4 Client Test Suite'
       short_title 'Subscriptions R4 Client'
       version VERSION
-      description File.read(File.join(__dir__, '..', 'docs', 'subscriptions_r5_backport_r4_client_suite_description.md'))
+      description File.read(File.join(__dir__, '..', 'docs',
+                                      'subscriptions_r5_backport_r4_client_suite_description.md'))
 
       links [
         {
@@ -43,7 +44,8 @@ module SubscriptionsTestKit
         end
       end
 
-      capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures', 'capability_statement.json'))
+      capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures',
+                                                 'capability_statement.json'))
       route(:get, '/fhir/metadata', proc { [200, { 'Content-Type' => 'application/json' }, [capability_statement]] })
 
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint

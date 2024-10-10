@@ -8,10 +8,10 @@ module SubscriptionsTestKit
       id :subscriptions_r4_server_reject_subscriptions
       title 'Server Handles Unsupported Subscriptions'
       description %(
-        When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does not
-        contain any information not implemented by the server. If the Subscription is no supported, the server should reject
-        the Subscription create request, or it should attempt to adjust the Subscription. This test checks that the server
-        correctly rejects or adjusts the Subscription in the following cases:
+        When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
+        not contain any information not implemented by the server. If the Subscription is no supported, the server
+        should reject the Subscription create request, or it should attempt to adjust the Subscription. This test checks
+        that the server correctly rejects or adjusts the Subscription in the following cases:
 
           - The Subscription contains cross-version extension
           - The Subscription contains a Subscription Topic not implemented by the server
@@ -21,7 +21,7 @@ module SubscriptionsTestKit
           - The Subscription contains a payload type not implemented by the server
           - The Subscription contains an unsupported channel and payload type combination
 
-        The test will pass if the server either 
+        The test will pass if the server either
         1. rejects the Subscription by responding with a non-201 response, or
         2. updates the Subscription resource to remove or replace the unsupported value.
       )
@@ -41,20 +41,23 @@ module SubscriptionsTestKit
               so that it can demonstrate its ability to perform the Subscription creation and Notification
               response workflow. The instance must be conformant to the R4/B Topic-Based Subscription profile.
               Inferno may modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
-              This input is also used by the unsupported Subscription test as the base on which to add unsupported element
-              values to test for server rejection.
+              This input is also used by the unsupported Subscription test as the base on which to add unsupported
+              element values to test for server rejection.
             )
       input :unsupported_subscription_topic,
             title: 'Unsupported Subscription Topic',
-            description: 'A Subscription Topic for the `criteria` element that is not implemented by the server to test for Subscription rejection.',
+            description: %(A Subscription Topic for the `criteria` element that is not implemented by the server to test
+                           for Subscription rejection.),
             optional: true
       input :unsupported_subscription_filter,
             title: 'Unsupported Subscription Filter',
-            description: 'A value for `filterCriteria` extension under the `criteria` that is not implemented by the server to test for Subscription rejection.',
+            description: %(A value for `filterCriteria` extension under the `criteria` that is not implemented by the
+                           server to test for Subscription rejection.),
             optional: true
       input :unsupported_subscription_channel_type,
             title: 'Unsupported Subscription Channel Type',
-            description: 'A value for the `channel.type` element that is not implemented by the server to test for Subscription rejection.',
+            description: %(A value for the `channel.type` element that is not implemented by the server to test for
+                           Subscription rejection.),
             optional: true
       input :unsupported_subscription_channel_endpoint,
             title: 'Unsupported Subscription Channel Endpoint',
@@ -62,12 +65,13 @@ module SubscriptionsTestKit
             optional: true
       input :unsupported_subscription_payload_type,
             title: 'Unsupported Subscription Payload Type',
-            description: 'A value for the `content` extension under the `channel.payload` element that is not implemented by the server to test for Subscription rejection.',
+            description: %(A value for the `content` extension under the `channel.payload` element that is not
+                           implemented by the server to test for Subscription rejection.),
             optional: true
       input :unsupported_subscription_channel_payload_combo,
             title: 'Unsupported Subscription Channel and Payload Combination',
             description: %(
-              A channel (`channel.type`) and payload type (`content` extension under the `channel.payload` element) 
+              A channel (`channel.type`) and payload type (`content` extension under the `channel.payload` element)
               combination not implemented by the server to test for Subscription
               rejection. Provide in the json format e.g. {channel: <'channel_type'>, payload: <'payload_type'>}.
             ),
@@ -92,13 +96,13 @@ module SubscriptionsTestKit
             'unsupported_title' => 'unsupported filter criteria',
             'field_path' => ['_criteria'],
             'field_value' => if unsupported_subscription_filter.nil?
-                              unsupported_subscription_filter
-                            else
-                              { 'extension' => [{
-                                url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
-                                valueString: unsupported_subscription_filter
-                              }] }
-                            end
+                               unsupported_subscription_filter
+                             else
+                               { 'extension' => [{
+                                 url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
+                                 valueString: unsupported_subscription_filter
+                               }] }
+                             end
           },
           {
             'unsupported_title' => 'unsupported channel type',
@@ -142,8 +146,8 @@ module SubscriptionsTestKit
           original_field_value = subscription_field[field_name]
           subscription_field[field_name] = unsupported_info['field_value']
 
-          send_unsupported_subscription(subscription, unsupported_info['unsupported_title'], [unsupported_info['field_path']],
-                                    [unsupported_info['field_value']])
+          send_unsupported_subscription(subscription, unsupported_info['unsupported_title'],
+                                        [unsupported_info['field_path']], [unsupported_info['field_value']])
 
           if original_field_value.nil?
             subscription_field.delete(field_name)
@@ -159,8 +163,8 @@ module SubscriptionsTestKit
           payload_value = channel_payload_combo['payload']
 
           if channel_value.blank? || payload_value.blank?
-            add_message('error', %(
-                Channel and payload values are not populated correctly in unsupported channel and payload combination input.))
+            add_message('error', %(Channel and payload values are not populated correctly in unsupported channel and
+                                   payload combination input.))
           else
             subscription_channel = subscription['channel']
             subscription_channel['type'] = channel_value
@@ -169,8 +173,8 @@ module SubscriptionsTestKit
             channel_path = ['channel', 'type']
             payload_path = ['channel', 'payload']
 
-            send_unsupported_subscription(subscription, 'unsupported channel and payload combination', [channel_path, payload_path],
-                                      [channel_value, payload_value])
+            send_unsupported_subscription(subscription, 'unsupported channel and payload combination',
+                                          [channel_path, payload_path], [channel_value, payload_value])
           end
         end
 

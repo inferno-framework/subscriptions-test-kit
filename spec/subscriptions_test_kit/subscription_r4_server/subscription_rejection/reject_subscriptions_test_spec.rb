@@ -124,9 +124,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
         .to_return(status: 400, body: subscription_resource.to_json)
 
       result = run(test, server_endpoint:, server_credentials:, subscription_resource: subscription_resource.to_json,
-                         unsupported_subscription_topic:, unsupported_subscription_filter:, unsupported_subscription_channel_type:,
-                         unsupported_subscription_channel_endpoint:, unsupported_subscription_payload_type:,
-                         unsupported_subscription_channel_payload_combo:)
+                         unsupported_subscription_topic:, unsupported_subscription_filter:,
+                         unsupported_subscription_channel_type:, unsupported_subscription_channel_endpoint:,
+                         unsupported_subscription_payload_type:, unsupported_subscription_channel_payload_combo:)
 
       expect(result.result).to eq('pass')
       expect(subscription_creation_request).to have_been_made.times(8)
@@ -144,9 +144,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
         .to_return(status: 400, body: subscription_resource.to_json)
 
       result = run(test, server_endpoint:, server_credentials:, subscription_resource: subscription_resource.to_json,
-                         unsupported_subscription_topic:, unsupported_subscription_filter:, unsupported_subscription_channel_type:,
-                         unsupported_subscription_channel_endpoint:, unsupported_subscription_payload_type:,
-                         unsupported_subscription_channel_payload_combo:)
+                         unsupported_subscription_topic:, unsupported_subscription_filter:,
+                         unsupported_subscription_channel_type:, unsupported_subscription_channel_endpoint:,
+                         unsupported_subscription_payload_type:, unsupported_subscription_channel_payload_combo:)
 
       expect(result.result).to eq('pass')
       expect(subscription_creation_request).to have_been_made.times(8)
@@ -166,12 +166,12 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
         .to_return(status: 400, body: subscription_resource.to_json)
 
       result = run(test, server_endpoint:, server_credentials:, subscription_resource: subscription_resource.to_json,
-                         unsupported_subscription_topic:, unsupported_subscription_filter:, unsupported_subscription_channel_type:,
-                         unsupported_subscription_channel_endpoint:, unsupported_subscription_payload_type:,
-                         unsupported_subscription_channel_payload_combo:)
+                         unsupported_subscription_topic:, unsupported_subscription_filter:,
+                         unsupported_subscription_channel_type:, unsupported_subscription_channel_endpoint:,
+                         unsupported_subscription_payload_type:, unsupported_subscription_channel_payload_combo:)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match("\nSending a Subscription with unsupported `SubscriptionTopic` should be rejected, or the Subscription should be\naltered to fix the unsupported value.")
+      expect(entity_result_message(test)).to match('Subscription with unsupported `SubscriptionTopic`')
       expect(subscription_creation_request).to have_been_made.times(8)
     end
 
@@ -195,14 +195,12 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
         .to_return(status: 201, body: subscription_resource.to_json).then
 
       result = run(test, server_endpoint:, server_credentials:, subscription_resource: subscription_resource.to_json,
-                         unsupported_subscription_topic:, unsupported_subscription_filter:, unsupported_subscription_channel_type:,
-                         unsupported_subscription_channel_endpoint:, unsupported_subscription_payload_type:,
-                         unsupported_subscription_channel_payload_combo:)
+                         unsupported_subscription_topic:, unsupported_subscription_filter:,
+                         unsupported_subscription_channel_type:, unsupported_subscription_channel_endpoint:,
+                         unsupported_subscription_payload_type:, unsupported_subscription_channel_payload_combo:)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        "\nSending a Subscription with unsupported channel and payload combination should be rejected, or the Subscription should be\naltered to fix the unsupported value."
-      )
+      expect(entity_result_message(test)).to match('Subscription with unsupported channel and payload combination')
       expect(subscription_creation_request).to have_been_made.times(8)
     end
 
@@ -225,9 +223,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
         .to_return(status: 201, body: subscription_resource.to_json).then
 
       result = run(test, server_endpoint:, server_credentials:, subscription_resource: subscription_resource.to_json,
-                         unsupported_subscription_topic:, unsupported_subscription_filter:, unsupported_subscription_channel_type:,
-                         unsupported_subscription_channel_endpoint:, unsupported_subscription_payload_type:,
-                         unsupported_subscription_channel_payload_combo:)
+                         unsupported_subscription_topic:, unsupported_subscription_filter:,
+                         unsupported_subscription_channel_type:, unsupported_subscription_channel_endpoint:,
+                         unsupported_subscription_payload_type:, unsupported_subscription_channel_payload_combo:)
 
       expect(result.result).to eq('pass')
       expect(subscription_creation_request).to have_been_made.times(8)

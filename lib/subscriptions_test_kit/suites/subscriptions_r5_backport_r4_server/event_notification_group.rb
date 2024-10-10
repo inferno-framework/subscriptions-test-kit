@@ -10,8 +10,8 @@ module SubscriptionsTestKit
       description %(
         Verify that the received Notifications are conformant to the
         [R4 Topic-Based Subscription Notification Bundle](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html)
-        profile, including additional requirements around the content type. This group contains tests for the three options
-        available when specifying the contents of a Notification: empty, id-only, and full-resource.
+        profile, including additional requirements around the content type. This group contains tests for the three
+        options available when specifying the contents of a Notification: empty, id-only, and full-resource.
       )
 
       input_order :url, :credentials, :access_token, :empty_subscription_resource,

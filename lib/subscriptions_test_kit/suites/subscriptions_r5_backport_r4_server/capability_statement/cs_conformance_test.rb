@@ -33,7 +33,7 @@ module SubscriptionsTestKit
         assert(rest_subscription.present?, 'Capability Statement missing `Subscription` resource in `rest` field')
 
         assert(rest_subscription.supportedProfile.present?,
-              'Capability Statement missing the `supportedProfile` field in `Subscription` resource')
+               'Capability Statement missing the `supportedProfile` field in `Subscription` resource')
 
         subscription_profile_present = rest_subscription.supportedProfile.any? do |profile|
           profile == subscription_profile_url

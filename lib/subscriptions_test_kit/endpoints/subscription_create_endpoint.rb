@@ -32,7 +32,7 @@ module SubscriptionsTestKit
       existing_subscription_request = requests.find { |r| r.status == 201 }
       if existing_subscription_request.present?
         subscription_hash = JSON.parse(existing_subscription_request.response_body)
-        error_text = 'Inferno only supports one subscription per test run. Subscription already created with '\
+        error_text = 'Inferno only supports one subscription per test run. Subscription already created with ' \
                      "ID #{subscription_hash['id']}"
         response.body = operation_outcome('error', 'business-rule', error_text).to_json
         return
@@ -74,10 +74,14 @@ module SubscriptionsTestKit
         return operation_outcome('error', 'value', 'channel.endpoint is not recognized as a conformant URL')
       end
 
-      heartbeat_period = subscription.channel&.extension&.find do |e|
+      heartbeat_period = find_heartbeat_period(subscription)
+      operation_outcome('error', 'not-supported', 'heartbeatPeriod is not supported') unless heartbeat_period.nil?
+    end
+
+    def find_heartbeat_period(subscription)
+      subscription&.channel&.extension&.find do |e|
         e.url == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period'
       end
-      operation_outcome('error', 'not-supported', 'heartbeatPeriod is not supported') unless heartbeat_period.nil?
     end
 
     def valid_url?(url)

@@ -19,7 +19,7 @@ module SubscriptionsTestKit
       def derive_handshake_notification(notification_json, subscription_url)
         notification_bundle = FHIR.from_contents(notification_json)
         subscription_status = update_subscription_status(notification_bundle, subscription_url, 'requested', 0,
-                                                        'handshake')
+                                                         'handshake')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status.parameter.delete(find_parameter(subscription_status, 'error'))
         notification_bundle
@@ -33,8 +33,8 @@ module SubscriptionsTestKit
 
       def derive_status_bundle(notification_json, subscription_url, status_code, event_count, request_url)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code, event_count,
-                                                        'query-status')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code,
+                                                         event_count, 'query-status')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         FHIR::Bundle.new(
@@ -56,7 +56,9 @@ module SubscriptionsTestKit
       end
 
       def find_subscription(test_session_id)
-        request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_CREATE_TAG])&.find { |r| r.status == 201 }
+        request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_CREATE_TAG])&.find do |r|
+          r.status == 201
+        end
         return unless request
 
         begin
@@ -107,7 +109,7 @@ module SubscriptionsTestKit
       def update_subscription_status(notification_bundle, subscription_url, status_code, event_count, type)
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         subscription_status_entry.request = FHIR::Bundle::Entry::Request.new(method: 'POST',
-                                                                            url: "#{subscription_url}/$status")
+                                                                             url: "#{subscription_url}/$status")
         subscription_status = subscription_status_entry&.resource
         set_subscription_reference(subscription_status, subscription_url)
         find_parameter(subscription_status, 'status')&.valueCode = status_code
@@ -130,6 +132,7 @@ module SubscriptionsTestKit
         end
 
         subscription.valueReference = FHIR::Reference.new(reference: subscription_url)
+        subscription
       end
 
       def find_parameter(subscription_status, parameter_name)

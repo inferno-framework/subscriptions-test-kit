@@ -8,7 +8,7 @@ module SubscriptionsTestKit
       description %(
         This test group verifies that the Backport Subscriptions Server supports the $status operation.
       )
-      
+
       test from: :subscriptions_r4_server_status_invocation
     end
   end

@@ -9,9 +9,9 @@ module SubscriptionsTestKit
       title 'Subscription Handshake Verification'
       description %(
         When a Subscription is created for a REST Hook channel type, the server SHALL set initial status to requested,
-        pending verification of the nominated endpoint URL. The Server will then send a handshake bundle to the endpoint.
-        After a successful handshake notification has been sent and accepted, the server SHALL update the status to
-        active. This test verifies that the incoming handshake request is a conformant
+        pending verification of the nominated endpoint URL. The Server will then send a handshake bundle to the
+        endpoint. After a successful handshake notification has been sent and accepted, the server SHALL update the
+        status to active. This test verifies that the incoming handshake request is a conformant
         [R4 Topic-Based Subscription Notification Bundle](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
       )
 
@@ -41,9 +41,10 @@ module SubscriptionsTestKit
 
         requests = load_tagged_requests('handshake')
         if requests.empty?
-          omit_if subscription_request_ids.empty?, 'No handshake requests were required or received in a previous tests.'
+          omit_if subscription_request_ids.empty?,
+                  'No handshake requests were required or received in a previous tests.'
           assert(subscription_request_ids.empty?,
-                'Handshake requests are required if a Subscription channel type is `rest-hook`')
+                 'Handshake requests are required if a Subscription channel type is `rest-hook`')
         end
 
         requests = requests.uniq(&:request_body)
@@ -60,7 +61,7 @@ module SubscriptionsTestKit
 
         no_error_verification('Received handshakes are not conformant.')
         assert(subscription_request_ids.empty?,
-              'Did not receive a handshake notification for some `rest-hook` subscriptions')
+               'Did not receive a handshake notification for some `rest-hook` subscriptions')
       end
     end
   end

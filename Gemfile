@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
 group :development, :test do
   gem 'debug'
+  gem 'rubocop', '~> 1.56'
+  gem 'rubocop-rspec', require: false
+  gem 'roo', '~> 2.10.1'
 end
 
 group :test do

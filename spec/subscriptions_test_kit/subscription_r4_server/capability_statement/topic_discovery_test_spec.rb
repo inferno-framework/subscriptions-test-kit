@@ -190,9 +190,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
 
     result = run(test, subscription_topic:)
     expect(result.result).to eq('pass')
-    expect(entity_result_message(test)).to match(
-      'No Subscription requests have been made in previous tests. Run the Subscription workflow tests first in order'
-    )
+    expect(entity_result_message(test)).to match('No Subscription requests have been made in previous tests.')
     expect(entity_result_message_type(test)).to eq('warning')
   end
 
@@ -243,7 +241,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
       "Subscription.criteria value(s) not found in Capability Statement's SubscriptionTopic Canonical extension"
     )
     expect(entity_result_message(test)).to match(
-      "The SubscriptionTopic Canonical extension should include the Subscription Topic URLs found"
+      'The SubscriptionTopic Canonical extension should include the Subscription Topic URLs found'
     )
   end
 end

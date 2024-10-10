@@ -30,18 +30,9 @@ module SubscriptionsTestKit
           return
         end
 
-        id_params = params&.parameter&.filter { |p| p.name == 'id' }
-
-        if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
+        unless subscription_params_match?(params)
           not_found
           return
-        else
-          status_params = params&.parameter&.filter { |p| p.name == 'status' }
-          subscription_status = determine_subscription_status_code(subscription.id)
-          if status_params&.any? && status_params.none? { |p| p.valueString == subscription_status }
-            not_found
-            return
-          end
         end
       end
 
@@ -54,6 +45,16 @@ module SubscriptionsTestKit
                                            request.url).to_json
     end
 
+    def subscription_params_match?(params)
+      id_params = find_params(params, 'id')
+
+      return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
+
+      status_params = find_params(params, 'status')
+      subscription_status = determine_subscription_status_code(subscription.id)
+      status_params.nil? || status_params.none? || status_params.any { p.valueString == subscription_status }
+    end
+
     def tags
       [SUBSCRIPTION_STATUS_TAG]
     end
@@ -63,8 +64,12 @@ module SubscriptionsTestKit
       response.body = operation_outcome('error', 'not-found').to_json
     end
 
+    def find_params(params, name)
+      params&.parameter&.filter { |p| p.name == name }
+    end
+
     def base_subscription_url
-      request.url.sub(%r{(#{Regexp.escape(FHIR_SUBSCRIPTION_PATH)}).*}, '\1')
+      request.url.sub(/(#{Regexp.escape(FHIR_SUBSCRIPTION_PATH)}).*/, '\1')
     end
   end
 end

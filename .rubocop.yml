@@ -74,5 +74,9 @@ RSpec/NestedGroups:
 RSpec/NotToNot:
   EnforcedStyle: to_not
 
+# The test kit folder organization (and corresponding spec organization) does not align with modules, so RSpec complains
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
 Gemspec/RequireMFA:
   Enabled: false

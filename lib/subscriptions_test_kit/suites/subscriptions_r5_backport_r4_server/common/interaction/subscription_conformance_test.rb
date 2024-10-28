@@ -60,7 +60,7 @@ module SubscriptionsTestKit
         uri = URI.parse(url)
         uri.is_a?(URI::HTTP) && !uri.host.nil?
         rescue URI::InvalidURIError
-        false
+          false
       end
 
       run do
@@ -68,10 +68,10 @@ module SubscriptionsTestKit
         subscription = subscription_verification(subscription_resource)
         no_error_verification('Subscription resource is not conformant.')
 
-        assert(subscription['criteria'].present? && subscription['criteria'].valid_url?,
+        assert(subscription['criteria'].present? && valid_url?(subscription['criteria']),
                'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.')
         output subscription_topic: subscription['criteria']
-        
+
         subscription = server_check_channel(subscription, access_token)
         output updated_subscription: subscription.to_json
       end

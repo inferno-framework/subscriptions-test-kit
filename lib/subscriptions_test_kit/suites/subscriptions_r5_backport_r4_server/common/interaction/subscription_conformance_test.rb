@@ -60,7 +60,7 @@ module SubscriptionsTestKit
         uri = URI.parse(url)
         uri.is_a?(URI::HTTP) && !uri.host.nil?
       rescue URI::InvalidURIError
-          false
+        false
       end
 
       run do

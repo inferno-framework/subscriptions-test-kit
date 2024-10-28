@@ -55,11 +55,11 @@ module SubscriptionsTestKit
             )
 
       output :updated_subscription, :subscription_topic
-      
+
       def valid_url?(url)
         uri = URI.parse(url)
         uri.is_a?(URI::HTTP) && !uri.host.nil?
-        rescue URI::InvalidURIError
+      rescue URI::InvalidURIError
           false
       end
 

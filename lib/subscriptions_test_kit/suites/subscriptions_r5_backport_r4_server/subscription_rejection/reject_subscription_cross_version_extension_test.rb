@@ -10,10 +10,10 @@ module SubscriptionsTestKit
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
         not contain any information not implemented by the server. If the Subscription is no supported, the server
-        should reject the Subscription create request, or it should attempt to adjust the Subscription. Since the FHIR R5 
-        is currently under development, there are no guarantees these extensions will meet the requirements of this guide. 
-        In order to promote widespread compatibility, cross version extensions SHOULD NOT be used on R4 subscriptions to describe
-        any elements.
+        should reject the Subscription create request, or it should attempt to adjust the Subscription. Since the FHIR
+        R5 is currently under development, there are no guarantees these extensions will meet the requirements of
+        this guide. In order to promote widespread compatibility, cross version extensions SHOULD NOT be used
+        on R4 subscriptions to describe any elements.
 
         The test will pass if the server either
         1. rejects the Subscription by responding with a non-201 response, or
@@ -53,14 +53,16 @@ module SubscriptionsTestKit
         field_name = unsupported_info['field_path'].last
 
         outer_field_name = unsupported_info['field_path'].first
-        subscription_field = unsupported_info['field_path'].length > 1 ?
-                    subscription[outer_field_name] :
-                    subscription
+        subscription_field = if unsupported_info['field_path'].length > 1
+                               subscription[outer_field_name]
+                             else
+                               subscription
+                             end
 
         subscription_field[field_name] = unsupported_info['field_value']
 
         send_unsupported_subscription(subscription, unsupported_info['unsupported_title'],
-                                        [unsupported_info['field_path']], [unsupported_info['field_value']])
+                                      [unsupported_info['field_path']], [unsupported_info['field_value']])
 
         no_error_verification('Unsupported Subscription creation error handling failures.')
       end

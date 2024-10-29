@@ -10,9 +10,9 @@ module SubscriptionsTestKit
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
         not contain any information not implemented by the server. If the Subscription is no supported, the server
-        should reject the Subscription create request, or it should attempt to adjust the Subscription. When processing a request 
-        for a Subscription, a server SHOULD validate, that the payload configuration is valid for the channel type requested 
-        (e.g., complies with the server's security policy).
+        should reject the Subscription create request, or it should attempt to adjust the Subscription. When
+        processing a request for a Subscription, a server SHOULD validate, that the payload configuration is
+        valid for the channel type requested (e.g., complies with the server's security policy).
 
         The test will pass if the server either
         1. rejects the Subscription by responding with a non-201 response, or
@@ -46,7 +46,7 @@ module SubscriptionsTestKit
         subscription = JSON.parse(subscription_resource)
 
         skip_if(unsupported_subscription_channel_payload_combo.blank?, %(
-          No subscription channel type and payload combo provided.) )
+          No subscription channel type and payload combo provided.))
 
         assert_valid_json(unsupported_subscription_channel_payload_combo)
         channel_payload_combo = JSON.parse(unsupported_subscription_channel_payload_combo)
@@ -68,7 +68,7 @@ module SubscriptionsTestKit
                                         [channel_path, payload_path], [channel_value, payload_value])
         end
 
-        no_error_verification('Unsupported Subscription creation error handling failures.')     
+        no_error_verification('Unsupported Subscription creation error handling failures.')
       end
     end
   end

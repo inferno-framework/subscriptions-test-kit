@@ -54,10 +54,9 @@ module SubscriptionsTestKit
 
         outer_field_name = unsupported_info['field_path'].first
         subscription_field = unsupported_info['field_path'].length > 1 ?
-                    subscription_field = subscription[outer_field_name] :
-                    subscription_field = subscription
+                    subscription[outer_field_name] :
+                    subscription
 
-        original_field_value = subscription_field[field_name]
         subscription_field[field_name] = unsupported_info['field_value']
 
         send_unsupported_subscription(subscription, unsupported_info['unsupported_title'],

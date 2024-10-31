@@ -15,9 +15,7 @@ module SubscriptionsTestKit
         this guide. In order to promote widespread compatibility, cross version extensions SHOULD NOT be used
         on R4 subscriptions to describe any elements.
 
-        The test will pass if the server either
-        1. rejects the Subscription by responding with a non-201 response, or
-        2. updates the Subscription resource to remove or replace the unsupported value.
+        The test will pass if the server rejects the Subscription by responding with a non-201 response.
       )
 
       input :subscription_resource,
@@ -46,18 +44,13 @@ module SubscriptionsTestKit
         }
 
         field_name = unsupported_info['field_path'].last
+        subscription[field_name] = unsupported_info['field_value']
 
-        outer_field_name = unsupported_info['field_path'].first
-        subscription_field = if unsupported_info['field_path'].length > 1
-                               subscription[outer_field_name]
-                             else
-                               subscription
-                             end
-
-        subscription_field[field_name] = unsupported_info['field_value']
-
-        send_unsupported_subscription(subscription, unsupported_info['unsupported_title'],
-                                      [unsupported_info['field_path']], [unsupported_info['field_value']])
+        fhir_operation('/Subscription', body: subscription)
+        if request.status == 201
+          add_message('error', %(
+            Sending a Subscription with #{unsupported_info['unsupported_title']} should be rejected.))
+        end
 
         no_error_verification('Unsupported Subscription creation error handling failures.')
       end

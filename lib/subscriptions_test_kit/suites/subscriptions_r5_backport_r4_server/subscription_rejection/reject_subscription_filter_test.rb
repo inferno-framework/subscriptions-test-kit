@@ -49,8 +49,8 @@ module SubscriptionsTestKit
           'unsupported_title' => 'unsupported filter criteria',
           'field_path' => ['_criteria'],
           'field_value' => { 'extension' => [{
-            'url': 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
-            'valueString': unsupported_subscription_filter
+            url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
+            valueString: unsupported_subscription_filter
           }] }
         }
 

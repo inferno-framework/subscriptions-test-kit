@@ -16,6 +16,12 @@ module SubscriptionsTestKit
         field_path.reduce(subscription) { |obj, path| obj[path] }
       end
 
+      def normalize_value(value)
+        return value.deep_transform_keys(&:to_sym) if value.is_a?(Hash)
+
+        value
+      end
+
       def send_unsupported_subscription(subscription, unsupported_type, field_paths, subscription_field_old_values)
         fhir_operation('/Subscription', body: subscription)
 
@@ -27,15 +33,8 @@ module SubscriptionsTestKit
         altered_field = false
         field_paths.each_with_index do |field_path, index|
           subscription_field_new_value = get_new_subscription_value(new_subscription, field_path)
-
-          # If both hash types, normalize keys into symbols
-          if subscription_field_new_value.is_a?(Hash) && subscription_field_old_values[index].is_a?(Hash)
-            new_value = subscription_field_new_value.deep_transform_keys(&:to_sym)
-            old_value = subscription_field_old_values[index].deep_transform_keys(&:to_sym)
-          else
-            new_value = subscription_field_new_value
-            old_value = subscription_field_old_values[index]
-          end
+          new_value = normalize_value(subscription_field_new_value)
+          old_value = normalize_value(subscription_field_old_values[index])
 
           if new_value != old_value
             altered_field = true

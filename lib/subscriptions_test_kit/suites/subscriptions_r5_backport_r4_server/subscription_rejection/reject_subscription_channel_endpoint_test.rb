@@ -38,6 +38,9 @@ module SubscriptionsTestKit
             optional: true
 
       run do
+        skip_if(unsupported_subscription_channel_endpoint.blank?, %(
+          No subscription channel type and payload combo provided.))
+
         assert_valid_json(subscription_resource)
         subscription = JSON.parse(subscription_resource)
 
@@ -46,9 +49,6 @@ module SubscriptionsTestKit
           'field_path' => ['channel', 'endpoint'],
           'field_value' => unsupported_subscription_channel_endpoint
         }
-
-        skip_if(unsupported_info['field_value'].blank?, %(
-          No subscription channel endpoint input provided.))
 
         field_name = unsupported_info['field_path'].last
 

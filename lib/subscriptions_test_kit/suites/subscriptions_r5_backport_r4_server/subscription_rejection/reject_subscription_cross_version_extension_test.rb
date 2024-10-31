@@ -20,8 +20,6 @@ module SubscriptionsTestKit
         2. updates the Subscription resource to remove or replace the unsupported value.
       )
 
-      verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@12'
-
       input :subscription_resource,
             title: 'Workflow Subscription Resource',
             type: 'textarea',
@@ -46,9 +44,6 @@ module SubscriptionsTestKit
             valueString: 'Encounter?patient=Patient/123'
           }] }
         }
-
-        skip_if(unsupported_info['field_value'].blank?, %(
-          No subscription topic input provided.))
 
         field_name = unsupported_info['field_path'].last
 

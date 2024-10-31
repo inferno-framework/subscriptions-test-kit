@@ -9,7 +9,7 @@ module SubscriptionsTestKit
       title 'Server Handles Unsupported Subscription Payload for Channel Type'
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
-        not contain any information not implemented by the server. If the Subscription is not supported, the server
+        not contain any information not implemented by the server. If the Subscription is no supported, the server
         should reject the Subscription create request, or it should attempt to adjust the Subscription. When
         processing a request for a Subscription, a server SHOULD validate, that the payload configuration is
         valid for the channel type requested (e.g., complies with the server's security policy).
@@ -42,11 +42,11 @@ module SubscriptionsTestKit
             optional: true
 
       run do
-        assert_valid_json(subscription_resource)
-        subscription = JSON.parse(subscription_resource)
-
         skip_if(unsupported_subscription_channel_payload_combo.blank?, %(
           No subscription channel type and payload combo provided.))
+
+        assert_valid_json(subscription_resource)
+        subscription = JSON.parse(subscription_resource)
 
         assert_valid_json(unsupported_subscription_channel_payload_combo)
         channel_payload_combo = JSON.parse(unsupported_subscription_channel_payload_combo)

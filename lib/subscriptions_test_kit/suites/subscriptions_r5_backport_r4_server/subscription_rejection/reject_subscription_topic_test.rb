@@ -9,7 +9,7 @@ module SubscriptionsTestKit
       title 'Server Handles Unsupported Subscription Topics'
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
-        not contain any information not implemented by the server. If the Subscription is no supported, the server
+        not contain any information not implemented by the server. If the Subscription is not supported, the server
         should reject the Subscription create request, or it should attempt to adjust the Subscription. When
         processing a request for a Subscription, a server SHOULD validate that the SubscriptionTopic is
         valid and implemented by the server.
@@ -39,6 +39,9 @@ module SubscriptionsTestKit
             optional: true
 
       run do
+        skip_if(unsupported_subscription_topic.blank?, %(
+          No subscription topic input provided.))
+
         assert_valid_json(subscription_resource)
         subscription = JSON.parse(subscription_resource)
 
@@ -48,7 +51,7 @@ module SubscriptionsTestKit
           'field_value' => unsupported_subscription_topic
         }
 
-        skip_if(unsupported_info['field_value'].blank?, %(
+        skip_if(unsupported_subscription_topic.blank?, %(
           No subscription topic input provided.))
 
         field_name = unsupported_info['field_path'].last

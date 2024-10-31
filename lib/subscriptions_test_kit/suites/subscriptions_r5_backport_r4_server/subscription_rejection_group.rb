@@ -21,7 +21,6 @@ module SubscriptionsTestKit
                   :unsupported_subscription_channel_endpoint, :unsupported_subscription_payload_type,
                   :unsupported_subscription_channel_payload_combo
 
-      # test from: :subscriptions_r4_server_reject_subscriptions
       test from: :subscriptions_r4_server_reject_subscription_cross_version_extension
       test from: :subscriptions_r4_server_reject_subscription_topic
       test from: :subscriptions_r4_server_reject_subscription_filter

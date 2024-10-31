@@ -9,7 +9,7 @@ module SubscriptionsTestKit
       title 'Server Handles Unsupported Subscription Filters'
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
-        not contain any information not implemented by the server. If the Subscription is no supported, the server
+        not contain any information not implemented by the server. If the Subscription is not supported, the server
         should reject the Subscription create request, or it should attempt to adjust the Subscription. When
         processing a request for a Subscription, a server SHOULD validate that all requested filters are
         defined in the requested topic and are implemented in the server.

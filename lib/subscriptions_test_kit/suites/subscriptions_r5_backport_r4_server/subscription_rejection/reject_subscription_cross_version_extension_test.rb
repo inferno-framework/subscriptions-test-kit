@@ -9,7 +9,7 @@ module SubscriptionsTestKit
       title 'Server Handles Unsupported Cross-Version Extensions'
       description %(
         When processing a request for a Subscription a server SHOULD verify that the Subscription is supported and does
-        not contain any information not implemented by the server. If the Subscription is no supported, the server
+        not contain any information not implemented by the server. If the Subscription is not supported, the server
         should reject the Subscription create request, or it should attempt to adjust the Subscription. Since the FHIR
         R5 is currently under development, there are no guarantees these extensions will meet the requirements of
         this guide. In order to promote widespread compatibility, cross version extensions SHOULD NOT be used

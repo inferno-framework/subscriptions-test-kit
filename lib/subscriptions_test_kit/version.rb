@@ -1,3 +1,3 @@
 module SubscriptionsTestKit
-  VERSION = '0.10.0'.freeze
+  VERSION = '0.9.3'.freeze
 end

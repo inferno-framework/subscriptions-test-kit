@@ -1,4 +1,4 @@
-## 0.10.0
+## 0.9.3
 
 * put requirements coverage in sync with id change by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/3
 * Fi-3237: Rubocop and Continuous Integration by @tstrass in https://github.com/inferno-framework/subscriptions-test-kit/pull/4

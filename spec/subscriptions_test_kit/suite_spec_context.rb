@@ -1,5 +1,6 @@
-RSpec.shared_context('when testing a suite') do |suite_id|
+RSpec.shared_context('when testing this suite') do |suite_id|
   let(:suite) { Inferno::Repositories::TestSuites.new.find(suite_id) }
+  let(:suite_id) { suite_id }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:validation_url) { "#{ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')}/validate" }
   let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
@@ -19,13 +20,16 @@ RSpec.shared_context('when testing a suite') do |suite_id|
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
-  def find_test(runnable, id)
-    # target has the search id as a suffix of the parent's id
-    target_id = runnable.parent.nil? ? id : "#{runnable.parent.id}-#{id}"
-    return runnable if runnable.id == target_id
+  # depth-first search looking for a runnable with a runtime id
+  # (prefixed with the ancestor suite / group ids) that ends
+  # with the provided suffix. It can be the test's id if unique, or
+  # can include some ancestor context if needed to identify the
+  # correct test. The first matching test found will be returned.
+  def find_test(runnable, id_suffix)
+    return runnable if runnable.id.ends_with?(id_suffix)
 
     runnable.children.each do |entity|
-      found = find_test(entity, id)
+      found = find_test(entity, id_suffix)
       return found unless found.nil?
     end
 

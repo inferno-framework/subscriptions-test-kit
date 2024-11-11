@@ -23,14 +23,15 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       let(:resume_fail_url) { "/custom/#{suite_id}/resume_fail" }
       let(:results_repo) { Inferno::Repositories::Results.new }
 
-      # pattern for wait testing
+      # Pattern for wait testing
       # 1. execute the test, e.g., result = run(test, ...)
       # 2. verify the test is waiting, e.g., expect(result.result).to eq('wait')
       # 3. perform an action that cause the wait to end, e.g., get(...)
       # 4. find the updated result, e.g., result = results_repo.find(result.id)
       # 5. verify it is no longer waiting, e.g., expect(result.result).to eq('pass')
       it 'passes when the tester chooses to complete the tests' do
-        result = run(test, access_token:, notification_bundle: valid_notification_json)
+        inputs = { access_token:, notification_bundle: valid_notification_json }
+        result = run(test, inputs)
         expect(result.result).to eq('wait')
 
         get("#{resume_pass_url}?test_run_identifier=#{access_token}")
@@ -40,7 +41,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       end
 
       it 'fails when the tester chooses to fail the tests' do
-        result = run(test, access_token:, notification_bundle: valid_notification_json)
+        inputs = { access_token:, notification_bundle: valid_notification_json }
+        result = run(test, inputs)
         expect(result.result).to eq('wait')
 
         get("#{resume_fail_url}?test_run_identifier=#{access_token}")
@@ -50,31 +52,40 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       end
     end
 
+    # Pattern for execution with tester inputs
+    # 1. create input hash, e.g., inputs = { ... }
+    # 2. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
+
     describe 'when the tester-provided notification bundle is not valid' do
       it 'fails when the notification bundle is not json' do
-        result = run(test, access_token:, notification_bundle: 'not json')
+        inputs = { access_token:, notification_bundle: 'not json' }
+        result = run(test, inputs)
         expect(result.result).to eq('fail')
       end
 
       it 'fails when the notification bundle is not FHIR' do
-        result = run(test, access_token:, notification_bundle: '{"not":"FHIR"}')
+        inputs = { access_token:, notification_bundle: '{"not":"FHIR"}' }
+        result = run(test, inputs)
         expect(result.result).to eq('fail')
       end
 
       it 'fails when the notification bundle is not a Bundle' do
-        result = run(test, access_token:, notification_bundle: '{"resourceType":"Patient"}')
+        inputs = { access_token:, notification_bundle: '{"resourceType":"Patient"}' }
+        result = run(test, inputs)
         expect(result.result).to eq('fail')
       end
 
       it 'fails when the notification bundle does not contain a Parameters instance' do
-        result = run(test, access_token:, notification_bundle: '{"resourceType":"Bundle"}')
+        inputs = { access_token:, notification_bundle: '{"resourceType":"Bundle"}' }
+        result = run(test, inputs)
         expect(result.result).to eq('fail')
       end
 
       it 'fails when the notification bundle Parameters instance does not contain a subscription parameter entry' do
-        result = run(test, access_token:,
-                           notification_bundle:
-                            '{"resourceType":"Bundle", "entry":[{"resource":{"resourceType":"Parameters"}}]}')
+        inputs = { access_token:,
+                   notification_bundle:
+                    '{"resourceType":"Bundle", "entry":[{"resource":{"resourceType":"Parameters"}}]}' }
+        result = run(test, inputs)
         expect(result.result).to eq('fail')
       end
     end

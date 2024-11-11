@@ -23,6 +23,12 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       let(:resume_fail_url) { "/custom/#{suite_id}/resume_fail" }
       let(:results_repo) { Inferno::Repositories::Results.new }
 
+      # pattern for wait testing
+      # 1. execute the test, e.g., result = run(test, ...)
+      # 2. verify the test is waiting, e.g., expect(result.result).to eq('wait')
+      # 3. perform an action that cause the wait to end, e.g., get(...)
+      # 4. find the updated result, e.g., result = results_repo.find(result.id)
+      # 5. verify it is no longer waiting, e.g., expect(result.result).to eq('pass')
       it 'passes when the tester chooses to complete the tests' do
         result = run(test, access_token:, notification_bundle: valid_notification_json)
         expect(result.result).to eq('wait')

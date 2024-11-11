@@ -13,6 +13,12 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
   include_context('when testing this suite', 'subscriptions_r5_backport_r4_client')
   describe 'performing interactions with the client under test' do
     let(:access_token) { '1234' }
+
+    # Pattern for execution with tester inputs
+    # 1. get the runnable into the `test` variable using the find_test function,
+    #    e.g., let(:test) { find_test(suite, described_class.id) }
+    # 2. create input hash, e.g., inputs = { ... }
+    # 3. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
     let(:test) { find_test(suite, described_class.id) }
 
     describe 'when the tester-provided notification bundle is valid' do
@@ -51,10 +57,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
         expect(result.result).to eq('fail')
       end
     end
-
-    # Pattern for execution with tester inputs
-    # 1. create input hash, e.g., inputs = { ... }
-    # 2. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
 
     describe 'when the tester-provided notification bundle is not valid' do
       it 'fails when the notification bundle is not json' do

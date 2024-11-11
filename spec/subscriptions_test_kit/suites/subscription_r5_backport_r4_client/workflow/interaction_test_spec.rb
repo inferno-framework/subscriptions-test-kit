@@ -1,15 +1,17 @@
 require_relative '../../../suite_spec_context'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::InteractionTest do
+  # ----- shared setup -----
+  # 1. enables http methods and requests to suite_endpoints
   include Rack::Test::Methods
-
   def app
     Inferno::Web.app
   end
-  include_context('when testing a suite', 'subscriptions_r5_backport_r4_client')
-
+  # 2. defines
+  # - variables: suite_id, suite, session_data_repo, validation_url, and test_session
+  # - methods: run, find_test
+  include_context('when testing this suite', 'subscriptions_r5_backport_r4_client')
   describe 'performing interactions with the client under test' do
-    let(:suite_id) { 'subscriptions_r5_backport_r4_client' }
     let(:access_token) { '1234' }
     let(:test) { find_test(suite, described_class.id) }
 

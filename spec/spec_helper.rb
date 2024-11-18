@@ -133,6 +133,9 @@ FactoryBot.definition_file_paths = [
   Inferno::SpecSupport::FACTORY_PATH
 ]
 
+require_relative 'runnable_helper'
+require_relative 'request_helper'
+
 RSpec::Matchers.define_negated_matcher :exclude, :include
 
 FHIR.logger = Inferno::Application['logger']

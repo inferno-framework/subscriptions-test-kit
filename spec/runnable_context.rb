@@ -1,9 +1,14 @@
-RSpec.shared_context('when testing this suite') do |suite_id|
+RSpec.shared_context('when testing a runnable') do
   let(:suite) { Inferno::Repositories::TestSuites.new.find(suite_id) }
-  let(:suite_id) { suite_id }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:validation_url) { "#{ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')}/validate" }
   let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
+
+  before do
+    if (described_class.parent.nil?)
+      allow(described_class).to receive(:suite).and_return(suite)
+    end
+  end
 
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)

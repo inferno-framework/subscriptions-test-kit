@@ -1,16 +1,6 @@
-require_relative '../../../suite_spec_context'
+RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::InteractionTest, :request do
+  let(:suite_id) { 'subscriptions_r5_backport_r4_client' }
 
-RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::InteractionTest do
-  # ----- shared setup -----
-  # 1. enables http methods and requests to suite_endpoints
-  include Rack::Test::Methods
-  def app
-    Inferno::Web.app
-  end
-  # 2. defines
-  # - variables: suite_id, suite, session_data_repo, validation_url, and test_session
-  # - methods: run, find_test
-  include_context('when testing this suite', 'subscriptions_r5_backport_r4_client')
   describe 'performing interactions with the client under test' do
     let(:access_token) { '1234' }
 
@@ -19,7 +9,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
     #    e.g., let(:test) { find_test(suite, described_class.id) }
     # 2. create input hash, e.g., inputs = { ... }
     # 3. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
-    let(:test) { find_test(suite, described_class.id) }
+    # let(:test) { find_test(suite, described_class.id) }
+    let(:test) { described_class }
 
     describe 'when the tester-provided notification bundle is valid' do
       let(:valid_notification_json) do
@@ -37,6 +28,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       # 5. verify it is no longer waiting, e.g., expect(result.result).to eq('pass')
       it 'passes when the tester chooses to complete the tests' do
         inputs = { access_token:, notification_bundle: valid_notification_json }
+        binding.pry
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 

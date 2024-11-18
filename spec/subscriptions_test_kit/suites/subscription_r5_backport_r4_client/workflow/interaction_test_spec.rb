@@ -28,7 +28,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
       # 5. verify it is no longer waiting, e.g., expect(result.result).to eq('pass')
       it 'passes when the tester chooses to complete the tests' do
         inputs = { access_token:, notification_bundle: valid_notification_json }
-        binding.pry
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 

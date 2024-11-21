@@ -56,12 +56,19 @@ module SubscriptionsTestKit
 
       output :updated_subscription, :subscription_topic
 
+      def valid_url?(url)
+        uri = URI.parse(url)
+        uri.is_a?(URI::HTTP) && !uri.host.nil?
+      rescue URI::InvalidURIError
+        false
+      end
+
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'
         subscription = subscription_verification(subscription_resource)
         no_error_verification('Subscription resource is not conformant.')
 
-        assert(subscription['criteria'].present?,
+        assert(subscription['criteria'].present? && valid_url?(subscription['criteria']),
                'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.')
         output subscription_topic: subscription['criteria']
 

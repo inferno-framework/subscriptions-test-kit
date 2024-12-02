@@ -4,10 +4,6 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'inferno_core',
-    git: 'https://github.com/inferno-framework/inferno-core.git',
-    branch: 'fi-3475-unit-testing-improvements'
-
 group :development, :test do
   gem 'debug'
   gem 'rubocop', '~> 1.56'

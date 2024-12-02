@@ -3,6 +3,7 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     class InteractionTest < Inferno::Test
+      include URLs
       id :subscriptions_r4_client_interaction
       description %(
         During this test, the client under test will interact with Inferno following the Subscription

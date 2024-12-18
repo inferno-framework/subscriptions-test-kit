@@ -37,6 +37,13 @@ module SubscriptionsTestKit
       end
     end
 
+    def valid_url?(url)
+      uri = URI.parse(url)
+      uri.is_a?(URI::HTTP) && !uri.host.nil?
+    rescue URI::InvalidURIError
+      false
+    end
+
     def subscription_verification(subscription_resource)
       assert_valid_json(subscription_resource)
       subscription = JSON.parse(subscription_resource)

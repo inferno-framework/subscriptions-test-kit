@@ -153,6 +153,33 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
       )
       expect(verification_request).to have_been_made
     end
+
+    it 'fails if subscription does not contain criteria field' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      subscription_resource.delete('criteria')
+
+      result = run(test, subscription_resource: subscription_resource.to_json)
+
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if subscription criteria does not contain valid URL' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      subscription_resource['criteria'] = ['Invalid Value']
+      result = run(test, subscription_resource: subscription_resource.to_json)
+
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
+    end
   end
 
   describe 'Server Check Channel' do

@@ -53,6 +53,11 @@ module SubscriptionsTestKit
         The `type` field on the Subscription resource must be set to `rest-hook`, the `#{subscription_channel['type']}`
         channel type is unsupported.))
 
+      unless subscription['criteria'].present? && valid_url?(subscription['criteria'])
+        add_message('error', %(
+                    'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.'
+                    ))
+      end
       subscription_resource = FHIR.from_contents(subscription.to_json)
       assert_resource_type('Subscription', resource: subscription_resource)
       assert_valid_resource(resource: subscription_resource,

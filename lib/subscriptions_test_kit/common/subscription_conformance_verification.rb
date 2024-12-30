@@ -77,7 +77,7 @@ module SubscriptionsTestKit
           Added the Authorization header field with a Bearer token set to #{access_token} to the `header` field on the
           Subscription resource in order to connect successfully with the Inferno subscription channel.
         ))
-        subscription_channel['header'] = [] unless subscription['header'].present?
+        subscription_channel['header'] = [] unless subscription_channel['header'].present?
         subscription_channel['header'].append("Authorization: Bearer #{access_token}")
       end
       subscription['channel'] = subscription_channel

@@ -22,12 +22,15 @@ module SubscriptionsTestKit
                                                          'handshake')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status.parameter.delete(find_parameter(subscription_status, 'error'))
+        notification_bundle.entry = [find_subscription_status_entry(notification_bundle)]
+        notification_bundle.timestamp = Time.now.utc.iso8601
         notification_bundle
       end
 
       def derive_event_notification(notification_json, subscription_url, event_count)
         notification_bundle = FHIR.from_contents(notification_json)
         update_subscription_status(notification_bundle, subscription_url, 'active', event_count, 'event-notification')
+        notification_bundle.timestamp = Time.now.utc.iso8601
         notification_bundle
       end
 
@@ -45,7 +48,8 @@ module SubscriptionsTestKit
           ),
           link: FHIR::Bundle::Link.new(relation: 'self', url: request_url),
           total: 1,
-          type: 'searchset'
+          type: 'searchset',
+          timestamp: Time.now.utc.iso8601
         )
       end
 

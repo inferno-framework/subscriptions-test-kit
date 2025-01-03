@@ -28,10 +28,12 @@ module SubscriptionsTestKit
       end
 
       def derive_event_notification(notification_json, subscription_url, subscription_topic, event_count)
+        notification_timestamp = Time.now.utc.iso8601
         notification_bundle = FHIR.from_contents(notification_json)
-        update_subscription_status(notification_bundle, subscription_url, subscription_topic,
-                                   'active', event_count, 'event-notification')
-        notification_bundle.timestamp = Time.now.utc.iso8601
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         'active', event_count, 'event-notification')
+        update_event_timestamps(subscription_status, notification_timestamp)
+        notification_bundle.timestamp = notification_timestamp
         notification_bundle
       end
 
@@ -127,6 +129,14 @@ module SubscriptionsTestKit
         subscription_status
       end
 
+      def update_event_timestamps(subscription_status, timestamp = nil)
+        timestamp = Time.now.utc.iso8601 unless timestamp.present?
+        event_list = find_parameter_list(subscription_status, 'notification-event')
+        event_list.each do |event|
+          event.part.find { |part| part.name == 'timestamp' }&.valueInstant = timestamp
+        end
+      end
+
       def find_subscription_status_entry(notification_bundle)
         notification_bundle.entry.find do |e|
           e.resource&.resourceType == 'Parameters' && e.resource.parameter&.any? { |p| p.name == 'subscription' }
@@ -146,6 +156,10 @@ module SubscriptionsTestKit
 
       def find_parameter(subscription_status, parameter_name)
         subscription_status.parameter&.find { |p| p.name == parameter_name }
+      end
+
+      def find_parameter_list(subscription_status, parameter_name)
+        subscription_status.parameter&.select { |p| p.name == parameter_name }
       end
     end
   end

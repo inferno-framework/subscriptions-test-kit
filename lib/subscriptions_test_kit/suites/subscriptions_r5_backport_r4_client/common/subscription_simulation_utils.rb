@@ -114,6 +114,7 @@ module SubscriptionsTestKit
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         subscription_status_entry.request = FHIR::Bundle::Entry::Request.new(method: 'POST',
                                                                              url: "#{subscription_url}/$status")
+        subscription_status_entry.response = FHIR::Bundle::Entry::Response.new(status: '200')
         subscription_status = subscription_status_entry&.resource
         set_subscription_reference(subscription_status, subscription_url)
         find_parameter(subscription_status, 'status')&.valueCode = status_code

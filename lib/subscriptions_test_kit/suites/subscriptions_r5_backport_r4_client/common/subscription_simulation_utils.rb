@@ -16,10 +16,10 @@ module SubscriptionsTestKit
         JSON.parse(test_result.input_json).find { |i| i['name'] == 'client_endpoint_access_token' }['value']
       end
 
-      def derive_handshake_notification(notification_json, subscription_url)
+      def derive_handshake_notification(notification_json, subscription_url, subscription_topic)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, 'requested', 0,
-                                                         'handshake')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         'requested', 0, 'handshake')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status.parameter.delete(find_parameter(subscription_status, 'error'))
         notification_bundle.entry = [find_subscription_status_entry(notification_bundle)]
@@ -27,17 +27,19 @@ module SubscriptionsTestKit
         notification_bundle
       end
 
-      def derive_event_notification(notification_json, subscription_url, event_count)
+      def derive_event_notification(notification_json, subscription_url, subscription_topic, event_count)
         notification_bundle = FHIR.from_contents(notification_json)
-        update_subscription_status(notification_bundle, subscription_url, 'active', event_count, 'event-notification')
+        update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                   'active', event_count, 'event-notification')
         notification_bundle.timestamp = Time.now.utc.iso8601
         notification_bundle
       end
 
-      def derive_status_bundle(notification_json, subscription_url, status_code, event_count, request_url)
+      def derive_status_bundle(notification_json, subscription_url, subscription_topic,
+                               status_code, event_count, request_url)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code,
-                                                         event_count, 'query-status')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         status_code, event_count, 'query-status')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         FHIR::Bundle.new(
@@ -110,13 +112,15 @@ module SubscriptionsTestKit
         subscription_url&.reference&.chomp('/')&.split('/')&.last
       end
 
-      def update_subscription_status(notification_bundle, subscription_url, status_code, event_count, type)
+      def update_subscription_status(notification_bundle, subscription_url, subscription_topic, status_code,
+                                     event_count, type)
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         subscription_status_entry.request = FHIR::Bundle::Entry::Request.new(method: 'POST',
                                                                              url: "#{subscription_url}/$status")
         subscription_status_entry.response = FHIR::Bundle::Entry::Response.new(status: '200')
         subscription_status = subscription_status_entry&.resource
         set_subscription_reference(subscription_status, subscription_url)
+        find_parameter(subscription_status, 'topic')&.valueCanonical = subscription_topic
         find_parameter(subscription_status, 'status')&.valueCode = status_code
         find_parameter(subscription_status, 'type')&.valueCode = type
         find_parameter(subscription_status, 'events-since-subscription-start')&.valueString = event_count.to_s

@@ -150,8 +150,14 @@ module SubscriptionsTestKit
     end
 
     def check_bundle_entry_reference(bundle_entries, reference)
+      check_full_url = reference.start_with?('urn:')
+
       referenced_entry = bundle_entries.find do |entry|
-        reference.include?("#{entry.resource.resourceType}/#{entry.resource.id}")
+        if check_full_url
+          reference == entry.fullUrl
+        else
+          reference.include?("#{entry.resource.resourceType}/#{entry.resource.id}")
+        end
       end
       referenced_entry.present?
     end

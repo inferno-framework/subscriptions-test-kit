@@ -367,6 +367,15 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       )
     end
 
+    it 'succeeds if event-notification focus uses a uuid (urn reference)' do
+      focus = full_resource_notification_bundle['entry'].first['resource']['parameter'].last['part'].last
+      focus['valueReference']['reference'] = 'urn:uri:86009987-eabe-42bf-8c02-b112b18cb616'
+      full_resource_notification_bundle['entry'][1]['fullUrl'] = 'urn:uri:86009987-eabe-42bf-8c02-b112b18cb616'
+
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
+      expect(result.result).to eq('pass')
+    end
+
     it 'fails if event-notification additional-context contains a reference not found in the Bundle entries' do
       additional_context = {
         name: 'additional-context',

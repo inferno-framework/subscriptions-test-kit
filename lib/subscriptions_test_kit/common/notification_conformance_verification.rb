@@ -232,15 +232,6 @@ module SubscriptionsTestKit
           resource in the entry.resource element.))
     end
 
-    def subscription_criteria(subscription)
-      return unless subscription['_criteria']
-
-      criteria_extension = subscription['_criteria']['extension'].find do |ext|
-        ext['url'].ends_with?('/backport-filter-criteria')
-      end
-      criteria_extension['valueString'].split('?').first
-    end
-
     def empty_event_notification_verification(notification_bundle)
       assert_valid_json(notification_bundle)
       bundle = FHIR.from_contents(notification_bundle)

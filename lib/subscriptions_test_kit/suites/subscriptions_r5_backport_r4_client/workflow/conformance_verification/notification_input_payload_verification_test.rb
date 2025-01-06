@@ -30,15 +30,13 @@ module SubscriptionsTestKit
         payload_content_code = payload_ext['valueCode'] if payload_ext
         skip_if(payload_content_code.nil?, 'Subscription does not have a payload content code')
 
-        criteria_resource_type = subscription_criteria(subscription.source_hash)
-
         case payload_content_code
         when 'empty'
           empty_event_notification_verification(notification_bundle)
         when 'id-only'
-          id_only_event_notification_verification(notification_bundle, criteria_resource_type)
+          id_only_event_notification_verification(notification_bundle, nil)
         when 'full-resource'
-          full_resource_event_notification_verification(notification_bundle, criteria_resource_type)
+          full_resource_event_notification_verification(notification_bundle, nil)
         else
           skip "Unrecognized payload content code: #{payload_content_code}"
         end

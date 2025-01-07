@@ -63,14 +63,18 @@ module SubscriptionsTestKit
         oo
       end
 
-      def find_subscription(test_session_id)
+      def find_subscription(test_session_id, as_json: false)
         request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_CREATE_TAG])&.find do |r|
           r.status == 201
         end
         return unless request
 
         begin
-          FHIR.from_contents(request.response_body)
+          if as_json
+            JSON.parse(request.response_body)
+          else
+            FHIR.from_contents(request.response_body)
+          end
         rescue StandardError
           nil
         end
@@ -131,7 +135,7 @@ module SubscriptionsTestKit
 
       def update_event_timestamps(subscription_status, timestamp = nil)
         timestamp = Time.now.utc.iso8601 unless timestamp.present?
-        event_list = find_parameter_list(subscription_status, 'notification-event')
+        event_list = find_all_parameters(subscription_status, 'notification-event')
         event_list.each do |event|
           event.part.find { |part| part.name == 'timestamp' }&.valueInstant = timestamp
         end
@@ -158,7 +162,7 @@ module SubscriptionsTestKit
         subscription_status.parameter&.find { |p| p.name == parameter_name }
       end
 
-      def find_parameter_list(subscription_status, parameter_name)
+      def find_all_parameters(subscription_status, parameter_name)
         subscription_status.parameter&.select { |p| p.name == parameter_name }
       end
     end

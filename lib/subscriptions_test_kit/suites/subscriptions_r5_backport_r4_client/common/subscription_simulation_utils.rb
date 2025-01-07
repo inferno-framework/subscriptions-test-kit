@@ -71,6 +71,7 @@ module SubscriptionsTestKit
 
         begin
           if as_json
+            # needed to access primitive extensions
             JSON.parse(request.response_body)
           else
             FHIR.from_contents(request.response_body)

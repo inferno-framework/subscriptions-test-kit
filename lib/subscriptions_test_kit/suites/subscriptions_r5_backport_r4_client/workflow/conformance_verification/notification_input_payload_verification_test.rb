@@ -47,7 +47,10 @@ module SubscriptionsTestKit
           skip "Unrecognized payload content code: #{payload_content_code}"
         end
 
-        no_error_verification('Notification bundle payload content was not conformant, see error messages')
+        no_error_verification(%(
+          Notification bundle payload content was not conformant to requirements of the #{payload_content_code}
+          content type. See error messages for details.
+        ))
       end
     end
   end

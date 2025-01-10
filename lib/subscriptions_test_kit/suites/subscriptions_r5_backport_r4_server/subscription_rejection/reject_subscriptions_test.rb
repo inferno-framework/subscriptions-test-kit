@@ -84,7 +84,7 @@ module SubscriptionsTestKit
             'field_path' => ['_criteria'],
             'field_value' => { 'extension' => [{
               url: 'http://hl7.org/fhir/5.0/subscriptions-backport/StructureDefinition/backport-filter-criteria',
-              valueString: 'Encounter?patient=Patient/123'
+              valueString: 'Encounter.patient=Patient/123'
             }] }
           },
           {

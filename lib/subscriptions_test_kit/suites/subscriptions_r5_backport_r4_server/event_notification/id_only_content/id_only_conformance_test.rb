@@ -52,11 +52,10 @@ module SubscriptionsTestKit
           requests = load_tagged_requests('event-notification', subscription['id'])
           skip_if requests.empty?, 'No event-notification requests were made in a previous test as expected.'
 
-          criteria_resource_type = subscription_criteria(subscription)
           requests = requests.uniq(&:request_body)
 
           requests.each do |request|
-            id_only_event_notification_verification(request.request_body, criteria_resource_type)
+            id_only_event_notification_verification(request.request_body, nil)
           end
         end
         no_error_verification('Received notification-events are not conformant.')

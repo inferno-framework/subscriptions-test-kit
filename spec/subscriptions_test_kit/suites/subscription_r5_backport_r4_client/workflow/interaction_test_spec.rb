@@ -5,11 +5,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
     let(:access_token) { '1234' }
 
     # Pattern for execution with tester inputs
-    # 1. get the runnable into the `test` variable using the find_test function,
-    #    e.g., let(:test) { find_test(suite, described_class.id) }
+    # 1. get the runnable into the `test` variable
     # 2. create input hash, e.g., inputs = { ... }
     # 3. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
-    # let(:test) { find_test(suite, described_class.id) }
     let(:test) { described_class }
 
     describe 'when the tester-provided notification bundle is valid' do

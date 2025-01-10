@@ -38,11 +38,12 @@ module SubscriptionsTestKit
 
       notification_json = notification_bundle_input(result)
       subscription_url = "#{base_subscription_url}/#{subscription.id}"
+      subscription_topic = subscription.criteria
       status_code = determine_subscription_status_code(subscription_id)
       event_count = determine_event_count(test_run.test_session_id)
       response.status = 200
-      response.body = derive_status_bundle(notification_json, subscription_url, status_code, event_count,
-                                           request.url).to_json
+      response.body = derive_status_bundle(notification_json, subscription_url, subscription_topic, status_code,
+                                           event_count, request.url).to_json
     end
 
     def subscription_params_match?(params)

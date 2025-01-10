@@ -37,7 +37,8 @@ module SubscriptionsTestKit
             description: %(
               A channel (`channel.type`) and payload type (`content` extension under the `channel.payload` element)
               combination not implemented by the server to test for Subscription
-              rejection. Provide in the json format e.g. {channel: <'channel_type'>, payload: <'payload_type'>}.
+              rejection. Provide as a JSON object with two keys as follows: {"channel": "channel_type",
+              "payload": "wrong_payload_type_for_this_channel"}.
             ),
             optional: true
 

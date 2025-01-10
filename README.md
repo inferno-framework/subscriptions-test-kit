@@ -45,6 +45,9 @@ Specific limitations to highlight include
 - Inferno does not test delivery error handling and recovery scenarios, including
   the optional `$events` API and event numbering details.
 - Inferno only supports verification of FHIR R4 systems.
+- Inferno does not verify that the shape and content of notifications are appropriate for the triggering
+  Subscription because those details, e.g., the resource types that can be a focus of the notification, 
+  are defined within the SubscriptionTopic which is not available in FHIR R4.
 
 See suite-specific documentation on scope and current limitations
 for R4 [server](lib/subscriptions_test_kit/docs/subscriptions_r5_backport_r4_server_suite_description.md) and R4

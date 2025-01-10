@@ -150,8 +150,14 @@ module SubscriptionsTestKit
     end
 
     def check_bundle_entry_reference(bundle_entries, reference)
+      check_full_url = reference.start_with?('urn:')
+
       referenced_entry = bundle_entries.find do |entry|
-        reference.include?("#{entry.resource.resourceType}/#{entry.resource.id}")
+        if check_full_url
+          reference == entry.fullUrl
+        else
+          reference.include?("#{entry.resource.resourceType}/#{entry.resource.id}")
+        end
       end
       referenced_entry.present?
     end
@@ -224,15 +230,6 @@ module SubscriptionsTestKit
       add_message('error', %(
           The notification bundle of type `full-resource` must include at least one #{criteria_resource_type}
           resource in the entry.resource element.))
-    end
-
-    def subscription_criteria(subscription)
-      return unless subscription['_criteria']
-
-      criteria_extension = subscription['_criteria']['extension'].find do |ext|
-        ext['url'].ends_with?('/backport-filter-criteria')
-      end
-      criteria_extension['valueString'].split('?').first
     end
 
     def empty_event_notification_verification(notification_bundle)

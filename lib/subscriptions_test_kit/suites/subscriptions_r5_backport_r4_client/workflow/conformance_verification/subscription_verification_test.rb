@@ -22,6 +22,7 @@ module SubscriptionsTestKit
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
         skip_if(requests.none?, 'Inferno did not receive a Subscription creation request')
         subscription_verification(request.request_body)
+        no_error_verification('Subscription resource is not conformant.')
       end
     end
   end

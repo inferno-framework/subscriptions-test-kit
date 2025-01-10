@@ -81,23 +81,5 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Subscripti
       expect(result.result).to eq('pass')
       expect(verification_request).to have_been_made
     end
-
-    it 'fails if subscription does not contain criteria field' do
-      allow(test).to receive(:suite).and_return(suite)
-
-      verification_request = stub_request(:post, "#{validator_url}/validate")
-        .to_return(status: 200, body: operation_outcome_success.to_json)
-
-      subscription_resource.delete('criteria')
-
-      result = run(test, subscription_resource: subscription_resource.to_json,
-                         access_token:)
-
-      expect(result.result).to eq('fail')
-      expect(result.result_message).to match(
-        'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.'
-      )
-      expect(verification_request).to have_been_made
-    end
   end
 end

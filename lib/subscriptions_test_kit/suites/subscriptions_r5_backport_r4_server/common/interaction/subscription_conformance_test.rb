@@ -32,6 +32,7 @@ module SubscriptionsTestKit
       )
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@72',
+                            'hl7.fhir.uv.subscriptions_1.1.0@73',
                             'hl7.fhir.uv.subscriptions_1.1.0@86'
 
       input :subscription_resource,
@@ -54,17 +55,12 @@ module SubscriptionsTestKit
               sent to Inferno.
             )
 
-      output :updated_subscription, :subscription_topic
+      output :updated_subscription
 
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'
         subscription = subscription_verification(subscription_resource)
         no_error_verification('Subscription resource is not conformant.')
-
-        assert(subscription['criteria'].present?,
-               'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.')
-        output subscription_topic: subscription['criteria']
-
         subscription = server_check_channel(subscription, access_token)
         output updated_subscription: subscription.to_json
       end

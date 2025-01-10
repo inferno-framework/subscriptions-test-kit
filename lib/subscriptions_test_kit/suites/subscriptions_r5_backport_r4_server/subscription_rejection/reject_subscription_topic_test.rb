@@ -40,7 +40,7 @@ module SubscriptionsTestKit
 
       run do
         skip_if(unsupported_subscription_topic.blank?, %(
-          No subscription topic input provided.))
+          Provide a value in the "Unsupported Subscription Topic" input to run this test.))
 
         assert_valid_json(subscription_resource)
         subscription = JSON.parse(subscription_resource)
@@ -50,9 +50,6 @@ module SubscriptionsTestKit
           'field_path' => ['criteria'],
           'field_value' => unsupported_subscription_topic
         }
-
-        skip_if(unsupported_subscription_topic.blank?, %(
-          No subscription topic input provided.))
 
         field_name = unsupported_info['field_path'].last
         subscription[field_name] = unsupported_info['field_value']

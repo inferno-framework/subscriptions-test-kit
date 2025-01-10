@@ -43,7 +43,7 @@ module SubscriptionsTestKit
 
       run do
         skip_if(unsupported_subscription_channel_payload_combo.blank?, %(
-          No subscription channel type and payload combo provided.))
+          Provide a value in the "Unsupported Subscription Channel and Payload Combination" input to run this test.))
 
         assert_valid_json(subscription_resource)
         subscription = JSON.parse(subscription_resource)

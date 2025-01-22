@@ -39,9 +39,10 @@ module SubscriptionsTestKit
           assert(request.content_type_header == mime_type,
                  'Content type of request does not match the Subscription MIME type')
           # Verification for hl7.fhir.uv.subscriptions_1.1.0@27
-          assert(request.header.include?(subscription&.channel&.header),
-                 'Subscriptoin channel header is not conveyed as HTTP request header')
-
+          for sc_header in subscription&.channel&.header do
+            assert(request.header.include?(sc_header),
+                   'Subscription channel header is not conveyed as HTTP request header')
+          end
         end
       end
     end

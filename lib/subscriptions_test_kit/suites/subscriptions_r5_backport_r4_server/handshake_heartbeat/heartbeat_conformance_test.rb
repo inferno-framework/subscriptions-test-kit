@@ -11,6 +11,9 @@ module SubscriptionsTestKit
         When a Subscription is created for a REST Hook channel type, the server Server may send notifications of type
         heartbeat at any time. This test verifies that the incoming heartbeat request is a conformant
         [R4 Topic-Based Subscription Notification Bundle](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
+
+        Note that all Subscriptions and the associated Heartbeat notifications received during previously-run tests
+        will be associated with this test and analyzed for conformance.
       )
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@14',

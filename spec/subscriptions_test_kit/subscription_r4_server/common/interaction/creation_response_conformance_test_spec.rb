@@ -108,7 +108,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CreationRe
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/The Subscription resource should have it's status set to 'requested'/)
+      expect(result.result_message).to match(/Expected Subscription.status to be 'requested'/)
     end
   end
 

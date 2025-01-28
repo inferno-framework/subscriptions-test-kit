@@ -4,7 +4,6 @@ require_relative 'subscriptions_r5_backport_r4_client/workflow_group'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
-require_relative '../version'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
@@ -12,7 +11,6 @@ module SubscriptionsTestKit
       id :subscriptions_r5_backport_r4_client
       title 'Subscriptions R5 Backport IG v1.1.0 FHIR R4 Client Test Suite'
       short_title 'Subscriptions R4 Client'
-      version VERSION
       description File.read(File.join(__dir__, '..', 'docs',
                                       'subscriptions_r5_backport_r4_client_suite_description.md'))
 

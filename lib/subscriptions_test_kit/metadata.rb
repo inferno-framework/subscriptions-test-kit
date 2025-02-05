@@ -83,10 +83,10 @@ module SubscriptionsTestKit
     DESCRIPTION
     suite_ids [:subscriptions_r5_backport_r4_client, :subscriptions_r5_backport_r4_server]
     tags ['Subscriptions']
-    last_updated '2025-01-28'
+    last_updated LAST_UPDATED
     version VERSION
     maturity 'Low'
-    authors ['Karl Naden, Emily Semple, Tom Strassner']
+    authors ['Karl Naden', 'Emily Semple', 'Tom Strassner']
     repo 'https://github.com/inferno-framework/subscriptions-test-kit'
   end
 end

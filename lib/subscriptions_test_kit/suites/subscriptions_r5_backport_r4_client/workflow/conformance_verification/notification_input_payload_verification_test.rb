@@ -18,7 +18,6 @@ module SubscriptionsTestKit
         of the payload indicated in the subscription created by the client under test.
         The content of the notification will be based on the Bundle provided by the tester.
       )
-      input :notification_bundle
 
       run do
         subscription = find_subscription(test_session_id)

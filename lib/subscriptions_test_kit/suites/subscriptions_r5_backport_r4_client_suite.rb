@@ -46,7 +46,9 @@ module SubscriptionsTestKit
 
       capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures',
                                                  'capability_statement.json'))
-      route(:get, '/fhir/metadata', proc { [200, { 'Content-Type' => 'application/json' }, [capability_statement]] })
+      route(:get, '/fhir/metadata', proc {
+                                      [200, { 'Content-Type' => 'application/fhir+json' }, [capability_statement]]
+                                    })
 
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint

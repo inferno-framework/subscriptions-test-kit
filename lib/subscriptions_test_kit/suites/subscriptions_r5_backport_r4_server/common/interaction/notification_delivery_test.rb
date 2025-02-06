@@ -33,15 +33,15 @@ module SubscriptionsTestKit
 
       run do
         subscription = JSON.parse(updated_subscription)
-        subscription_type = send_subscription(subscription)
-
+        returned_subscription = send_subscription(subscription)
+        subscription_payload_type = subscription_payload_type(subscription)
         wait(
           identifier: "notification #{access_token}",
           message: %(
-            **Subscription `#{subscription['id']}`: `#{subscription_type}` Notification Test**
+            **Subscription `#{returned_subscription['id']}`: `#{subscription_payload_type}` Notification Test**
 
-            Send any handshake, heartbeat, and `#{subscription_type}` event-notification requests for the Subscription
-            with id `#{subscription['id']}` to:
+            Send any handshake, heartbeat, and `#{subscription_payload_type}` event-notification requests for the
+            Subscription with id `#{returned_subscription['id']}` to:
 
             `#{subscription_channel_url}`
 

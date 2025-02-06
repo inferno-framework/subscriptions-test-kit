@@ -121,3 +121,6 @@ Specific limitations to highlight include
 - Inferno does not verify that the shape and content of notifications are appropriate for the triggering
   Subscription because those details, e.g., the resource types that can be a focus of the notification, 
   are defined within the SubscriptionTopic which is not available in FHIR R4.
+- When sending notifications, Inferno supports only JSON payloads and will always use `application/fhir+json`
+  as the value of the `content-type` HTTP header, unless the client system explicitly asks for
+  `application/json` using the `Subscription.channel.payload` element.

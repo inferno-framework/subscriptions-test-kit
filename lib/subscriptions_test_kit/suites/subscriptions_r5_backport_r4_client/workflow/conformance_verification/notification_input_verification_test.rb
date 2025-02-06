@@ -15,7 +15,6 @@ module SubscriptionsTestKit
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
         The content of the notification will be based on the Bundle provided by the tester.
         )
-      input :notification_bundle
 
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)

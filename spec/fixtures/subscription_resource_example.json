@@ -50,7 +50,7 @@
       "Authorization: Bearer SAMPLE_TOKEN"
     ],
     "endpoint": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
-    "payload": "application/json",
+    "payload": "application/fhir+json",
     "_payload": {
       "extension": [
         {

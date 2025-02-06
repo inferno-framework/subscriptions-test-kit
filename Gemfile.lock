@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     subscriptions_test_kit (0.9.4)
-      inferno_core (~> 0.5.0)
+      inferno_core (~> 0.5.4)
 
 GEM
   remote: https://rubygems.org/
@@ -133,7 +133,7 @@ GEM
       domain_name (~> 0.5)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    inferno_core (0.5.1)
+    inferno_core (0.5.4)
       activesupport (~> 6.1.7.5)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)

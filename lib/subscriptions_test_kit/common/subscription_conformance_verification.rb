@@ -50,12 +50,14 @@ module SubscriptionsTestKit
 
       subscription_channel = subscription['channel']
       assert(channel_field_matches?(subscription_channel, 'type', 'rest-hook'), %(
-        The `type` field on the Subscription resource must be set to `rest-hook`, the `#{subscription_channel['type']}`
-        channel type is unsupported.))
+        The `type` element on the Subscription resource must be set to `rest-hook`,
+        the `#{subscription_channel['type']}` channel type is unsupported.))
 
       unless subscription['criteria'].present? && valid_url?(subscription['criteria'])
-        add_message('error', %(
-                    'The `criteria` field SHALL be populated and contain the canonical URL for the Subscription Topic.'
+        add_message('error',
+                    %(
+                      'The `criteria` element SHALL be populated and contain the canonical
+                      URL for the Subscription Topic.'
                     ))
       end
       subscription_resource = FHIR.from_contents(subscription.to_json)
@@ -76,10 +78,17 @@ module SubscriptionsTestKit
         subscription_channel['endpoint'] = subscription_channel_url
       end
 
-      unless channel_field_matches?(subscription_channel, 'payload', 'application/json')
+      unless channel_field_matches?(subscription_channel, 'payload', 'application/fhir+json')
+        update_message = if channel_field_matches?(subscription_channel, 'payload', 'application/json')
+                           ''
+                         else
+                           subscription_channel['payload'] = 'application/fhir+json'
+                           ' The requested Subscription has been updated to use this value.'
+                         end
+
         add_message('warning', %(
-          The `type` field on the Subscription resource should be set to `application/json`. Inferno will only accept
-          resources in requests with this content type.
+          The `payload` element on the Subscription resource should be set to `application/fhir+json`, which is the
+          [correct mime type for FHIR JSON](https://hl7.org/fhir/R4/http.html#mime-type).#{update_message}
         ))
       end
 

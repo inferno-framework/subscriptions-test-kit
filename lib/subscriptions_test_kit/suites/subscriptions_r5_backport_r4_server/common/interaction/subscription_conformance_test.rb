@@ -8,27 +8,25 @@ module SubscriptionsTestKit
       id :subscriptions_r4_server_subscription_conformance
       title '[USER INPUT VERIFICATION] Verify Subscription to Send to Server'
       description %(
-        The Subscription resource is used to request notifications for a specific client about a specific topic
-        Conceptually, a subscription is a concrete request for a single client to receive notifications per a single
-        topic. In order to support topic-based subscriptions in R4, this guide defines several extensions for use on the
-        [R4 Subscription resource](http://hl7.org/fhir/R4/subscription.html). A list of extensions defined by this guide
-        can be found on the
-        [Subscriptions R5 Backport IG's Artifacts page](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/artifacts.html#5).
-
         This test accepts a Subscription resource as an input and verifies that it is conformant to the
-        [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html).
+        [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
+        and that it is constructed to make supported notifications to Inferno's simulated
+        Subscriptions client.
 
-        The Subscription channel should have it's fields populated with the following information:
-          - The `endpoint` field must be set to
+        For the server to successfuly deliver notifications recognized by this test session, the Subscription `channel`
+        element should have it's subelements populated with the following information:
+        - The `endpoint` field must be set to
           `#{Inferno::Application['base_url']}/custom/subscriptions_r5_backport_r4_server#{SUBSCRIPTION_CHANNEL_PATH}`.
           The test will add the correct url to this field if it is not properly set.
-          - The `type` field must be set to `rest-hook`, as the Inferno subscription workflow tests use a `rest-hook`
+        - The `type` element must be set to `rest-hook`, as the Inferno subscription workflow tests use a `rest-hook`
           subscription channel to receive incoming notifications. The test will add the correct type to this field if it
           is not properly set.
-          - The `payload` field must be set to `application/json`, as Inferno will only accept resources in requests
-          with this content type.
-          - The `header` field must include the `Authorization` header with a Bearer token set to the inputted Inferno
-          access token.
+        - The `payload` element should be `application/fhir+json`. Inferno will update it to that value
+          unless the provided value is `application/json`, which Inferno also supports receiving as the
+          `content-type` HTTP header on notifications.
+        - The `header` element must include the `Authorization` header with a Bearer token set to the inputted Inferno
+          access token to direct the server to send that header to identify the notifications are for this session.
+          Inferno will add the entry if it is not present.
       )
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@72',

@@ -1,3 +1,4 @@
+require_relative 'subscriptions_test_kit/metadata'
 require_relative 'inferno_requirements_tools/ext/inferno_core/runnable'
 require_relative 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server_suite'
 require_relative 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_client_suite'

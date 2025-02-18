@@ -6,7 +6,6 @@ require_relative 'subscriptions_r5_backport_r4_server/status_operation_group'
 require_relative 'subscriptions_r5_backport_r4_server/subscription_rejection_group'
 require_relative '../endpoints/subscription_rest_hook_endpoint'
 require_relative '../urls'
-require_relative '../version'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
@@ -14,7 +13,6 @@ module SubscriptionsTestKit
       id :subscriptions_r5_backport_r4_server
       title 'Subscriptions R5 Backport IG v1.1.0 FHIR R4 Server Test Suite'
       short_title 'Subscriptions R4 Server'
-      version VERSION
       description File.read(File.join(__dir__, '..', 'docs',
                                       'subscriptions_r5_backport_r4_server_suite_description.md'))
 

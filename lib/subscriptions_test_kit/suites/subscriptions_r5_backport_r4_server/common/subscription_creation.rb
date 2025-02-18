@@ -65,7 +65,7 @@ module SubscriptionsTestKit
 
         fhir_operation('/Subscription', body: subscription, tags:)
         assert_response_status(201)
-        payload_type
+        json_parse(request.response_body)
       end
     end
   end

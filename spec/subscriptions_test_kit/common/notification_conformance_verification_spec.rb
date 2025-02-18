@@ -526,7 +526,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
-        'When populating the SubscriptionStatus.notificationEvent structure for a notification with an empty'
+        'When populating the SubscriptionStatus.notificationEvent structure for an event notification with an empty'
       )
     end
   end

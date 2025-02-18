@@ -127,7 +127,7 @@ module SubscriptionsTestKit
       return if empty_req_check
 
       add_message('error', %(
-            When populating the SubscriptionStatus.notificationEvent structure for a notification with an empty
+            When populating the SubscriptionStatus.notificationEvent structure for an event notification with an empty
             payload, a server SHALL NOT include references to resources))
     end
 

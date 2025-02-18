@@ -3,8 +3,8 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     module SubscriptionSimulationUtils
-      # Per the IG this should only be application/fhir+xml and application/fhir+json, however, Inferno (server suite)
-      # can only handle application/json, so we'll allow that. Disallow XML for now.
+      # Per the IG this should only be application/fhir+xml and application/fhir+json,
+      # application/json, so we'll allow that. Disallow XML for now.
       DEFAULT_MIME_TYPE = 'application/fhir+json'
       ALLOWED_MIME_TYPES = [DEFAULT_MIME_TYPE, 'application/json'].freeze
 

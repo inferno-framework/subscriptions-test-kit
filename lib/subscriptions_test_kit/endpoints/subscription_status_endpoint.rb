@@ -53,7 +53,7 @@ module SubscriptionsTestKit
 
       status_params = find_params(params, 'status')
       subscription_status = determine_subscription_status_code(subscription.id)
-      status_params.nil? || status_params.none? || status_params.any { p.valueString == subscription_status }
+      status_params.nil? || status_params.none? || status_params.any? { |p| p.valueString == subscription_status }
     end
 
     def tags

@@ -168,3 +168,13 @@ Specific limitations to highlight include
   [provide feedback](https://github.com/inferno-framework/subscriptions-test-kit/issues) to that effect.
 - Inferno does not test delivery error handling and recovery scenarios, including
   the optional `$events` API and event numbering details.
+- Inferno does not verify that the shape and content of notifications are appropriate for the triggering
+  Subscription because those details, e.g., the resource types that can be a focus of the notification, 
+  are defined within the SubscriptionTopic which is not available in FHIR R4.
+- When accepting notifications, Inferno supports only JSON payloads with a
+  `content-type` HTTP header of `application/fhir+json` or `application/json`.
+  Inferno will always request that `application/fhir+json` appear in `content-type`
+  header using the `Subscription.channel.payload` element. Testers may instruct
+  Inferno to request that `application/json` be used instead by placing it in the
+  `Subscription.channel.payload` element of the Subscription they provide for Inferno
+  to use.

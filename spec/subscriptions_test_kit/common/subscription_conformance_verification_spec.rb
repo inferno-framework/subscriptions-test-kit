@@ -110,7 +110,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
-        'The `type` field on the Subscription resource must be set to `rest-hook`, the `email`'
+        /The `type` element on the Subscription resource must be set to `rest-hook`/
       )
     end
 
@@ -151,6 +151,33 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
       expect(entity_result_message(test)).to match(
         'Cross-version extensions SHOULD NOT be used on R4 subscriptions to describe any elements also described by'
       )
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if subscription does not contain criteria field' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      subscription_resource.delete('criteria')
+
+      result = run(test, subscription_resource: subscription_resource.to_json)
+
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if subscription criteria does not contain valid URL' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      subscription_resource['criteria'] = ['Invalid Value']
+      result = run(test, subscription_resource: subscription_resource.to_json)
+
+      expect(result.result).to eq('fail')
       expect(verification_request).to have_been_made
     end
   end
@@ -206,7 +233,26 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
                          access_token:)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
-        'The `type` field on the Subscription resource should be set to `application/json`'
+        /The `payload` element on the Subscription resource should be set to/
+      )
+      expect(entity_result_message(test)).to match(
+        /The requested Subscription has been updated to use this value./
+      )
+    end
+
+    it 'warns but does not update if subscription uses application/json payload' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['payload'] = 'application/json'
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(
+        /The `payload` element on the Subscription resource should be set to/
+      )
+      expect(entity_result_message(test)).to_not match(
+        /The requested Subscription has been updated to use this value./
       )
     end
 

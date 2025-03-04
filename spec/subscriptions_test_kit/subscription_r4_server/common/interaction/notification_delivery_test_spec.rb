@@ -1,11 +1,7 @@
 require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/' \
                  'common/interaction/notification_delivery_test'
-require_relative '../../../../request_helper'
 
-RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationDeliveryTest do
-  include Rack::Test::Methods
-  include RequestHelpers
-
+RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationDeliveryTest, :request do
   let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
   let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_notification_delivery') }
   let(:test_group) { Inferno::Repositories::TestGroups.new.find('subscriptions_r4_server_interaction') }
@@ -61,6 +57,10 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       "notification%20#{access_token}"
   end
 
+  def post_fhir(path, data)
+    post path, data.to_json, 'CONTENT_TYPE' => 'application/fhir+json'
+  end
+
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
@@ -104,9 +104,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       expect(result.result).to eq('wait')
 
       header('Authorization', "Bearer #{access_token}")
-      post_json(subscription_channel, handshake_bundle)
-      post_json(subscription_channel, heartbeat_bundle)
-      post_json(subscription_channel, notification_bundle)
+      post_fhir(subscription_channel, handshake_bundle)
+      post_fhir(subscription_channel, heartbeat_bundle)
+      post_fhir(subscription_channel, notification_bundle)
       expect(last_response).to be_ok
 
       get(resume_pass_url)

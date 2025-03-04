@@ -4,7 +4,6 @@ require_relative 'subscriptions_r5_backport_r4_client/workflow_group'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
-require_relative '../version'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
@@ -12,7 +11,6 @@ module SubscriptionsTestKit
       id :subscriptions_r5_backport_r4_client
       title 'Subscriptions R5 Backport IG v1.1.0 FHIR R4 Client Test Suite'
       short_title 'Subscriptions R4 Client'
-      version VERSION
       description File.read(File.join(__dir__, '..', 'docs',
                                       'subscriptions_r5_backport_r4_client_suite_description.md'))
 
@@ -46,7 +44,9 @@ module SubscriptionsTestKit
 
       capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures',
                                                  'capability_statement.json'))
-      route(:get, '/fhir/metadata', proc { [200, { 'Content-Type' => 'application/json' }, [capability_statement]] })
+      route(:get, '/fhir/metadata', proc {
+                                      [200, { 'Content-Type' => 'application/fhir+json' }, [capability_statement]]
+                                    })
 
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint

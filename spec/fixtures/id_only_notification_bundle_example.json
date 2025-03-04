@@ -23,7 +23,7 @@
           {
             "name": "subscription",
             "valueReference": {
-              "reference": "https://fhirserver.org/fhir/Subscription/admission"
+              "reference": "https://fhirserver.org/fhir/Subscription/123"
             }
           },
           {

@@ -8,12 +8,12 @@ module SubscriptionsTestKit
       title 'Demonstrate the subscription workflow'
       description %(
         Demonstrate the ability of the server to accept a request for the
-        creation of a FHIR Subscription instance and deliver a notification
+        creation of a FHIR Subscription instance and deliver an event notification
         for that Subscription. The tester must provide a Subscription instance
         that the server under test supports. Inferno will act as a client,
-        creating the Subscription and waiting for a notification based on it.
-        Inferno will then verify that the Subscription and the Notification
-        match and that the exchange is conformant.
+        creating the Subscription and waiting for notifications based on it.
+        Inferno will then verify that an event notification has been received
+        for the created Subscription and that the exchange is conformant.
       )
 
       run_as_group

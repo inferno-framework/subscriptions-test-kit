@@ -3,8 +3,8 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     module SubscriptionSimulationUtils
-      # Per the IG this should only be application/fhir+xml and application/fhir+json, however, Inferno (server suite)
-      # can only handle application/json, so we'll allow that. Disallow XML for now.
+      # Per the IG this should only be application/fhir+xml and application/fhir+json,
+      # application/json, so we'll allow that. Disallow XML for now.
       DEFAULT_MIME_TYPE = 'application/fhir+json'
       ALLOWED_MIME_TYPES = [DEFAULT_MIME_TYPE, 'application/json'].freeze
 
@@ -16,25 +16,32 @@ module SubscriptionsTestKit
         JSON.parse(test_result.input_json).find { |i| i['name'] == 'client_endpoint_access_token' }['value']
       end
 
-      def derive_handshake_notification(notification_json, subscription_url)
+      def derive_handshake_notification(notification_json, subscription_url, subscription_topic)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, 'requested', 0,
-                                                         'handshake')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         'requested', 0, 'handshake')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status.parameter.delete(find_parameter(subscription_status, 'error'))
+        notification_bundle.entry = [find_subscription_status_entry(notification_bundle)]
+        notification_bundle.timestamp = Time.now.utc.iso8601
         notification_bundle
       end
 
-      def derive_event_notification(notification_json, subscription_url, event_count)
+      def derive_event_notification(notification_json, subscription_url, subscription_topic, event_count)
+        notification_timestamp = Time.now.utc.iso8601
         notification_bundle = FHIR.from_contents(notification_json)
-        update_subscription_status(notification_bundle, subscription_url, 'active', event_count, 'event-notification')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         'active', event_count, 'event-notification')
+        update_event_timestamps(subscription_status, notification_timestamp)
+        notification_bundle.timestamp = notification_timestamp
         notification_bundle
       end
 
-      def derive_status_bundle(notification_json, subscription_url, status_code, event_count, request_url)
+      def derive_status_bundle(notification_json, subscription_url, subscription_topic,
+                               status_code, event_count, request_url)
         notification_bundle = FHIR.from_contents(notification_json)
-        subscription_status = update_subscription_status(notification_bundle, subscription_url, status_code,
-                                                         event_count, 'query-status')
+        subscription_status = update_subscription_status(notification_bundle, subscription_url, subscription_topic,
+                                                         status_code, event_count, 'query-status')
         subscription_status.parameter.delete(find_parameter(subscription_status, 'notification-event'))
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
         FHIR::Bundle.new(
@@ -45,7 +52,8 @@ module SubscriptionsTestKit
           ),
           link: FHIR::Bundle::Link.new(relation: 'self', url: request_url),
           total: 1,
-          type: 'searchset'
+          type: 'searchset',
+          timestamp: Time.now.utc.iso8601
         )
       end
 
@@ -55,14 +63,19 @@ module SubscriptionsTestKit
         oo
       end
 
-      def find_subscription(test_session_id)
+      def find_subscription(test_session_id, as_json: false)
         request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_CREATE_TAG])&.find do |r|
           r.status == 201
         end
         return unless request
 
         begin
-          FHIR.from_contents(request.response_body)
+          if as_json
+            # needed to access primitive extensions
+            JSON.parse(request.response_body)
+          else
+            FHIR.from_contents(request.response_body)
+          end
         rescue StandardError
           nil
         end
@@ -106,16 +119,27 @@ module SubscriptionsTestKit
         subscription_url&.reference&.chomp('/')&.split('/')&.last
       end
 
-      def update_subscription_status(notification_bundle, subscription_url, status_code, event_count, type)
+      def update_subscription_status(notification_bundle, subscription_url, subscription_topic, status_code,
+                                     event_count, type)
         subscription_status_entry = find_subscription_status_entry(notification_bundle)
-        subscription_status_entry.request = FHIR::Bundle::Entry::Request.new(method: 'POST',
+        subscription_status_entry.request = FHIR::Bundle::Entry::Request.new(method: 'GET',
                                                                              url: "#{subscription_url}/$status")
+        subscription_status_entry.response = FHIR::Bundle::Entry::Response.new(status: '200')
         subscription_status = subscription_status_entry&.resource
         set_subscription_reference(subscription_status, subscription_url)
+        find_parameter(subscription_status, 'topic')&.valueCanonical = subscription_topic
         find_parameter(subscription_status, 'status')&.valueCode = status_code
         find_parameter(subscription_status, 'type')&.valueCode = type
         find_parameter(subscription_status, 'events-since-subscription-start')&.valueString = event_count.to_s
         subscription_status
+      end
+
+      def update_event_timestamps(subscription_status, timestamp = nil)
+        timestamp = Time.now.utc.iso8601 unless timestamp.present?
+        event_list = find_all_parameters(subscription_status, 'notification-event')
+        event_list.each do |event|
+          event.part.find { |part| part.name == 'timestamp' }&.valueInstant = timestamp
+        end
       end
 
       def find_subscription_status_entry(notification_bundle)
@@ -137,6 +161,10 @@ module SubscriptionsTestKit
 
       def find_parameter(subscription_status, parameter_name)
         subscription_status.parameter&.find { |p| p.name == parameter_name }
+      end
+
+      def find_all_parameters(subscription_status, parameter_name)
+        subscription_status.parameter&.select { |p| p.name == parameter_name }
       end
     end
   end

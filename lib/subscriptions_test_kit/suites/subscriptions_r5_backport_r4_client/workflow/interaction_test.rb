@@ -3,6 +3,7 @@
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
     class InteractionTest < Inferno::Test
+      include URLs
       id :subscriptions_r4_client_interaction
       description %(
         During this test, the client under test will interact with Inferno following the Subscription
@@ -37,6 +38,13 @@ module SubscriptionsTestKit
         1. The provided content must be a valid json representation of a FHIR Bundle resource.
         2. The first instance in the Bundle is a Parameters resource.
         3. The first Parameters instance has a `subscription` parameter entry.
+
+        Additional notes:
+        - Inferno will only accept one successful Subscription creation request per test run. If you
+          need to change the Subscription after Inferno has successfully received it, end the tests and re-run them.
+        - Inferno will modify the `Subscription.channel.payload` value on the submitted Subscription to
+          `application/fhir+json` unless it is `application/json`. The value in their field returned by Inferno
+          will be used for the `content-type` HTTP header on notifications.
       )
       title 'Subscription Workflow Interaction'
 

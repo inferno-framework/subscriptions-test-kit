@@ -74,6 +74,10 @@ module SubscriptionsTestKit
         @authorization_header ||= @bearer_token.present? ? { 'Authorization' => "Bearer #{@bearer_token}" } : {}
       end
 
+      def subscription_topic
+        @subscription_topic ||= subscription&.criteria
+      end
+
       def test_still_waiting?
         results_repo.find_waiting_result(test_run_id: @test_run_id)
       end
@@ -83,14 +87,15 @@ module SubscriptionsTestKit
       end
 
       def send_handshake_notification
-        handshake_json = derive_handshake_notification(@notification_json, @subscription_url).to_json
+        handshake_json = derive_handshake_notification(@notification_json, @subscription_url,
+                                                       subscription_topic).to_json
         response = send_notification(handshake_json)
         persist_notification_request(response, [REST_HOOK_HANDSHAKE_NOTIFICATION_TAG])
         resume_inferno_test unless response.status == 200
       end
 
       def send_event_notification
-        event_json = derive_event_notification(@notification_json, @subscription_url, 1).to_json
+        event_json = derive_event_notification(@notification_json, @subscription_url, subscription_topic, 1).to_json
         response = send_notification(event_json)
         persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
       end

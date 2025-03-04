@@ -10,15 +10,17 @@ module SubscriptionsTestKit
       id :subscriptions_r4_client_notification_input_verification
       title '[USER INPUT VERIFICATION] Notification Bundle Input Conformance Verification'
       description %(
-        This test verifies that the notification bundle provided by the tester is conformant
+        This test verifies that the notification bundle sent is conformant
         to the [R4 Topic-Based Subscription Notification Bundle
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
-      )
-      input :notification_bundle
+        The content of the notification will be based on the Bundle provided by the tester.
+        )
 
       run do
-        notification_verification(notification_bundle, 'event-notification')
-        no_error_verification('Notification bundle input was not conformant, see error messages')
+        load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
+        skip_if(requests.none?, 'Inferno did not send an event notification')
+        notification_verification(request.request_body, 'event-notification')
+        no_error_verification('Notification bundle was not conformant, see error messages')
       end
     end
   end

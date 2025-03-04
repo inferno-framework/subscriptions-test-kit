@@ -46,7 +46,6 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
   end
 
   let(:subscription_id) { '123' }
-  let(:criteria_resource_type) { 'Encounter' }
   let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def entity_result_message(runnable)
@@ -367,6 +366,15 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       )
     end
 
+    it 'succeeds if event-notification focus uses a uuid (urn reference)' do
+      focus = full_resource_notification_bundle['entry'].first['resource']['parameter'].last['part'].last
+      focus['valueReference']['reference'] = 'urn:uri:86009987-eabe-42bf-8c02-b112b18cb616'
+      full_resource_notification_bundle['entry'][1]['fullUrl'] = 'urn:uri:86009987-eabe-42bf-8c02-b112b18cb616'
+
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
+      expect(result.result).to eq('pass')
+    end
+
     it 'fails if event-notification additional-context contains a reference not found in the Bundle entries' do
       additional_context = {
         name: 'additional-context',
@@ -401,14 +409,14 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
           igs('hl7.fhir.uv.subscriptions-backport#1.1.0')
         end
 
-        input :notification_bundle, :criteria_resource_type
+        input :notification_bundle
 
         run do
           notification_bundle_resource = FHIR.from_contents(notification_bundle)
           notification_event = notification_bundle_resource.entry.first.resource.parameter.last
           notification_events = [notification_event]
 
-          id_only_notification_event_parameter_verification(notification_events, criteria_resource_type)
+          id_only_notification_event_parameter_verification(notification_events, nil)
           no_error_verification('There were verification errors')
         end
       end
@@ -419,28 +427,18 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'passes if array of conformant event-notifications passed in' do
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('pass')
     end
 
     it 'fails if event-notification focus field is blank' do
       id_only_notification_bundle['entry'].first['resource']['parameter'].last['part'].pop
 
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
         'When the content type is `id-only`, notification bundles SHALL include references to'
-      )
-    end
-
-    it 'fails if event-notification focus does not reference the criteria resource type' do
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
-                         criteria_resource_type: 'Patient')
-      expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('There were verification errors')
-      expect(entity_result_message(test)).to match(
-        'The SubscriptionStatus.notificationEvent.focus should include a reference to a Patient'
       )
     end
   end
@@ -528,7 +526,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
-        'When populating the SubscriptionStatus.notificationEvent structure for a notification with an empty'
+        'When populating the SubscriptionStatus.notificationEvent structure for an event notification with an empty'
       )
     end
   end
@@ -549,10 +547,10 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
           igs('hl7.fhir.uv.subscriptions-backport#1.1.0')
         end
 
-        input :notification_bundle, :criteria_resource_type
+        input :notification_bundle
 
         run do
-          full_resource_event_notification_verification(notification_bundle, criteria_resource_type)
+          full_resource_event_notification_verification(notification_bundle, nil)
           no_error_verification('There were verification errors')
         end
       end
@@ -566,19 +564,19 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       verification_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
       expect(result.result).to eq('pass')
       expect(verification_request).to have_been_made
     end
 
     it 'fails if full-resource notification bundle is not valid JSON' do
-      result = run(test, notification_bundle: '[[', criteria_resource_type:)
+      result = run(test, notification_bundle: '[[')
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Invalid JSON. ')
     end
 
     it 'fails if full-resource notification bundle is not a FHIR resource' do
-      result = run(test, notification_bundle: { field: 'example' }.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: { field: 'example' }.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Not a FHIR resource')
     end
@@ -588,7 +586,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first['resource']['parameter'].delete_at(1)
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
         'This value SHOULD be present when using full-resource payloads'
@@ -597,25 +595,12 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       expect(verification_request).to have_been_made
     end
 
-    it 'fails if there are no resource entries that are of the criteria_resource_type resource type' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
-        .to_return(status: 200, body: operation_outcome_success.to_json)
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
-                         criteria_resource_type: 'Patient')
-      expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('There were verification errors')
-      expect(entity_result_message(test)).to match(
-        'The notification bundle of type `full-resource` must include at least one Patient'
-      )
-      expect(verification_request).to have_been_made
-    end
-
     it 'fails if SubscriptionStatus does not contain any event-notifications' do
       verification_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first['resource']['parameter'].pop
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
@@ -628,7 +613,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       verification_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
-      result = run(test, notification_bundle: full_resource_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
@@ -654,10 +639,10 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
           igs('hl7.fhir.uv.subscriptions-backport#1.1.0')
         end
 
-        input :notification_bundle, :criteria_resource_type
+        input :notification_bundle
 
         run do
-          id_only_event_notification_verification(notification_bundle, criteria_resource_type)
+          id_only_event_notification_verification(notification_bundle, nil)
           no_error_verification('There were verification errors')
         end
       end
@@ -668,24 +653,24 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'passes if conformant id-only notification bundle passed in' do
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('pass')
     end
 
     it 'fails if id-only notification bundle is not valid JSON' do
-      result = run(test, notification_bundle: '[[', criteria_resource_type:)
+      result = run(test, notification_bundle: '[[')
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Invalid JSON. ')
     end
 
     it 'fails if id-only notification bundle is not a FHIR resource' do
-      result = run(test, notification_bundle: { field: 'example' }.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: { field: 'example' }.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Not a FHIR resource')
     end
 
     it 'produces info message if id-only notification bundle contains parameter.topic field' do
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
         'is populated in `id-only` Notification'
@@ -695,7 +680,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
 
     it 'produces info message if id-only notification bundle does not contain parameter.topic field' do
       id_only_notification_bundle['entry'].first['resource']['parameter'].delete_at(1)
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
         'is not populated in `id-only` Notification'
@@ -705,7 +690,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
 
     it 'fails if SubscriptionStatus does not contain any event-notifications' do
       id_only_notification_bundle['entry'].first['resource']['parameter'].pop
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
@@ -716,7 +701,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     it 'fails if id-only bundle contains an entry with a resource' do
       entry_resource = full_resource_notification_bundle['entry'].last['resource']
       id_only_notification_bundle['entry'].last['resource'] = entry_resource
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
@@ -726,12 +711,103 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
 
     it 'fails if id-only bundle contains an entry without a full url' do
       id_only_notification_bundle['entry'].last.delete('fullUrl')
-      result = run(test, notification_bundle: id_only_notification_bundle.to_json, criteria_resource_type:)
+      result = run(test, notification_bundle: id_only_notification_bundle.to_json)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('There were verification errors')
       expect(entity_result_message(test)).to match(
         'Each Bundle.entry for id-only notification SHALL contain a relevant resource URL in the fullUrl'
       )
+    end
+  end
+
+  describe 'Notification Header Verification' do
+    let(:subscription_resource) do
+      JSON.parse(File.read(File.join(
+                             __dir__, '../..', 'fixtures', 'subscription_resource_example.json'
+                           )))
+    end
+
+    let(:test) do
+      Class.new(Inferno::Test) do
+        include SubscriptionsTestKit::NotificationConformanceVerification
+
+        input :subscription
+
+        run do
+          headers = [
+            Inferno::Entities::Header.new(
+              type: 'request',
+              name: 'Authorization',
+              value: 'Bearer SAMPLE_TOKEN'
+            ),
+            Inferno::Entities::Header.new(
+              type: 'request',
+              name: 'content-type',
+              value: 'application/json'
+            )
+          ]
+          notification_header_verification(headers, JSON.parse(subscription))
+          no_error_verification('There were verification errors')
+        end
+      end
+    end
+
+    before do
+      Inferno::Repositories::Tests.new.insert(test)
+    end
+
+    it 'passes when the right headers are in the list' do
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'fails when the wrong headers are in the list' do
+      subscription_resource['channel']['payload'] = 'application/fhir+json'
+      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq('Content type of request does not match the Subscription MIME type.\n' \
+                                                'Expected application/fhir+json, received application/json\n' \
+                                                'Requested header not sent: accept: application/fhir+json\n')
+    end
+  end
+
+  describe 'Notification Header Verification Error Handling' do
+    let(:subscription_resource) do
+      JSON.parse(File.read(File.join(
+                             __dir__, '../..', 'fixtures', 'subscription_resource_example.json'
+                           )))
+    end
+
+    let(:test) do
+      Class.new(Inferno::Test) do
+        include SubscriptionsTestKit::NotificationConformanceVerification
+
+        input :subscription
+
+        run do
+          notification_header_verification([], JSON.parse(subscription))
+          no_error_verification('There were verification errors')
+        end
+      end
+    end
+
+    before do
+      Inferno::Repositories::Tests.new.insert(test)
+    end
+
+    it 'fails when the content-type header and requesed header are blank' do
+      subscription_resource['channel']['payload'] = 'application/fhir+json'
+      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq('Content type header not sent, subscription requested' \
+                                                'application/fhir+json\n Requested header not sent: ' \
+                                                'Authorization: Bearer SAMPLE_TOKEN\n Requested header ' \
+                                                'not sent: accept: application/fhir+json\n')
     end
   end
 end

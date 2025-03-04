@@ -2,10 +2,7 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
                  'common/interaction_verification/notification_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:full_resource_notification_bundle) do
@@ -17,6 +14,18 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   let(:empty_notification_bundle) do
     JSON.parse(File.read(File.join(
                            __dir__, '../../../..', 'fixtures', 'empty_notification_bundle_example.json'
+                         )))
+  end
+
+  let(:empty_notification_bundle_non_conformant) do
+    JSON.parse(File.read(File.join(
+                           __dir__, '../../../..', 'fixtures', 'empty_notification_bundle_non_conformant_example.json'
+                         )))
+  end
+
+  let(:handshake_bundle) do
+    JSON.parse(File.read(File.join(
+                           __dir__, '../../../..', 'fixtures', 'handshake_bundle_example.json'
                          )))
   end
 
@@ -54,7 +63,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   let(:server_endpoint) { 'http://example.com/fhir/Subscription' }
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_id) { '123' }
-  let(:criteria_resource_type) { 'Encounter' }
   let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def create_request(url: subscription_channel, direction: 'incoming', tags: nil, body: nil, status: 200, headers: nil)
@@ -63,6 +71,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
         type: 'request',
         name: 'Authorization',
         value: "Bearer #{access_token}"
+      },
+      {
+        type: 'request',
+        name: 'content-type',
+        value: 'application/json'
       }
     ]
     repo_create(
@@ -80,31 +93,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     )
   end
 
-  def entity_result_message(runnable)
-    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
-      .first
-      .messages
-      .map(&:message)
-      .join(' ')
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   describe 'Server Workflow Notification Test' do
     let(:test) do
-      Class.new(SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationConformanceTest) do
+      Class.new(described_class) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -148,22 +139,85 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
 
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to eq('No successful Subscription creation request was made in the previous test.')
+      expect(result.result_message).to match(/No successful Subscription creation request/)
     end
 
     it 'skips if no event-notification requests were made' do
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
-
+      create_request(tags: ['handshake', subscription_id], body: handshake_bundle)
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to eq('No event-notification requests were made in a previous test as expected.')
+      expect(result.result_message).to match(/No event-notification requests were made/)
+    end
+
+    it 'fails if a non-conformant event-notification is made' do
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', subscription_id],
+                     body: empty_notification_bundle_non_conformant)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to match(/are not conformant/)
+      expect(verification_request).to have_been_made.once
+    end
+
+    it 'uses the most recent Susbcription if there are multiple' do
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      first_subscription_id = subscription_resource['id']
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', first_subscription_id],
+                     body: full_resource_notification_bundle)
+
+      second_subscription_id = SecureRandom.uuid
+      subscription_resource['id'] = second_subscription_id
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', second_subscription_id],
+                     body: empty_notification_bundle_non_conformant)
+
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to match(
+        /Received event-notifications for Subscription #{second_subscription_id} are not conformant./
+      )
+      expect(verification_request).to have_been_made.once
+    end
+
+    it 'fails if an expected header is not sent' do
+      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', subscription_id], body: empty_notification_bundle)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if wrong mime type is sent' do
+      subscription_resource['channel']['payload'] = 'application/fhir+json'
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', subscription_id], body: empty_notification_bundle)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
     end
   end
 
   describe 'Server Coverage Full-Resource Notification Test' do
-    let(:test) do
-      Class.new(SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationConformanceTest) do
+    let(:full_resource_test) do
+      Class.new(described_class) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -189,7 +243,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
       create_request(tags: ['event-notification', subscription_id], body: full_resource_notification_bundle)
-      result = run(test)
+      result = run(full_resource_test)
       expect(result.result).to eq('pass')
       expect(verification_request).to have_been_made
     end
@@ -198,9 +252,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
                      body: subscription_resource)
 
-      result = run(test)
+      result = run(full_resource_test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to eq('No successful Subscription creation request was made in the previous test.')
+      expect(result.result_message).to match(/No successful Subscription creation request/)
     end
   end
 end

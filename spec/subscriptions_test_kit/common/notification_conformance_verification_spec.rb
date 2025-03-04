@@ -743,7 +743,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
             Inferno::Entities::Header.new(
               type: 'request',
               name: 'content-type',
-              value: 'application/json'
+              value: 'application/fhir+json'
             )
           ]
           notification_header_verification(headers, JSON.parse(subscription))
@@ -763,14 +763,14 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails when the wrong headers are in the list' do
-      subscription_resource['channel']['payload'] = 'application/fhir+json'
-      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      subscription_resource['channel']['payload'] = 'application/json'
+      subscription_resource.dig('channel', 'header') << 'accept: application/json'
       inputs = { subscription: subscription_resource.to_json }
       result = run(test, inputs)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to eq('Content type of request does not match the Subscription MIME type.\n' \
-                                                'Expected application/fhir+json, received application/json\n' \
-                                                'Requested header not sent: accept: application/fhir+json\n')
+      expect(entity_result_message(test)).to eq('Content type of request does not match the Subscription MIME type. ' \
+                                                'Expected application/json, received application/fhir+json ' \
+                                                "Requested header not sent: accept: application/json\n")
     end
   end
 
@@ -804,10 +804,11 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       inputs = { subscription: subscription_resource.to_json }
       result = run(test, inputs)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to eq('Content type header not sent, subscription requested' \
-                                                'application/fhir+json\n Requested header not sent: ' \
-                                                'Authorization: Bearer SAMPLE_TOKEN\n Requested header ' \
-                                                'not sent: accept: application/fhir+json\n')
+      expect(entity_result_message(test)).to eq(
+        "Content type header not sent, subscription requested application/fhir+json\n " \
+        "Requested header not sent: Authorization: Bearer SAMPLE_TOKEN\n " \
+        "Requested header not sent: accept: application/fhir+json\n"
+      )
     end
   end
 end

@@ -315,7 +315,7 @@ module SubscriptionsTestKit
       end
       # Verification for hl7.fhir.uv.subscriptions_1.1.0@27
       subscription.dig('channel', 'header').each do |requested_header|
-        handle_sent_header_errors(requested_header)
+        handle_sent_header_errors(request_headers, requested_header)
       end
     end
 
@@ -329,7 +329,7 @@ module SubscriptionsTestKit
       end
     end
 
-    def handle_sent_header_errors(requested_header)
+    def handle_sent_header_errors(request_headers, requested_header)
       requested_name = requested_header.partition(': ').first.downcase
       requested_value = requested_header.partition(': ').last
       sent_header = request_headers.find { |header| header.name.downcase == requested_name }

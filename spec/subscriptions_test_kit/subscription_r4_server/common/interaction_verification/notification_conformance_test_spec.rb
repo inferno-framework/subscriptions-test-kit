@@ -75,7 +75,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       {
         type: 'request',
         name: 'content-type',
-        value: 'application/json'
+        value: 'application/fhir+json'
       }
     ]
     repo_create(
@@ -202,7 +202,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'fails if wrong mime type is sent' do
-      subscription_resource['channel']['payload'] = 'application/fhir+json'
+      subscription_resource['channel']['payload'] = 'application/json'
       verification_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 

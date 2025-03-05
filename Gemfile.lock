@@ -276,6 +276,8 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.3)
       parser (>= 3.3.1.0)
+    rubocop-rake (0.6.0)
+      rubocop (~> 1.0)
     rubocop-rspec (3.0.3)
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
@@ -339,6 +341,7 @@ DEPENDENCIES
   roo (~> 2.10.1)
   rspec (~> 3.10)
   rubocop (~> 1.56)
+  rubocop-rake (~> 0.6.0)
   rubocop-rspec
   subscriptions_test_kit!
   webmock (~> 3.11)

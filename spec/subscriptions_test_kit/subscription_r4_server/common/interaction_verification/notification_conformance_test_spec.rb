@@ -71,6 +71,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
         type: 'request',
         name: 'Authorization',
         value: "Bearer #{access_token}"
+      },
+      {
+        type: 'request',
+        name: 'content-type',
+        value: 'application/fhir+json'
       }
     ]
     repo_create(
@@ -181,6 +186,32 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
         /Received event-notifications for Subscription #{second_subscription_id} are not conformant./
       )
       expect(verification_request).to have_been_made.once
+    end
+
+    it 'fails if an expected header is not sent' do
+      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', subscription_id], body: empty_notification_bundle)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if wrong mime type is sent' do
+      subscription_resource['channel']['payload'] = 'application/json'
+      verification_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+
+      create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
+                     body: subscription_resource, status: 201)
+      create_request(tags: ['event-notification', subscription_id], body: empty_notification_bundle)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(verification_request).to have_been_made
     end
   end
 

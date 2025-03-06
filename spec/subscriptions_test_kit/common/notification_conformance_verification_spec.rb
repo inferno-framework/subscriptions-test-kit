@@ -719,4 +719,96 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       )
     end
   end
+
+  describe 'Notification Header Verification' do
+    let(:subscription_resource) do
+      JSON.parse(File.read(File.join(
+                             __dir__, '../..', 'fixtures', 'subscription_resource_example.json'
+                           )))
+    end
+
+    let(:test) do
+      Class.new(Inferno::Test) do
+        include SubscriptionsTestKit::NotificationConformanceVerification
+
+        input :subscription
+
+        run do
+          headers = [
+            Inferno::Entities::Header.new(
+              type: 'request',
+              name: 'Authorization',
+              value: 'Bearer SAMPLE_TOKEN'
+            ),
+            Inferno::Entities::Header.new(
+              type: 'request',
+              name: 'content-type',
+              value: 'application/fhir+json'
+            )
+          ]
+          notification_header_verification(headers, JSON.parse(subscription))
+          no_error_verification('There were verification errors')
+        end
+      end
+    end
+
+    before do
+      Inferno::Repositories::Tests.new.insert(test)
+    end
+
+    it 'passes when the right headers are in the list' do
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'fails when the wrong headers are in the list' do
+      subscription_resource['channel']['payload'] = 'application/json'
+      subscription_resource.dig('channel', 'header') << 'accept: application/json'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq('Content type of request does not match the Subscription MIME type. ' \
+                                                'Expected application/json, received application/fhir+json ' \
+                                                "Requested header not sent: accept: application/json\n")
+    end
+  end
+
+  describe 'Notification Header Verification Error Handling' do
+    let(:subscription_resource) do
+      JSON.parse(File.read(File.join(
+                             __dir__, '../..', 'fixtures', 'subscription_resource_example.json'
+                           )))
+    end
+
+    let(:test) do
+      Class.new(Inferno::Test) do
+        include SubscriptionsTestKit::NotificationConformanceVerification
+
+        input :subscription
+
+        run do
+          notification_header_verification([], JSON.parse(subscription))
+          no_error_verification('There were verification errors')
+        end
+      end
+    end
+
+    before do
+      Inferno::Repositories::Tests.new.insert(test)
+    end
+
+    it 'fails when the content-type header and requesed header are blank' do
+      subscription_resource['channel']['payload'] = 'application/fhir+json'
+      subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq(
+        "Content type header not sent, subscription requested application/fhir+json\n " \
+        "Requested header not sent: Authorization: Bearer SAMPLE_TOKEN\n " \
+        "Requested header not sent: accept: application/fhir+json\n"
+      )
+    end
+  end
 end

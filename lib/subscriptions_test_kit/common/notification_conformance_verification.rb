@@ -305,5 +305,41 @@ module SubscriptionsTestKit
 
       verify_id_only_notification_bundle_entries(bundle_entries)
     end
+
+    def notification_header_verification(request_headers, subscription)
+      mime_type = subscription&.dig('channel', 'payload')
+      # Verification for hl7.fhir.uv.subscriptions_1.1.0@26
+      if mime_type.present?
+        content_type_header = request_headers.find { |header| header.name.downcase == 'content-type' }
+        handle_content_type_header_errors(mime_type, content_type_header)
+      end
+      # Verification for hl7.fhir.uv.subscriptions_1.1.0@27
+      subscription.dig('channel', 'header').each do |requested_header|
+        handle_sent_header_errors(request_headers, requested_header)
+      end
+    end
+
+    def handle_content_type_header_errors(mime_type, content_type_header)
+      if content_type_header.blank?
+        add_message('error', "Content type header not sent, subscription requested #{mime_type}\n")
+      elsif !content_type_header.value.start_with?(mime_type)
+        add_message('error',
+                    'Content type of request does not match the Subscription MIME type. ' \
+                    "Expected #{mime_type}, received #{content_type_header.value}")
+      end
+    end
+
+    def handle_sent_header_errors(request_headers, requested_header)
+      requested_name = requested_header.partition(': ').first.downcase
+      requested_value = requested_header.partition(': ').last
+      sent_header = request_headers.find { |header| header.name.downcase == requested_name }
+      if sent_header.blank?
+        add_message('error', "Requested header not sent: #{requested_header}\n")
+      elsif sent_header.value != requested_value
+        add_message('error',
+                    "Requested value for header #{requested_name} does not match the request sent. " \
+                    "Expected #{requested_value}, received #{sent_header.value}")
+      end
+    end
   end
 end

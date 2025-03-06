@@ -1,4 +1,5 @@
 require:
+  - rubocop-rake
   - rubocop-rspec
 
 AllCops:
@@ -6,14 +7,14 @@ AllCops:
   SuggestExtensions: false
   TargetRubyVersion: 3.3.6
   Exclude:
-    - "Gemfile"
-    - "vendor/**/*"
+    - 'Gemfile'
+    - 'vendor/**/*'
 
 Layout/LineLength:
   Max: 120
 
 Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: "indented"
+  EnforcedStyle: 'indented'
 
 Style/Documentation:
   Enabled: false
@@ -26,7 +27,7 @@ Style/NumericLiterals:
 
 Style/OpenStructUse:
   Exclude:
-    - "spec/**/*"
+    - 'spec/**/*'
 
 Style/SymbolArray:
   Enabled: false

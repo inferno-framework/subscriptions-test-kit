@@ -23,6 +23,8 @@ module SubscriptionsTestKit
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@14',
                             'hl7.fhir.uv.subscriptions_1.1.0@15',
+                            'hl7.fhir.uv.subscriptions_1.1.0@26',
+                            'hl7.fhir.uv.subscriptions_1.1.0@27',
                             'hl7.fhir.uv.subscriptions_1.1.0@28',
                             'hl7.fhir.uv.subscriptions_1.1.0@69',
                             'hl7.fhir.uv.subscriptions_1.1.0@70',
@@ -79,6 +81,10 @@ module SubscriptionsTestKit
             'event-notification',
             subscription_id: subscription['id'],
             status: 'active'
+          )
+          notification_header_verification(
+            request.request_headers,
+            subscription
           )
         end
 

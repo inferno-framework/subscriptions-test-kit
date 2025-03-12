@@ -3,9 +3,9 @@ require_relative 'version'
 module SubscriptionsTestKit
   class Metadata < Inferno::TestKit
     id :subscriptions_test_kit
-    title 'Subscription Test Kit'
+    title 'Subscriptions Test Kit'
     description <<~DESCRIPTION
-      The Subscriptions Test Suite verifies the conformance of systems to the FHIR Subscriptions
+      The Subscriptions Test Kit verifies the conformance of systems to the FHIR Subscriptions
       framework as specified in the [HL7® FHIR® R5 version](https://www.hl7.org/fhir/R5/subscriptions.html)
       and above. For systems using the R4 and R4B releases of FHIR, it verifies Subscription
       functionality against the [Subscriptions R5 Backport

@@ -107,11 +107,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
 
         fhir_client do
           url :server_endpoint
-          oauth_credentials :server_credentials
         end
 
         input :server_endpoint
-        input :server_credentials, type: :oauth_credentials
       end
     end
 

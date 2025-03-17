@@ -16,7 +16,7 @@ module SubscriptionsTestKit
         Subscription creation requests.
       )
 
-      input_order :url, :credentials, :subscription_resource, :unsupported_subscription_topic,
+      input_order :url, :smart_auth_info, :subscription_resource, :unsupported_subscription_topic,
                   :unsupported_subscription_filter, :unsupported_subscription_channel_type,
                   :unsupported_subscription_channel_endpoint, :unsupported_subscription_payload_type,
                   :unsupported_subscription_channel_payload_combo

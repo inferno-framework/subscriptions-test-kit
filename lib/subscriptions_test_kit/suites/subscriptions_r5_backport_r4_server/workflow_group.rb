@@ -18,7 +18,7 @@ module SubscriptionsTestKit
 
       run_as_group
 
-      input_order :url, :credentials, :access_token, :subscription_resource
+      input_order :url, :smart_auth_info, :access_token, :subscription_resource
 
       group from: :subscriptions_r4_server_interaction
       group from: :subscriptions_r4_server_interaction_verification

@@ -16,7 +16,7 @@ module SubscriptionsTestKit
       run_as_group
       optional
 
-      input_order :url, :credentials, :access_token, :id_only_subscription_resource
+      input_order :url, :smart_auth_info, :access_token, :id_only_subscription_resource
 
       group from: :subscriptions_r4_server_interaction do
         id :subscriptions_r4_server_id_only_content_interaction

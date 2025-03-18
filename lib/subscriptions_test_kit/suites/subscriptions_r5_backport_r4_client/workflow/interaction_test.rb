@@ -101,10 +101,10 @@ module SubscriptionsTestKit
             At any point while this test is waiting, Inferno will respond to Subscription GET and $status requests.
 
             Once the client has received an event notification and has made any additional requests,
-            [click here to complete the test](#{resume_pass_url}?test_run_identifier=#{access_token})
+            [click here to complete the test](#{resume_pass_url_client}?test_run_identifier=#{access_token})
 
             If at any point something has gone wrong and the client is unable to continue,
-            [click here to fail the test](#{resume_fail_url}?test_run_identifier=#{access_token})
+            [click here to fail the test](#{resume_fail_url_client}?test_run_identifier=#{access_token})
 
             NOTE: The test must be completed or failed using the links above within 10 minutes. After that,
             attempts to send requests or to complete or fail the tests using the links above

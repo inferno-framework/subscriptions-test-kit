@@ -45,7 +45,7 @@ module SubscriptionsTestKit
 
             `#{subscription_channel_url}`
 
-            [Click here](#{resume_pass_url}?token=notification%20#{access_token}) when you have finished submitting
+            [Click here](#{resume_pass_url_server}?token=notification%20#{access_token}) when you have finished submitting
             requests.
 
           )

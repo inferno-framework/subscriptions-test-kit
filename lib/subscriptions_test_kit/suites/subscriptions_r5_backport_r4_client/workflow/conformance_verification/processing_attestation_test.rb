@@ -27,9 +27,9 @@ module SubscriptionsTestKit
           message: %(
             I attest that the client application successfully processed the event notification sent by Inferno.
 
-            [Click here](#{resume_pass_url}?test_run_identifier=#{token}) if the above statement is **true**.
+            [Click here](#{resume_pass_url_client}?test_run_identifier=#{token}) if the above statement is **true**.
 
-            [Click here](#{resume_fail_url}?test_run_identifier=#{token}) if the above statement is **false**.
+            [Click here](#{resume_fail_url_client}?test_run_identifier=#{token}) if the above statement is **false**.
           )
         )
       end

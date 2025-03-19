@@ -1,3 +1,9 @@
+## 0.10.1
+
+* FI-3011: Rest hook notification validation by @dclark43 in https://github.com/inferno-framework/subscriptions-test-kit/pull/8
+* Fix test kit title and description by @tstrass in https://github.com/inferno-framework/subscriptions-test-kit/pull/22
+* FI-3625: Statically define Suite ID in URLs by @tstrass in https://github.com/inferno-framework/subscriptions-test-kit/pull/24
+
 ## 0.10.0
 
 ### Breaking changes by @vanessuniq in https://github.com/inferno-framework/subscriptions-test-kit/pull/19:

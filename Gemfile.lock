@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    subscriptions_test_kit (0.10.0)
+    subscriptions_test_kit (0.10.1)
       inferno_core (~> 0.6.4)
 
 GEM

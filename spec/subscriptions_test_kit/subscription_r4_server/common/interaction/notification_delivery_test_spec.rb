@@ -47,7 +47,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       refresh_token: 'REFRESH_TOKEN',
       expires_in: 3600,
       client_id: 'CLIENT_ID',
-      token_retrieval_time: Time.now.iso8601,
+      issue_time: Time.now.iso8601,
       token_url: 'http://example.com/token'
     }.to_json
   end
@@ -81,11 +81,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       Class.new(SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationDeliveryTest) do
         fhir_client do
           url :server_endpoint
-          oauth_credentials :server_credentials
+          auth_info :server_credentials
         end
 
         input :server_endpoint
-        input :server_credentials, type: :oauth_credentials
+        input :server_credentials, type: :auth_info
       end
     end
 

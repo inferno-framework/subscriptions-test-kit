@@ -15,7 +15,7 @@ module SubscriptionsTestKit
         `empty`, `id-only`, and `full-resource`.
       )
 
-      input_order :url, :credentials, :access_token, :empty_subscription_resource,
+      input_order :url, :smart_auth_info, :access_token, :empty_subscription_resource,
                   :id_only_subscription_resource, :full_resource_subscription_resource
 
       group from: :subscriptions_r4_server_empty_content

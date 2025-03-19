@@ -44,16 +44,19 @@ module SubscriptionsTestKit
                             these tests.
                           )
 
-      input :credentials,
+      input :smart_auth_info,
             title: 'OAuth Credentials',
             description: 'Credentials for Inferno to include when making requests against the server under test.',
-            type: :oauth_credentials,
-            optional: true
+            type: :auth_info,
+            optional: true,
+            options: {
+              mode: 'access'
+            }
 
       # All FHIR requests in this suite will use this FHIR client
       fhir_client do
         url :url
-        oauth_credentials :credentials
+        auth_info :smart_auth_info
       end
 
       # All FHIR validation requests will use this FHIR validator

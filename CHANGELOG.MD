@@ -1,3 +1,12 @@
+# 0.11.0
+### Breaking Change
+This release updates the FHIR Subscriptions Test Kit to use AuthInfo rather than
+OAuthCredentials for storing auth information. As a result of this change, any
+test kits which rely on this test kit will need to be updated to use AuthInfo
+rather than OAuthCredentials inputs.
+
+* FI-3746: Use AuthInfo by @Jammjammjamm in https://github.com/inferno-framework/subscriptions-test-kit/pull/23
+
 ## 0.10.1
 
 * FI-3011: Rest hook notification validation by @dclark43 in https://github.com/inferno-framework/subscriptions-test-kit/pull/8

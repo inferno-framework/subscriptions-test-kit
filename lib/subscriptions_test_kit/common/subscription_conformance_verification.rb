@@ -66,7 +66,6 @@ module SubscriptionsTestKit
                             profile_url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription')
 
       cross_version_extension_check(subscription)
-      subscription
     end
 
     def server_check_channel(subscription, access_token)

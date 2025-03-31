@@ -21,9 +21,8 @@ module SubscriptionsTestKit
         fhir_get_capability_statement
         assert_response_status(200)
         assert_resource_type(:capability_statement)
-        assert_valid_resource
-
         scratch[:capability_statement] ||= resource
+        assert_valid_resource
 
         assert(resource.rest.present?, 'Capability Statement missing the `rest` field')
         rest_server = resource.rest.find { |elem| elem.mode == 'server' }

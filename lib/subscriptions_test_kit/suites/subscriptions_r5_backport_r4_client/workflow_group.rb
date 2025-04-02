@@ -13,7 +13,7 @@ module SubscriptionsTestKit
       title 'Demonstrate the Rest-Hook Subscription Workflow'
       description %(
         This test allows the tester to demonstrate the ability of the client
-        to request the= creation of a FHIR Subscription instance and receive
+        to request the creation of a FHIR Subscription instance and receive
         notifications for that Subscription.
 
         The tester must provide the body of an event notification

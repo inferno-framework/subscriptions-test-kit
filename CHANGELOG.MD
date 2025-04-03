@@ -1,3 +1,8 @@
+# 0.11.1
+
+* FI-3652: Allow nonconformant subscription and capability statement by @tstrass in https://github.com/inferno-framework/subscriptions-test-kit/pull/27
+
+
 # 0.11.0
 ### Breaking Change
 This release updates the FHIR Subscriptions Test Kit to use AuthInfo rather than

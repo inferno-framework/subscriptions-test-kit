@@ -50,12 +50,13 @@ module SubscriptionsTestKit
       end
 
       def subscription_payload_type(subscription)
-        return unless subscription['channel']['_payload']
+        payload_extensions = subscription.dig('channel', '_payload', 'extension')
+        return unless payload_extensions
 
-        payload_extension = subscription['channel']['_payload']['extension'].find do |ext|
+        payload_type = payload_extensions.find do |ext|
           ext['url'].ends_with?('/backport-payload-content')
         end
-        payload_extension['valueCode']
+        payload_type&.dig('valueCode')
       end
 
       def send_subscription(subscription)

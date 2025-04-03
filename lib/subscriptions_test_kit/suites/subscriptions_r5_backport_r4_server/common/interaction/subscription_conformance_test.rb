@@ -57,10 +57,16 @@ module SubscriptionsTestKit
 
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'
-        subscription = subscription_verification(subscription_resource)
+        assert_valid_json(subscription_resource)
+        assert_resource_type('Subscription', resource: FHIR.from_contents(subscription_resource))
+        subscription = JSON.parse(subscription_resource)
+        server_check_channel(subscription, access_token)
+
+        updated_subscription = subscription.to_json
+        output(updated_subscription:)
+
+        subscription_verification(updated_subscription)
         no_error_verification('Subscription resource is not conformant.')
-        subscription = server_check_channel(subscription, access_token)
-        output updated_subscription: subscription.to_json
       end
     end
   end

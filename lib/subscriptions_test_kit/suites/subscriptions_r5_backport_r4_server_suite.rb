@@ -35,6 +35,14 @@ module SubscriptionsTestKit
         }
       ]
 
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
+          title: 'Subscriptions R5 Backport IG',
+          actor: 'Server'
+        }
+      )
+
       # These inputs will be available to all tests in this suite
       input :url,
             title: 'FHIR Server Base URL',

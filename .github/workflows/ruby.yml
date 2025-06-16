@@ -67,4 +67,4 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Check Coverage
-        run: bundle exec rake requirements check_coverage
+        run: bundle exec inferno requirements check_coverage

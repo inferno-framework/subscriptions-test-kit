@@ -16,7 +16,6 @@ module SubscriptionsTestKit
         of what should happen when the client receives an event notification for the requested
         Subscription.
       )
-      verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@113'
 
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)

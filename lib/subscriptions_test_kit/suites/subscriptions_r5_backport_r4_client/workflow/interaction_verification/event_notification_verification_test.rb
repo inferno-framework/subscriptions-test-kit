@@ -13,8 +13,7 @@ module SubscriptionsTestKit
         This test verifies that the client's response to the event notification
         was conformant.
       )
-      verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@24',
-                            'hl7.fhir.uv.subscriptions_1.1.0@71'
+      verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@71'
 
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)

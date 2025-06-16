@@ -30,8 +30,7 @@ module SubscriptionsTestKit
       )
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@72',
-                            'hl7.fhir.uv.subscriptions_1.1.0@73',
-                            'hl7.fhir.uv.subscriptions_1.1.0@86'
+                            'hl7.fhir.uv.subscriptions_1.1.0@73'
 
       input :subscription_resource,
             title: 'Workflow Subscription Resource',

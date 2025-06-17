@@ -79,7 +79,7 @@ module SubscriptionsTestKit
     end
 
     def find_heartbeat_period(subscription)
-      subscription&.channel&.extension&.find do |e|
+      subscription.channel&.extension&.find do |e|
         e.url == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period'
       end
     end

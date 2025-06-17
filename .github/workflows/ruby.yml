@@ -53,7 +53,7 @@ jobs:
     - name: Rubocop
       run: bundle exec rubocop
 
-  requirements-coverage:
+  requirements:
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -66,5 +66,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Check Export
+        run: bundle exec rake requirements check
       - name: Check Coverage
-        run: bundle exec inferno requirements check_coverage
+        run: bundle exec rake requirements check_coverage

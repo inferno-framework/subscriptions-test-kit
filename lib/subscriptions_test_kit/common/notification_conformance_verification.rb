@@ -102,7 +102,7 @@ module SubscriptionsTestKit
       empty_req_check = true
       notification_events.each do |notification_event|
         empty_req_check = notification_event.part.none? do |part|
-          part.name == 'focus' || part.name == 'additional-context'
+          ['focus', 'additional-context'].include?(part.name)
         end
         break unless empty_req_check
       end

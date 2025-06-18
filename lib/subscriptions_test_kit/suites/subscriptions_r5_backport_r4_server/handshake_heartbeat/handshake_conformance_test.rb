@@ -23,7 +23,6 @@ module SubscriptionsTestKit
                             'hl7.fhir.uv.subscriptions_1.1.0@28',
                             'hl7.fhir.uv.subscriptions_1.1.0@69',
                             'hl7.fhir.uv.subscriptions_1.1.0@70',
-                            'hl7.fhir.uv.subscriptions_1.1.0@24',
                             'hl7.fhir.uv.subscriptions_1.1.0@25',
                             'hl7.fhir.uv.subscriptions_1.1.0@138',
                             'hl7.fhir.uv.subscriptions_1.1.0@139'

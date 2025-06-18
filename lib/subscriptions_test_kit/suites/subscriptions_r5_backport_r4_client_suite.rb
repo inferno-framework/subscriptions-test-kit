@@ -33,6 +33,14 @@ module SubscriptionsTestKit
         }
       ]
 
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
+          title: 'Subscriptions R5 Backport IG',
+          actor: 'Client'
+        }
+      )
+
       # All FHIR validation requests will use this FHIR validator
       fhir_resource_validator do
         igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'

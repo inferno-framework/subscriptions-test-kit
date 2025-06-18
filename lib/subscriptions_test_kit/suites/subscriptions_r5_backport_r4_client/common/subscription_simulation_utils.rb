@@ -116,7 +116,9 @@ module SubscriptionsTestKit
         notification_bundle = FHIR.from_contents(notification_json)
         subscription_status = find_subscription_status_entry(notification_bundle)&.resource
         subscription_url = find_parameter(subscription_status, 'subscription')&.valueReference
-        subscription_url&.reference&.chomp('/')&.split('/')&.last
+        return unless subscription_url&.reference.present?
+
+        subscription_url.reference.chomp('/').split('/').last
       end
 
       def update_subscription_status(notification_bundle, subscription_url, subscription_topic, status_code,

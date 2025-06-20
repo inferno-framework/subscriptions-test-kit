@@ -149,7 +149,7 @@ module SubscriptionsTestKit
       end
     end
 
-    def check_bundle_entry_reference(bundle_entries, reference)
+    def bundle_entry_reference_valid?(bundle_entries, reference)
       check_full_url = reference.start_with?('urn:')
 
       referenced_entry = bundle_entries.find do |entry|
@@ -168,7 +168,7 @@ module SubscriptionsTestKit
             When the content type is `full-resource`, notification bundles SHALL include references to
             the appropriate focus resources in the SubscriptionStatus.notificationEvent.focus element))
       else
-        unless check_bundle_entry_reference(bundle_entries, focus_elem.valueReference.reference)
+        unless bundle_entry_reference_valid?(bundle_entries, focus_elem.valueReference.reference)
           add_message('error', %(
             The Notification Bundle does not include a resource entry for the reference found in
             SubscriptionStatus.notificationEvent.focus with id #{focus_elem.valueReference.reference}))
@@ -180,7 +180,7 @@ module SubscriptionsTestKit
       return if additional_context_list.empty?
 
       additional_context_list.each do |additional_context|
-        next if check_bundle_entry_reference(bundle_entries, additional_context.valueReference.reference)
+        next if bundle_entry_reference_valid?(bundle_entries, additional_context.valueReference.reference)
 
         add_message('error', %(
             The Notification Bundle does not include a resource entry for the reference found in

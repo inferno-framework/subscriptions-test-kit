@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    subscriptions_test_kit (0.11.1)
-      inferno_core (~> 0.6.13)
+    subscriptions_test_kit (0.11.2)
+      inferno_core (~> 0.6.14)
 
 GEM
   remote: https://rubygems.org/
@@ -135,7 +135,7 @@ GEM
       domain_name (~> 0.5)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    inferno_core (0.6.13)
+    inferno_core (0.6.14)
       activesupport (~> 6.1.7.5)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)
@@ -274,7 +274,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.4)
-    rubocop (1.76.2)
+    rubocop (1.77.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)

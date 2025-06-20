@@ -1,3 +1,8 @@
+# 0.11.2
+
+* FI-4141: Requirements Conversion by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/29
+* FI-4141: Requirements Conversion Update by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/30
+
 # 0.11.1
 
 * FI-3652: Allow nonconformant subscription and capability statement by @tstrass in https://github.com/inferno-framework/subscriptions-test-kit/pull/27

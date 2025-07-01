@@ -1,3 +1,6 @@
+# 0.11.3
+* FI-4144: Requirement clean for PAS by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/32
+
 # 0.11.2
 
 * FI-4141: Requirements Conversion by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/29

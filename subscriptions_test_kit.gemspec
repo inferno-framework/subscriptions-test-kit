@@ -4,7 +4,6 @@ Gem::Specification.new do |spec|
   spec.name          = 'subscriptions_test_kit'
   spec.version       = SubscriptionsTestKit::VERSION
   spec.authors       = ['Karl Naden, Emily Semple, Tom Strassner']
-  spec.email         = ['inferno@groups.mitre.org']
   spec.summary       = 'Subscriptions Test Kit'
   spec.description   = 'Inferno test kit for FHIR R5-style Subscriptions'
   spec.homepage      = 'https://github.com/inferno-framework/subscriptions-test-kit'

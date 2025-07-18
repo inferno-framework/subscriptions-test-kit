@@ -3,11 +3,8 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConformanceTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_id_only_conformance') }
-  
+  let(:test) { find_test suite, described_class.id } # reload to grab parent inputs
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
-  let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:id_only_notification_bundle) do
     JSON.parse(File.read(File.join(
@@ -27,7 +24,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
   end
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:server_endpoint) { 'http://example.com/fhir/Subscription' }
-  let(:subscription_id) { '123' }
+  let(:subscription_id) { subscription_resource['id'] }
 
   def create_request(url: subscription_channel, direction: 'incoming', tags: nil, body: nil, status: 200, headers: nil)
     headers ||= [
@@ -42,7 +39,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
       name: 'subscription_notification',
       direction:,
       url:,
-      result:,
+      result: repo_create(:result, test_session_id: test_session.id),
       test_session_id: test_session.id,
       response_body: body.is_a?(Hash) ? body.to_json : body,
       request_body: body.is_a?(Hash) ? body.to_json : body,
@@ -60,34 +57,28 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
       .join(' ')
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   it 'omits if no Subscriptions are for id-only Notifications' do
     create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
                    body: subscription_resource)
-    result = run(test)
-    expect(result.result).to eq('omit')
+    result = run(test, url: server_endpoint)
+    expect(result.result).to eq('omit'), result.result_message
     expect(result.result_message).to eq('No Subscriptions sent with notification payload type of `id-only`')
   end
 
   it 'passes if conformant id-only notification sent to Subscription channel' do
-    create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'id-only'],
-                   body: subscription_resource)
-    create_request(tags: ['event-notification', subscription_id], body: id_only_notification_bundle)
+    # FIXME: The request immediately below is not getting loaded by the inferno test,
+    # causing this rspec test to fail, despite the tags being correct. I suspected its
+    # due to `create_request` reusing the same name, but SQLite browser says there is no
+    # uniqueness constraint...
+    create_request(url: server_endpoint,
+                   direction: 'outgoing',
+                   tags: ['subscription_creation', 'id-only'],
+                   body: id_only_notification_bundle)
+    create_request(tags: ['event-notification', subscription_id], body: subscription_resource)
 
-    result = run(test)
-    expect(result.result).to eq('pass')
+    pp Inferno::Repositories::Requests.new.find_named_request(test_session.id, 'subscription_notification')
+
+    result = run(test, url: server_endpoint)
+    expect(result.result).to eq('pass'), result.result_message
   end
 end

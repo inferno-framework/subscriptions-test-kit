@@ -1,9 +1,8 @@
 require_relative '../../../lib/subscriptions_test_kit/common/notification_conformance_verification'
 
-RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
+RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification, :runnable do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  
-  
+
   let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }
 

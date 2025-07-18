@@ -1,11 +1,9 @@
 require_relative '../../../lib/subscriptions_test_kit/common/subscription_conformance_verification'
 
-RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
+RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runnable do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }
-
+  let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_resource) do
     JSON.parse(File.read(File.join(
                            __dir__, '../..', 'fixtures', 'subscription_resource_example.json'
@@ -17,7 +15,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -29,12 +27,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
-
-  let(:access_token) { 'SAMPLE_TOKEN' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -42,20 +37,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
       .messages
       .map(&:message)
       .join(' ')
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'Subscription Verification' do
@@ -88,7 +69,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
     end
 
     it 'passes if conformant subscription passed in' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, subscription_resource: subscription_resource.to_json)
@@ -124,7 +105,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
     end
 
     it 'fails if subscription is not a conformant resource' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       result = run(test, subscription_resource: subscription_resource.to_json)
@@ -137,7 +118,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
     end
 
     it 'warns if subscription contains a cross-version extension' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       subscription_resource['channel']['_type']['extension'].append(
@@ -157,7 +138,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
     it 'fails if subscription does not contain criteria field' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       subscription_resource.delete('criteria')
@@ -171,7 +152,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification do
     it 'fails if subscription criteria does not contain valid URL' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       subscription_resource['criteria'] = ['Invalid Value']

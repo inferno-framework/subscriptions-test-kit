@@ -2,8 +2,8 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'handshake_heartbeat/heartbeat_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
+  
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }

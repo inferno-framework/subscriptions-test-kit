@@ -2,9 +2,9 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'capability_statement/topic_discovery_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDiscoveryTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_topic_discovery') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }

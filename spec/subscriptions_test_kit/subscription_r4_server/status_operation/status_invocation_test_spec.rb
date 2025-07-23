@@ -2,10 +2,8 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'status_operation/status_invocation_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvocationTest do
-  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }  
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:subscription_status) do
@@ -43,7 +41,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
 
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:access_token) { 'SAMPLE_TOKEN' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -76,20 +73,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
     )
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   describe 'Server Coverage Subscription Status' do
     let(:test) do
       Class.new(SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvocationTest) do
@@ -116,7 +99,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
     it 'passes if Conformant Subscription status response returned from $status operation' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       status_operation = stub_request(:get, "#{server_endpoint}/Subscription/123/$status")
         .to_return(status: 200, body: subscription_status.to_json)
@@ -173,7 +156,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
     it 'fails if Subscription status operation does not return a valid Bundle' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
       status_operation = stub_request(:get, "#{server_endpoint}/Subscription/123/$status")
         .to_return(status: 200, body: subscription_status.to_json)
@@ -192,7 +175,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
       allow(test).to receive(:suite).and_return(suite)
 
       subscription_status['type'] = 'history'
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       status_operation = stub_request(:get, "#{server_endpoint}/Subscription/123/$status")
         .to_return(status: 200, body: subscription_status.to_json)
@@ -212,7 +195,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
     it 'fails if Subscription status Bundle does not contain a subscription parameter with correct reference id' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       status_operation = stub_request(:get, "#{server_endpoint}/Subscription/wrong_id/$status")
         .to_return(status: 200, body: subscription_status.to_json)
@@ -233,7 +216,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvo
     it 'fails if Parameter resource in Subscription Status Bundle is not conformant' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json).then
         .to_return(status: 200, body: operation_outcome_failure.to_json)
       status_operation = stub_request(:get, "#{server_endpoint}/Subscription/123/$status")

@@ -42,8 +42,6 @@ module SubscriptionsTestKit
                             'hl7.fhir.uv.subscriptions_1.1.0@139'
 
       run do
-        # binding.pry # DEBUGGING
-
         subscription_requests = load_tagged_requests('subscription_creation', 'id-only')
         omit_if subscription_requests.empty?, 'No Subscriptions sent with notification payload type of `id-only`'
 

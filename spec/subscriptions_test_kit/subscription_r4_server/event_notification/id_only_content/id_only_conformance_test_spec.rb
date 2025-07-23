@@ -3,11 +3,8 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConformanceTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  #let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_id_only_conformance') }
-  #let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  #let(:results_repo) { Inferno::Repositories::Results.new }
-  #let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
+  let(:test) { described_class }
+  # let(:test) { find_test suite, described_class.id } # TODO
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:id_only_notification_bundle) do
@@ -60,20 +57,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
       .map(&:message)
       .join(' ')
   end
-
-  # def run(runnable, inputs = {})
-  #   test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-  #   test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-  #   inputs.each do |name, value|
-  #     session_data_repo.save(
-  #       test_session_id: test_session.id,
-  #       name:,
-  #       value:,
-  #       type: runnable.config.input_type(name) || 'text'
-  #     )
-  #   end
-  #   Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  # end
 
   it 'omits if no Subscriptions are for id-only Notifications' do
     create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],

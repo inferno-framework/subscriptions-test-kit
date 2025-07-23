@@ -3,10 +3,9 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDiscoveryTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_topic_discovery') }
-  
+  let(:test) { find_test(suite, described_class.id) }
+  # let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_topic_discovery') }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:capability_statement) do
@@ -28,20 +27,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_topic) { 'http://fhirserver.org/topics/patient-admission' }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])

@@ -3,9 +3,7 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubscriptionPayloadTypeTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
 
   let(:subscription_resource) do
     JSON.parse(File.read(File.join(
@@ -18,7 +16,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -30,15 +28,17 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
   let(:server_endpoint) { 'http://example.com/fhir' }
+  let(:access_token) { 'SAMPLE_TOKEN' }
+  let(:subscription_topic_url) { 'http://fhirserver.org/topics/patient-admission' }
   let(:server_credentials) do
     {
       auth_type: 'public',
-      access_token: 'SAMPLE_TOKEN',
+      access_token:,
       refresh_token: 'REFRESH_TOKEN',
       expires_in: 3600,
       client_id: 'CLIENT_ID',
@@ -48,24 +48,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
   end
 
   let(:unsupported_subscription_payload_type) { 'application/unsupported+payload' }
-
-  let(:access_token) { 'SAMPLE_TOKEN' }
-  let(:subscription_topic_url) { 'http://fhirserver.org/topics/patient-admission' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -136,7 +118,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
 
       subscription_creation_request = stub_request(:post, "#{server_endpoint}/Subscription")
         .with(
-          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+          headers: { Authorization: "Bearer #{access_token}" }
         )
         .to_return(status: 201, body: subscription_resource.to_json)
 
@@ -154,7 +136,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
 
       stub_request(:post, "#{server_endpoint}/Subscription")
         .with(
-          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+          headers: { Authorization: "Bearer #{access_token}" }
         )
         .to_return(status: 201, body: subscription_resource.to_json)
 

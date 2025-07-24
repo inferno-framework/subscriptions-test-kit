@@ -7,7 +7,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   # let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_topic_discovery') }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
-
+  
   let(:capability_statement) do
     JSON.parse(File.read(File.join(
                            __dir__, '../../..', 'fixtures', 'capability_statement_example.json'
@@ -68,81 +68,49 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   end
 
   it 'passes if Capability Statement retrieved containing subscription topic extension' do
-    allow(test).to receive(:suite).and_return(suite)
-
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('pass')
   end
 
   it 'skips if no Capability Statement returned in previous test' do
-    allow(test).to receive(:suite).and_return(suite)
-
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return({})
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: {} })
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to eq('No Capability Statement received in previous test')
   end
 
   it 'fails if Capability Statement does not contain the rest field' do
-    allow(test).to receive(:suite).and_return(suite)
-
     capability_statement.delete('rest')
 
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to eq('Capability Statement missing the `rest` field')
   end
 
   it 'fails if Capability Statement does not contain entry rest field with mode server' do
-    allow(test).to receive(:suite).and_return(suite)
-
     capability_statement['rest'][0]['mode'] = 'client'
 
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to eq("Capability Statement missing entry in `rest` with a `mode` set to 'server'")
   end
 
   it 'fails if Capability Statement does not contain the Subscription resource in the rest field' do
-    allow(test).to receive(:suite).and_return(suite)
-
     capability_statement['rest'][0]['resource'].shift
 
     allow_any_instance_of(test)
       .to receive(:scratch_resource)
       .and_return(capability_statement_resource)
 
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to eq('Capability Statement missing `Subscription` resource in `rest` field')
   end
 
   it 'fails if Subscription in Capability Statement does not contain the extension field' do
-    allow(test).to receive(:suite).and_return(suite)
-
     capability_statement['rest'][0]['resource'][0].delete('extension')
 
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to eq(
       'Capability Statement missing the `extension` field on the Subscription resource'
@@ -150,16 +118,10 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   end
 
   it 'fails if Subscription does not contain the subscriptiontopic extension in the extension field' do
-    allow(test).to receive(:suite).and_return(suite)
-
     capability_statement['rest'][0]['resource'][0]['extension'].shift
     capability_statement['rest'][0]['resource'][0]['extension'][0]['url'] = 'incorrect_extension'
 
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to match(
       'The server SHOULD support topic discovery via the CapabilityStatement SubscriptionTopic Canonical'
@@ -167,29 +129,18 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   end
 
   it 'provides warning if no Subscription requests made prior to this test' do
-    allow(test).to receive(:suite).and_return(suite)
 
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('pass')
     expect(entity_result_message(test)).to match('No Subscription requests have been made in previous tests.')
     expect(entity_result_message_type(test)).to eq('warning')
   end
 
   it 'provides warning if no Subscriptions contain topics in the criteria field' do
-    allow(test).to receive(:suite).and_return(suite)
-
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
     subscription_resource.delete('criteria')
     create_subscription_request(body: subscription_resource)
 
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('pass')
     expect(entity_result_message(test)).to match(
       'Subscriptions missing criteria field containing a Subscription topic URL. Could not verify any'
@@ -198,29 +149,17 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   end
 
   it 'passes if Subscription request made and contains criteria found in subscription topic extension' do
-    allow(test).to receive(:suite).and_return(suite)
-
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
     create_subscription_request(body: subscription_resource)
 
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('pass')
   end
 
   it 'fails if Subscription request made and contains criteria not found in subscription topic extension' do
-    allow(test).to receive(:suite).and_return(suite)
-
-    allow_any_instance_of(test)
-      .to receive(:scratch_resource)
-      .and_return(capability_statement_resource)
-
     subscription_resource['criteria'] = 'unsupported_topic'
     create_subscription_request(body: subscription_resource)
 
-    result = run(test, subscription_topic:)
+    result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('fail')
     expect(result.result_message).to eq(
       "Subscription.criteria value(s) not found in Capability Statement's SubscriptionTopic Canonical extension"

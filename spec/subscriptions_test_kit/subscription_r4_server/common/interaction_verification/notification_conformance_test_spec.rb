@@ -40,7 +40,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -52,7 +52,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -63,7 +63,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   let(:server_endpoint) { 'http://example.com/fhir/Subscription' }
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_id) { '123' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def create_request(url: subscription_channel, direction: 'incoming', tags: nil, body: nil, status: 200, headers: nil)
     headers ||= [
@@ -111,7 +110,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'passes if conformant full-resource event-notification sent to Subscription channel' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
@@ -123,7 +122,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'passes if conformant empty event-notification sent to Subscription channel' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
@@ -152,7 +151,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'fails if a non-conformant event-notification is made' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
@@ -165,7 +164,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'uses the most recent Susbcription if there are multiple' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       first_subscription_id = subscription_resource['id']
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
@@ -190,7 +189,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
 
     it 'fails if an expected header is not sent' do
       subscription_resource.dig('channel', 'header') << 'accept: application/fhir+json'
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
@@ -203,7 +202,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
 
     it 'fails if wrong mime type is sent' do
       subscription_resource['channel']['payload'] = 'application/json'
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
@@ -237,7 +236,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
     end
 
     it 'passes if conformant full-resource event-notification sent to Subscription channel' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],

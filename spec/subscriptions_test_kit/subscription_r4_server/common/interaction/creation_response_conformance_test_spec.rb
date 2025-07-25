@@ -2,10 +2,8 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
                  'common/interaction/creation_response_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CreationResponseConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:subscription_resource) do
@@ -38,20 +36,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CreationRe
       headers:,
       tags: ['subscription_creation', payload_type]
     )
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'Server Workflow Subscription Response Test' do

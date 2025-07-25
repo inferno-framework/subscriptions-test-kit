@@ -8,7 +8,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::Interactio
     # 1. get the runnable into the `test` variable
     # 2. create input hash, e.g., inputs = { ... }
     # 3. pass to the run method (defined in the shared context), e.g., result = run(test, inputs)
-    let(:test) { described_class }
+    let(:test) { find_test suite, described_class.id }
 
     describe 'when the tester-provided notification bundle is valid' do
       let(:valid_notification_json) do

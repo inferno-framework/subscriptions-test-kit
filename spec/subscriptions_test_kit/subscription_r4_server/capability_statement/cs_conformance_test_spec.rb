@@ -2,11 +2,8 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'capability_statement/cs_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
-
   let(:capability_statement) do
     JSON.parse(File.read(File.join(
                            __dir__, '../../../', 'fixtures', 'capability_statement_example.json'
@@ -18,7 +15,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -30,12 +27,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
   let(:server_endpoint) { 'http://example.com/fhir' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -43,20 +39,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
       .messages
       .map(&:message)
       .join(' ')
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'Server Coverage Topic Discovery' do
@@ -85,7 +67,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
     it 'passes if Capability Statement retrieved containing subscription topic extension' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -113,7 +95,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
     it 'fails if Capability Statement returned is not conformant' do
       allow(test).to receive(:suite).and_return(suite)
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -131,7 +113,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
 
       capability_statement.delete('rest')
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -148,7 +130,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
 
       capability_statement['rest'][0]['mode'] = 'client'
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -164,7 +146,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
       allow(test).to receive(:suite).and_return(suite)
 
       capability_statement['rest'][0]['resource'].shift
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -181,7 +163,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
 
       capability_statement['rest'][0]['resource'][0].delete('supportedProfile')
 
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)
@@ -199,7 +181,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::CSConforma
       allow(test).to receive(:suite).and_return(suite)
 
       capability_statement['rest'][0]['resource'][0]['supportedProfile'] = 'incorrect_profile'
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       get_capability_statement = stub_request(:get, "#{server_endpoint}/metadata")
         .to_return(status: 200, body: capability_statement.to_json)

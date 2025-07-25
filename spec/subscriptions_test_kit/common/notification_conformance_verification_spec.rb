@@ -1,9 +1,7 @@
 require_relative '../../../lib/subscriptions_test_kit/common/notification_conformance_verification'
 
-RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
+RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification, :runnable do
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
 
   let(:full_resource_notification_bundle) do
@@ -29,7 +27,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -41,12 +39,11 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
   let(:subscription_id) { '123' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -62,20 +59,6 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
       .messages
       .map(&:type)
       .first
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'Notification Verification' do
@@ -110,7 +93,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'passes if conformant notification bundle passed in' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
@@ -120,7 +103,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'passes if conformant notification bundle passed in with correct status argument' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
@@ -152,7 +135,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if passed in bundle not a history type Bundle' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['type'] = 'collection'
@@ -174,7 +157,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus does not have the `request` field populated' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first.delete('request')
@@ -189,7 +172,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus does not have the `response` field populated' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first.delete('response')
@@ -204,7 +187,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus does not have the $status operation url in the `request` field' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first['request']['url'] = 'https://fhirserver.org/fhir/Subscription/123/$wrongoperation'
@@ -219,7 +202,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if entry in Bundle does not have the `request` field populated' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].last.delete('request')
@@ -234,7 +217,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if entry in Bundle does not have the `response` field populated' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].last.delete('response')
@@ -260,7 +243,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus Parameters resource is not conformant' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json).then
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
@@ -275,7 +258,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus type is not set to the notification type passed in' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
@@ -289,7 +272,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if status argument is passed in but does not equal the status of the SubscriptionStatus' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json,
@@ -561,7 +544,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'passes if conformant full-resource notification bundle passed in' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json)
@@ -582,7 +565,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'produces warning if full-resource notification bundle does not contain parameter.topic field' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first['resource']['parameter'].delete_at(1)
@@ -596,7 +579,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if SubscriptionStatus does not contain any event-notifications' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       full_resource_notification_bundle['entry'].first['resource']['parameter'].pop
@@ -610,7 +593,7 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification do
     end
 
     it 'fails if any entries in full-resource notification bundle are not conformant' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       result = run(test, notification_bundle: full_resource_notification_bundle.to_json)

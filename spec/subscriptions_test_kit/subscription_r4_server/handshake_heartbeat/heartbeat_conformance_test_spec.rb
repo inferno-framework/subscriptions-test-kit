@@ -2,10 +2,8 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'handshake_heartbeat/heartbeat_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:heartbeat_bundle) do
@@ -25,7 +23,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatC
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -37,7 +35,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatC
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -47,7 +45,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatC
   end
   let(:subscription_id) { '123' }
   let(:access_token) { 'SAMPLE_TOKEN' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
   let(:heartbeat_period) { 86400 }
 
   def create_request(name: nil, tags: nil, direction: nil, url: subscription_channel, body: nil, status: 200,
@@ -82,20 +79,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatC
       .join(' ')
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   describe 'Server Coverage Handshake Test' do
     let(:test) do
       Class.new(SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatConformanceTest) do
@@ -114,7 +97,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::HeartbeatC
     end
 
     it 'passes if conformant Heartbeat Bundle sent to Subscription channel' do
-      verification_request = stub_request(:post, "#{validator_url}/validate")
+      verification_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_request(name: 'subscription_create', direction: 'outgoing', tags: ['subscription_creation', 'Workflow'],

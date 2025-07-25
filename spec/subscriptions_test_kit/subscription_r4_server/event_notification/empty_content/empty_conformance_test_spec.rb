@@ -2,11 +2,9 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
                  'event_notification/empty_content/empty_conformance_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::EmptyConformanceTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_empty_conformance') }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:empty_notification_bundle) do
@@ -28,7 +26,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::EmptyConfo
   let(:server_endpoint) { 'http://example.com/fhir/Subscription' }
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_id) { '123' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def create_request(url: subscription_channel, direction: 'incoming', tags: nil, body: nil, status: 200, headers: nil)
     headers ||= [
@@ -59,20 +56,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::EmptyConfo
       .messages
       .map(&:message)
       .join(' ')
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name) || 'text'
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   it 'omits if no Subscriptions are for empty Notifications' do

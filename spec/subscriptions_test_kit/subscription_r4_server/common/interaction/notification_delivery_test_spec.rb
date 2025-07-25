@@ -2,12 +2,10 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
                  'common/interaction/notification_delivery_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationDeliveryTest, :request do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('subscriptions_r5_backport_r4_server') }
-  let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_notification_delivery') }
-  let(:test_group) { Inferno::Repositories::TestGroups.new.find('subscriptions_r4_server_interaction') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
+  let(:test) { find_test suite, described_class.id }
+  let(:test_group) { test.parent }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'subscriptions_r5_backport_r4_server') }
 
   let(:handshake_bundle) do
     JSON.parse(File.read(File.join(
@@ -39,7 +37,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   end
 
   let(:access_token) { 'SAMPLE_TOKEN' }
-
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:server_credentials) do
     {
@@ -59,21 +56,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
 
   def post_fhir(path, data)
     post path, data.to_json, 'CONTENT_TYPE' => 'application/fhir+json'
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'Server Receive Notification Test' do

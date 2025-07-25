@@ -41,7 +41,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       outcomes: [{
         issues: []
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -53,7 +53,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
           message: 'Resource does not conform to profile'
         }]
       }],
-      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+      sessionId: test_session.id
     }
   end
 
@@ -64,7 +64,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
   let(:server_endpoint) { 'http://example.com/fhir/Subscription' }
   let(:access_token) { 'SAMPLE_TOKEN' }
   let(:subscription_id) { '123' }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
 
   def create_request(url: subscription_channel, direction: 'incoming', tags: nil, body: nil, status: 200, headers: nil)
     headers ||= [

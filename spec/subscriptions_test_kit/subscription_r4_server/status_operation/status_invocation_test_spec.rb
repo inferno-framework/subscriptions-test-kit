@@ -2,7 +2,7 @@ require_relative '../../../../lib/subscriptions_test_kit/suites/subscriptions_r5
                  'status_operation/status_invocation_test'
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::StatusInvocationTest do
-  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }  
+  let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 

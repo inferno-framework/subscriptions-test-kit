@@ -7,7 +7,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   # let(:test) { Inferno::Repositories::Tests.new.find('subscriptions_r4_server_topic_discovery') }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
-  
+
   let(:capability_statement) do
     JSON.parse(File.read(File.join(
                            __dir__, '../../..', 'fixtures', 'capability_statement_example.json'
@@ -129,7 +129,6 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::TopicDisco
   end
 
   it 'provides warning if no Subscription requests made prior to this test' do
-
     result = run(test, { url: server_endpoint }, { capability_statement: capability_statement_resource })
     expect(result.result).to eq('pass')
     expect(entity_result_message(test)).to match('No Subscription requests have been made in previous tests.')

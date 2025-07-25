@@ -47,7 +47,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::RejectSubs
   end
 
   let(:unsupported_subscription_channel_endpoint) { 'http://unsupported-email.com' }
-  
+
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first

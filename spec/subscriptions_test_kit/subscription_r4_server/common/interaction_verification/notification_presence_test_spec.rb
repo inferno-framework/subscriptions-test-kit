@@ -3,7 +3,7 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::NotificationPresenceTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  let(:test) { described_class }
+  let(:test) { find_test suite, described_class.id }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:full_resource_notification_bundle) do
@@ -93,7 +93,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
       create_request(tags: ['event-notification', subscription_id], body: full_resource_notification_bundle)
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('pass')
     end
 
@@ -101,14 +101,14 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
                      body: subscription_resource, status: 201)
       create_request(tags: ['event-notification', subscription_id], body: empty_notification_bundle)
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('pass')
     end
 
     it 'skips if no Subscription requests were made' do
       create_request(tags: ['event-notification', subscription_id], body: full_resource_notification_bundle)
 
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(/No successful Subscription creation request/)
     end
@@ -117,7 +117,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
       create_request(tags: ['handshake', subscription_id], body: handshake_bundle)
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('pass')
     end
 
@@ -126,7 +126,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
                      body: subscription_resource, status: 201)
       create_request(tags: ['event-notification', subscription_id],
                      body: empty_notification_bundle_non_conformant)
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('pass')
     end
 
@@ -142,7 +142,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'full-resource'],
                      body: subscription_resource, status: 201)
 
-      result = run(test)
+      result = run(test, { url: server_endpoint })
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
         /No notifications were received from the server related to Subscription #{second_subscription_id}./

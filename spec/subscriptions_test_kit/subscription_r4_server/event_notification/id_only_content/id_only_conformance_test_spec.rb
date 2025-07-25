@@ -3,8 +3,7 @@ require_relative '../../../../../lib/subscriptions_test_kit/suites/subscriptions
 
 RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConformanceTest do
   let(:suite_id) { 'subscriptions_r5_backport_r4_server' }
-  let(:test) { described_class }
-  # let(:test) { find_test suite, described_class.id } # TODO
+  let(:test) { find_test suite, described_class.id }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:id_only_notification_bundle) do
@@ -61,7 +60,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
   it 'omits if no Subscriptions are for id-only Notifications' do
     create_request(url: server_endpoint, direction: 'outgoing', tags: ['subscription_creation', 'empty'],
                    body: subscription_resource)
-    result = run(test)
+    result = run(test, url: server_endpoint)
     expect(result.result).to eq('omit')
     expect(result.result_message).to eq('No Subscriptions sent with notification payload type of `id-only`')
   end
@@ -71,7 +70,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::IdOnlyConf
                    body: subscription_resource)
     create_request(tags: ['event-notification', subscription_id], body: id_only_notification_bundle)
 
-    result = run(test)
+    result = run(test, url: server_endpoint)
     expect(result.result).to eq('pass')
   end
 end

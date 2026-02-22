@@ -30,11 +30,16 @@ module SubscriptionsTestKit
               provided as a `Bearer` token in the `Authorization` header of HTTP requests
               sent to Inferno.
             )
+      output :confirmation_url
 
       run do
         subscription = JSON.parse(updated_subscription)
         returned_subscription = send_subscription(subscription)
         subscription_payload_type = subscription_payload_type(subscription)
+
+        confirmation_url = "#{resume_pass_url_server}?token=notification%20#{access_token}"
+        output(confirmation_url:)
+
         wait(
           identifier: "notification #{access_token}",
           message: %(
@@ -45,7 +50,7 @@ module SubscriptionsTestKit
 
             `#{subscription_channel_url}`
 
-            [Click here](#{resume_pass_url_server}?token=notification%20#{access_token}) when you have finished
+            [Click here](#{confirmation_url}) when you have finished
             submitting requests.
 
           )

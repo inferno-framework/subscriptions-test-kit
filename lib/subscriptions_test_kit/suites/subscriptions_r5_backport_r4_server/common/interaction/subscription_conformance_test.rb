@@ -6,7 +6,7 @@ module SubscriptionsTestKit
       include SubscriptionConformanceVerification
 
       id :subscriptions_r4_server_subscription_conformance
-      title '[USER INPUT VERIFICATION] Verify Subscription to Send to Server'
+      title 'Verify Subscription to Send to Server'
       description %(
         This test accepts a Subscription resource as an input and verifies that it is conformant to the
         [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
@@ -28,6 +28,7 @@ module SubscriptionsTestKit
           access token to direct the server to send that header to identify the notifications are for this session.
           Inferno will add the entry if it is not present.
       )
+      simulation_verification
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@72',
                             'hl7.fhir.uv.subscriptions_1.1.0@73'

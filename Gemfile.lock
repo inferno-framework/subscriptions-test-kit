@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     subscriptions_test_kit (0.12.0)
-      inferno_core (~> 1.0, >= 1.0.2)
+      inferno_core (~> 1.0, >= 1.1.2)
 
 GEM
   remote: https://rubygems.org/

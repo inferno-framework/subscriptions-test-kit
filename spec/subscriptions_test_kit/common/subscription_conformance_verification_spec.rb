@@ -43,6 +43,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
     let(:test) do
       Class.new(Inferno::Test) do
         include SubscriptionsTestKit::SubscriptionConformanceVerification
+
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -167,6 +168,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
     let(:test) do
       Class.new(Inferno::Test) do
         include SubscriptionsTestKit::SubscriptionConformanceVerification
+
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 

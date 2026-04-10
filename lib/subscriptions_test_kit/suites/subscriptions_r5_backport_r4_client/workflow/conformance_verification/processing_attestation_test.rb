@@ -17,12 +17,21 @@ module SubscriptionsTestKit
         Subscription.
       )
 
+      output :attest_true_url
+      output :attest_false_url
+
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
         skip_if(requests.none?, 'Inferno did not send an event notification')
-        token = SecureRandom.hex(32)
+
+        identifier = test_session_id
+        attest_true_url = "#{resume_pass_url_client}?test_run_identifier=#{identifier}"
+        output(attest_true_url:)
+        attest_false_url = "#{resume_fail_url_client}?test_run_identifier=#{identifier}"
+        output(attest_false_url:)
+
         wait(
-          identifier: token,
+          identifier:,
           message: %(
             I attest that the client application successfully processed the event notification sent by Inferno.
 

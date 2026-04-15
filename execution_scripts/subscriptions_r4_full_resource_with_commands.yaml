@@ -1,10 +1,10 @@
 sessions:
   - suite: subscriptions_r5_backport_r4_client
     name: client
-    preset: inferno-subscriptions_r5_backport_r4_client_empty
+    preset: inferno-subscriptions_r5_backport_r4_client_full_resource
   - suite: subscriptions_r5_backport_r4_server
     name: server
-    preset: inferno-subscriptions_r5_backport_r4_server_preset_empty
+    preset: inferno-subscriptions_r5_backport_r4_server_preset_full_resource
 
 comparison_config:
   normalized_strings:
@@ -15,51 +15,57 @@ comparison_config:
       pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 
 steps:
-  # Step 1: Start client suite — it runs until it reaches the InteractionTest wait,
-  # where it is ready to receive a Subscription from the server under test.
   - session: client
     status: created
+    state_description: >
+      Step 1: Start client suite — it runs until it reaches the InteractionTest wait,
+      where it is ready to receive a Subscription from the server under test.
     start_run:
       session: client
       runnable: suite
     next_poll_session: client
     action_description: Start client suite
 
-  # Step 2: Client is waiting at InteractionTest (1.1.01). Start the server suite,
-  # which will POST a Subscription to the client's FHIR endpoint. The client then
-  # sends handshake and event notifications to Inferno's own notification endpoint.
   - session: client
     status: waiting
     last_completed: 1.1.01
+    state_description: >
+      Step 2: Client is waiting at InteractionTest (1.1.01). Start the server suite,
+      which will POST a Subscription to the client's FHIR endpoint. The client
+      then sends handshake and event notifications to Inferno's own notification
+      endpoint inside Inferno.
     start_run:
       session: server
       runnable: suite
     next_poll_session: server
     action_description: Start server suite once client is waiting at InteractionTest
 
-  # Step 3: Server is waiting at notification delivery (1.1.02). Sleep to allow the
-  # client to finish delivering notifications, then advance the server wait.
   - session: server
     status: waiting
     last_completed: 1.1.02
+    state_description: >
+      Step 3: Server is waiting at notification delivery (1.1.02). Sleep to allow the
+      client to finish delivering notifications, then advance the server wait.
     command: bundle exec ruby execution_scripts/advance_wait.rb '{server.wait_outputs.confirmation_url}' 15
     next_poll_session: server
     action_description: Wait for client to deliver notifications then advance server wait
 
-  # Step 4: Server suite is done. Advance the client interaction wait so the client
-  # suite can continue with conformance verification.
   - session: server
     status: done
     last_completed: suite
+    state_description: >
+      Step 4: Server suite is done. Advance the client interaction wait so the client
+      suite can continue with conformance verification.
     command: bundle exec ruby execution_scripts/advance_wait.rb '{client.wait_outputs.confirmation_url}'
     next_poll_session: client
     action_description: Advance client interaction wait after server suite completes
 
-  # Step 5: Client is waiting at the processing attestation (1.3.04). Attest that
-  # the event notification was processed correctly.
   - session: client
     status: waiting
     last_completed: 1.3.04
+    state_description: >
+      Step 5: Client is waiting at the processing attestation (1.3.04). Attest that
+      the event notification was processed correctly.
     command: curl -s '{client.wait_outputs.attest_true_url}'
     next_poll_session: client
     action_description: Attest that event notification was processed correctly

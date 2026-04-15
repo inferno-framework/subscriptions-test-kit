@@ -1,8 +1,8 @@
 /data/*.db
 /data/igs/*.tgz
-/data/redis/**/*.rdb
-/data/redis/**/*.aof
-/data/redis/**/*.manifest
+/data/redis/*.rdb
+/data/redis/*.aof
+/data/redis/appendonlydir
 /tmp
 .env.local
 .env.*.local
@@ -13,10 +13,14 @@
 .settings/org.eclipse.wst.jsdt.ui.superType.container
 .settings/org.eclipse.wst.jsdt.ui.superType.name
 .idea
-*.gem
 
 /coverage
 /spec/examples.txt
 /docs/yard
 .yardoc
 node_modules
+
+.byebug_history
+
+# execution script failed run artifacts
+execution_scripts/**/*_actual_results*.json

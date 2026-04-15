@@ -35,9 +35,9 @@ advancement is handled by `advance_wait.rb`, a small Ruby helper invoked via the
 
 | File | Payload |
 |------|---------|
-| `subscriptions_r4_empty.yaml` | `empty` |
-| `subscriptions_r4_id_only.yaml` | `id-only` |
-| `subscriptions_r4_full_resource.yaml` | `full-resource` |
+| `subscriptions_r4_empty_with_commands.yaml` | `empty` |
+| `subscriptions_r4_id_only_with_commands.yaml` | `id-only` |
+| `subscriptions_r4_full_resource_with_commands.yaml` | `full-resource` |
 | `advance_wait.rb` | Shared helper — advances an Inferno wait state via GET |
 
 ---
@@ -74,16 +74,18 @@ lsof -ti :4567 | xargs kill -9
 Open a second terminal and from the repository root:
 
 ```bash
-bundle exec inferno execute_script execution_scripts/subscriptions_r4_empty.yaml --allow-commands
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_empty_with_commands.yaml --allow-commands
 ```
 ```bash
-bundle exec inferno execute_script execution_scripts/subscriptions_r4_id_only.yaml --allow-commands
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_id_only_with_commands.yaml --allow-commands
 ```
 ```bash
-bundle exec inferno execute_script execution_scripts/subscriptions_r4_full_resource.yaml --allow-commands
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_full_resource_with_commands.yaml --allow-commands
 ```
 
-> The `--allow-commands` flag is required because the scripts use `command:` actions.
+> The `--allow-commands` flag is required because the scripts use `command:` actions. The
+> `_with_commands` suffix in the filename signals this to the `execute_scripts:run_all` Rake task
+> and the GitHub Actions workflow, which pass the flag automatically.
 
 ---
 
@@ -136,9 +138,9 @@ session:
 
 | Script | Client preset | Server preset |
 |--------|--------------|---------------|
-| `subscriptions_r4_empty.yaml` | `...client_empty` | `...server_preset_empty` |
-| `subscriptions_r4_id_only.yaml` | `...client_id_only` | `...server_preset_id_only` |
-| `subscriptions_r4_full_resource.yaml` | `...client_full_resource` | `...server_preset_full_resource` |
+| `subscriptions_r4_empty_with_commands.yaml` | `...client_empty` | `...server_preset_empty` |
+| `subscriptions_r4_id_only_with_commands.yaml` | `...client_id_only` | `...server_preset_id_only` |
+| `subscriptions_r4_full_resource_with_commands.yaml` | `...client_full_resource` | `...server_preset_full_resource` |
 
 ---
 

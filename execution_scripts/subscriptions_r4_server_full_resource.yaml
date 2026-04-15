@@ -1,0 +1,60 @@
+sessions:
+  - suite: subscriptions_r5_backport_r4_client
+    name: client
+    preset: inferno-subscriptions_r5_backport_r4_client_full_resource
+  - suite: subscriptions_r5_backport_r4_server
+    name: server
+    preset: inferno-subscriptions_r5_backport_r4_server_preset_full_resource
+
+comparison_config:
+  normalized_strings:
+    - replacement: <INFERNO_HOST>
+      patterns:
+        - http://localhost:4567
+    - replacement: <UUID>
+      pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+
+steps:
+  - session: client
+    status: created
+    start_run:
+      session: client
+      runnable: suite
+    next_poll_session: client
+    action_description: Start client suite
+
+  - session: client
+    status: waiting
+    last_completed: 1.1.01
+    start_run:
+      session: server
+      runnable: suite
+    next_poll_session: server
+    action_description: Start server suite once client is waiting at InteractionTest
+
+  - session: server
+    status: waiting
+    last_completed: 1.1.02
+    command: sleep 20 && curl -s '{server.wait_outputs.confirmation_url}'
+    next_poll_session: server
+    action_description: Wait for notification delivery then advance server wait state
+
+  - session: server
+    status: done
+    last_completed: suite
+    command: curl -s '{client.wait_outputs.confirmation_url}'
+    next_poll_session: client
+    action_description: Advance client interaction wait after server suite completes
+
+  - session: client
+    status: waiting
+    last_completed: 1.3.04
+    command: curl -s '{client.wait_outputs.attest_true_url}'
+    next_poll_session: client
+    action_description: Attest that event notification was processed correctly
+
+  - session: client
+    status: done
+    last_completed: suite
+    action: END_SCRIPT
+    action_description: Script complete

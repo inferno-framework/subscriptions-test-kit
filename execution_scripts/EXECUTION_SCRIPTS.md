@@ -1,7 +1,8 @@
 # Execution Scripts
 
-Automated end-to-end scripts that drive the Inferno Subscriptions Test Kit via
-its REST API, simulating a human tester without manual browser interaction.
+Automated end-to-end scripts that drive the Inferno Subscriptions Test Kit using
+the `inferno execute_script` CLI. They simulate a human tester running the suite
+without any manual browser interaction.
 
 ---
 
@@ -18,50 +19,32 @@ test run:
 These scripts replace those manual steps with API calls, allowing
 the full suite to run unattended.
 
+Scripts use the built-in `inferno execute_script` framework: YAML configuration
+files declare sessions, steps, and result comparison config. Complex interactions
+that need local infrastructure (like the notification listener for client scripts)
+are handled by a small Ruby command script invoked via the `command:` action.
+
 ---
 
 ## Files
 
-| File | Suite | Payload |
-|------|-------|---------|
-| `subscriptions_r4_client_empty.rb` | R4 Client | `empty` |
-| `subscriptions_r4_client_id_only.rb` | R4 Client | `id-only` |
-| `subscriptions_r4_client_full_resource.rb` | R4 Client | `full-resource` |
-| `subscriptions_r4_server_empty.rb` | R4 Server | `empty` |
-| `subscriptions_r4_server_id_only.rb` | R4 Server | `id-only` |
-| `subscriptions_r4_server_full_resource.rb` | R4 Server | `full-resource` |
-| `run_script_helper.rb` | Shared helper module | — |
+| File | Suite | Payload | Sessions |
+|------|-------|---------|----------|
+| `subscriptions_r4_client_empty.yaml` | R4 Client | `empty` | Single |
+| `subscriptions_r4_client_id_only.yaml` | R4 Client | `id-only` | Single |
+| `subscriptions_r4_client_full_resource.yaml` | R4 Client | `full-resource` | Single |
+| `subscriptions_r4_server_empty.yaml` | R4 Server + Client | `empty` | Multi |
+| `subscriptions_r4_server_id_only.yaml` | R4 Server + Client | `id-only` | Multi |
+| `subscriptions_r4_server_full_resource.yaml` | R4 Server + Client | `full-resource` | Multi |
+| `client_interaction.rb` | Command script for client YAML scripts | — | — |
 
----
-
-## Changes Made to the Codebase
-
-### New files added
-
-- `execution_scripts/run_script_helper.rb` — shared helper module included by
-  all scripts
-- `execution_scripts/subscriptions_r4_client_empty.rb`
-- `execution_scripts/subscriptions_r4_client_id_only.rb`
-- `execution_scripts/subscriptions_r4_client_full_resource.rb`
-- `execution_scripts/subscriptions_r4_server_empty.rb`
-- `execution_scripts/subscriptions_r4_server_id_only.rb`
-- `execution_scripts/subscriptions_r4_server_full_resource.rb`
-
-### Gemfile
-
-No changes required to Gemfile
 ---
 
 ## Prerequisites
 
-### `foreman`
+### Set up Inferno environment
 
-`bundle exec inferno start` uses foreman to start Puma and Sidekiq together.
-Install it as a system gem (not in the bundle):
-
-```bash
-gem install foreman
-```
+https://inferno-framework.github.io/docs/getting-started/
 
 ---
 
@@ -93,179 +76,122 @@ lsof -ti :4567 | xargs kill -9
 
 Open a second terminal and from the repository root:
 
-Preset 1 test: client empty preset
+**Client scripts:**
 ```bash
-bundle exec ruby execution_scripts/subscriptions_r4_client_empty.rb
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_client_empty.yaml --allow-commands
 ```
-Preset 2 test: client id only preset
 ```bash
-bundle exec ruby execution_scripts/subscriptions_r4_client_id_only.rb
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_client_id_only.yaml --allow-commands
 ```
-Preset 3 test: client full resource preset
 ```bash
-bundle exec ruby execution_scripts/subscriptions_r4_client_full_resource.rb
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_client_full_resource.yaml --allow-commands
 ```
+
+**Server scripts:**
+```bash
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_server_empty.yaml --allow-commands
+```
+```bash
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_server_id_only.yaml --allow-commands
+```
+```bash
+bundle exec inferno execute_script execution_scripts/subscriptions_r4_server_full_resource.yaml --allow-commands
+```
+
+> The `--allow-commands` flag is required because the client scripts use `command:` actions.
+> The server scripts use `command:` actions too (curl for URL clicks). All scripts require it.
+
 
 ## How the Client Scripts Work
 
-The three client scripts are identical except for their preset ID and payload
-type. They act as the **FHIR client under test**.
+The three client scripts (empty, id-only, full-resource) follow the same flow.
+They act as the **FHIR client under test**.
 
 ```
-[1/7] Start notification listener
-      Starts a minimal TCPServer on a random port in a background thread.
-      It responds HTTP 200 to every request. This is the endpoint Inferno
-      will POST handshake and event notifications to.
+[created]   → start_run: suite
+              Starts the full client suite test run.
 
-[2/7] Create test session
-      POST /api/test_sessions with the suite ID and preset ID.
-      The preset loads access_token (SAMPLE_TOKEN) and the
-      notification_bundle input for the chosen payload type.
+[waiting]   → last_completed: subscriptions_r4_client_interaction
+  command:    bundle exec ruby execution_scripts/client_interaction.rb ...
+              The client_interaction.rb script:
+                1. Starts a TCPServer on a random local port (responds 200 to
+                   everything — receives Inferno's handshake and event notifications)
+                2. POSTs a conformant Subscription to Inferno's FHIR endpoint
+                   with the payload type for this script
+                3. Sleeps 20s for Inferno's SendSubscriptionNotifications job
+                   to deliver handshake + event notification to the listener
+                4. GETs the confirmation_url to advance the InteractionTest wait
 
-[3/7] Start test run
-      POST /api/test_runs. Session data is passed as inputs to satisfy
-      Inferno's required-input validation.
+[waiting]   → last_completed: subscriptions_r4_client_processing_attestation
+  command:    curl -s '{wait_outputs.attest_true_url}'
+              Equivalent to a human clicking "true" in the UI.
 
-[4/7] Wait for subscription interaction wait state
-      The InteractionTest pauses and waits for a Subscription POST.
-      The script polls GET /api/test_runs/:id every 2s until status == "waiting",
-      then POSTs a conformant FHIR Subscription to:
-        /custom/subscriptions_r5_backport_r4_client/fhir/Subscription
-      with Authorization: Bearer SAMPLE_TOKEN.
-
-      Inferno's SendSubscriptionNotifications background job then POSTs a
-      handshake followed by an event notification to the TCPServer listener.
-      The script sleeps 20s to allow both deliveries to complete.
-
-[5/7] Advance the interaction wait
-      Fetches confirmation_url from session data and GETs it. This resumes
-      the test run. Inferno then automatically runs the handshake and event
-      notification verification tests.
-
-[6/7] Wait for attestation wait state
-      ProcessingAttestationTest pauses and waits for the tester to confirm
-      the event notification was processed correctly. The script fetches
-      attest_true_url from session data and GETs it — equivalent to a human
-      clicking "true" in the UI.
-
-[7/7] Wait for completion
-      Polls until the run reaches "done", then prints a pass/fail summary.
+[done]      → END_SCRIPT
 ```
 
 ### Payload type differences
 
-The only difference between the three client scripts is:
+The only difference between the three client YAML files is the preset and the
+`payload_code` argument passed to `client_interaction.rb`:
 
-| Script | `PRESET_ID` | `PAYLOAD_CODE` |
-|--------|-------------|----------------|
-| `empty` | `...client_empty` | `"empty"` |
-| `id_only` | `...client_id_only` | `"id-only"` |
-| `full_resource` | `...client_full_resource` | `"full-resource"` |
-
-`PRESET_ID` controls which `notification_bundle` fixture is loaded as input.
-`PAYLOAD_CODE` sets the `backport-payload-content` extension value in the
-Subscription that gets POSTed to Inferno.
-
-### Payload type meanings
-
-| Type | What Inferno includes in the event notification |
-|------|-------------------------------------------------|
-| `empty` | Status parameters only — no resource data |
-| `id-only` | Status parameters + resource ID reference |
-| `full-resource` | Status parameters + complete resource inline |
+| Script | Preset | `payload_code` |
+|--------|--------|----------------|
+| `empty` | `...client_empty` | `empty` |
+| `id_only` | `...client_id_only` | `id-only` |
+| `full_resource` | `...client_full_resource` | `full-resource` |
 
 ---
 
 ## How the Server Scripts Work
 
-> **These scripts are not recommended for use yet.** See Known Issues below.
-
-The server scripts act as the **FHIR server under test**. In the server suite,
-Inferno acts as the client — it POSTs a Subscription to the "server under test"
-and expects to receive handshake and event notifications back.
-
-The server presets point Inferno's `url` at the **client suite's** FHIR
-endpoint (`/custom/subscriptions_r5_backport_r4_client/fhir/Subscription`).
-The client suite's `SubscriptionCreateEndpoint` then kicks off the
-`SendSubscriptionNotifications` job, which delivers notifications back to the
-server suite's listener.
+The three server scripts (empty, id-only, full-resource) follow the same flow.
+They orchestrate **two sessions**: a client session and a server session. The
+client session is required because `SubscriptionCreateEndpoint` (which the server
+suite uses to POST its Subscription) requires an active waiting client test run
+to exist before it will accept the request.
 
 ```
-[1/5] Create test session with server preset
-[2/5] Start test run
-[3/5] Wait for notification delivery wait state
-      Sleep 20s for notifications to be delivered
-[4/5] Advance wait state via confirmation_url
-[5/5] Wait for completion
+[client: created]   → start_run: client suite
+                      Starts the full client suite. Poll client.
+
+[client: waiting]   → last_completed: subscriptions_r4_client_interaction
+  start_run:          server suite
+  next_poll:          server
+                      Client is now at InteractionTest wait. Start the server
+                      suite. The server suite POSTs a Subscription to the client
+                      suite's FHIR endpoint, which triggers
+                      SendSubscriptionNotifications to deliver handshake + event
+                      notifications back to the server suite's listener.
+
+[server: waiting]   → last_completed: subscriptions_r4_server_notification_delivery
+  command:            sleep 20 && curl -s '{server.wait_outputs.confirmation_url}'
+  next_poll:          server
+                      Wait for notifications to land, then advance the server wait.
+
+[server: done]      → last_completed: suite
+  command:            curl -s '{client.wait_outputs.confirmation_url}'
+  next_poll:          client
+                      Server suite complete. Advance the client's InteractionTest
+                      wait so the client can run its post-interaction verification
+                      tests.
+
+[client: waiting]   → last_completed: subscriptions_r4_client_processing_attestation
+  command:            curl -s '{client.wait_outputs.attest_true_url}'
+  next_poll:          client
+
+[client: done]      → END_SCRIPT
 ```
 
 ---
 
-## Known Issues
+## Result Comparison
 
-### 1. Server scripts — missing client session (blocker)
+On first run the framework auto-creates an expected results file
+(`<script_name>_expected.json`) and exits with a non-zero code. Re-run the
+script to compare against it.
 
-**Status:** Not safe to run.
+The `comparison_config` in each YAML normalises:
+- The Inferno host URL (replaced with `<INFERNO_HOST>`)
+- UUIDs (replaced with `<UUID>`)
 
-The `SubscriptionCreateEndpoint` (the client suite's FHIR endpoint that accepts
-Subscription POSTs) requires an active, waiting client suite test run to exist
-with identifier `SAMPLE_TOKEN` before it will accept a request. It uses this
-to look up which `notification_bundle` to send and which session to associate
-the request with.
-
-The server scripts currently only create a server session. When Inferno's server
-suite test POSTs the Subscription, the endpoint finds no waiting client run and
-returns HTTP 500. The server suite's `send_subscription` method then asserts a
-201 response, which fails, and the test run errors out before reaching the
-notification delivery wait state.
-
-**Fix required:** The server scripts need to be redesigned to:
-1. Create a **client** session and start a client test run
-2. Wait for the client's `InteractionTest` to enter `waiting` status
-3. Then create the server session and start the server test run
-4. Orchestrate both runs through to completion
-
-### 2. `ProcessingAttestationTest` — undefined variable `token` (blocker for client scripts)
-
-**Status:** Pre-existing bug in the test kit, not introduced by the scripts.
-
-In `lib/subscriptions_test_kit/suites/subscriptions_r5_backport_r4_client/workflow/conformance_verification/processing_attestation_test.rb`,
-the `wait()` message interpolates `#{token}` on lines 38 and 40, but `token`
-is never defined. The variable defined above it is `identifier` (set to
-`test_session_id`). Ruby raises `NameError` at runtime, crashing the test
-before it enters the wait state. The test run completes as `done/error` at step
-6 instead of pausing for attestation.
-
-**Fix:** Change both occurrences of `#{token}` to `#{identifier}` in
-`processing_attestation_test.rb`.
-
----
-
-## Helper Module Reference (`run_script_helper.rb`)
-
-All scripts include `RunScriptHelper` which provides:
-
-| Method | Description |
-|--------|-------------|
-| `inferno_base_url` | Returns `INFERNO_BASE_URL` env var or `http://localhost:4567` |
-| `create_session(suite_id, preset_id)` | Creates a session and applies a preset |
-| `start_test_run(session_id, suite_id)` | Starts a full suite test run with session inputs |
-| `get_test_run(id)` | Fetches current test run status |
-| `get_session_data(session_id)` | Returns all session inputs/outputs as a name→value hash |
-| `wait_for_waiting_state(id)` | Polls until status == `"waiting"`, raises on timeout or early completion |
-| `wait_for_completion(id)` | Polls until status == `"done"` |
-| `fetch_output(session_id, name)` | Reads a named output from session data, raises if missing |
-| `http_get(url)` | GETs a URL — used to click confirmation/attestation URLs |
-| `http_post_fhir(url, body, token)` | POSTs a FHIR resource with a Bearer token |
-| `start_notification_listener` | Starts a TCPServer on a random port, returns `[server, thread, port]` |
-| `stop_notification_listener(server, thread)` | Shuts down the listener |
-| `build_subscription(endpoint, payload_code)` | Builds a conformant FHIR Subscription JSON body |
-| `assert_all_tests_passed(run_id, session_id, suite_id)` | Prints result summary, raises if any test failed/errored |
-
-### Timing constants
-
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `POLL_INTERVAL` | 2s | Delay between status poll requests |
-| `DEFAULT_TIMEOUT` | 120s | Max time to wait for a status change |
-| `NOTIFICATION_DELAY` | 20s | Sleep time to allow `SendSubscriptionNotifications` to complete |
+This ensures results are comparable across different runs and machines.

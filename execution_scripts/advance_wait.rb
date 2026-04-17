@@ -9,8 +9,7 @@
 #   ARGV[0] - url          (the wait URL to GET)
 #   ARGV[1] - delay        (seconds to sleep before advancing, default: 0)
 
-require 'net/http'
-require 'uri'
+require 'faraday'
 
 url   = ARGV[0]
 delay = ARGV[1]&.to_i || 0

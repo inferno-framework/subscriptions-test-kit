@@ -16,7 +16,7 @@ delay = ARGV[1].to_i
 
 raise "Usage: #{$PROGRAM_NAME} <url> [delay_seconds]" if url.nil?
 
-if delay > 0
+if delay.positive?
   puts "Waiting #{delay}s for notifications to be delivered..."
   sleep delay
 end

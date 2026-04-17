@@ -12,7 +12,7 @@
 require 'faraday'
 
 url   = ARGV[0]
-delay = ARGV[1]&.to_i || 0
+delay = ARGV[1].to_i
 
 raise "Usage: #{$0} <url> [delay_seconds]" if url.nil?
 

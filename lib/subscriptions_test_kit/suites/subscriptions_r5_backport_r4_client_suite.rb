@@ -52,6 +52,9 @@ module SubscriptionsTestKit
 
       capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures',
                                                  'capability_statement.json'))
+      if Inferno::Application['base_url'].start_with? 'https://inferno-qa.healthit.gov'
+        capability_statement.gsub!('https://inferno.healthit.gov', 'https://inferno-qa.healthit.gov')
+      end
       route(:get, '/fhir/metadata', proc {
                                       [200, { 'Content-Type' => 'application/fhir+json' }, [capability_statement]]
                                     })

@@ -22,6 +22,5 @@ if delay.positive?
 end
 
 puts "Advancing wait: #{url}"
-uri      = URI(url)
-response = Net::HTTP.new(uri.host, uri.port).request(Net::HTTP::Get.new(uri.request_uri))
-puts "Response: #{response.code}"
+response = Faraday.get(url)
+puts "Response: #{response.status}"

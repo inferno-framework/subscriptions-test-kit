@@ -4,6 +4,9 @@ source 'https://rubygems.org'
 
 gemspec
 
+#Will get rid of this reference one we release the real gem 
+gem 'inferno_core', path: '../inferno-core'
+
 group :development, :test do
   gem 'debug'
   gem 'rubocop', '~> 1.56'

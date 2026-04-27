@@ -8,13 +8,14 @@ module SubscriptionsTestKit
       include NotificationConformanceVerification
 
       id :subscriptions_r4_client_notification_input_verification
-      title '[USER INPUT VERIFICATION] Notification Bundle Input Conformance Verification'
+      title 'Notification Bundle Input Conformance Verification'
       description %(
         This test verifies that the notification bundle sent is conformant
         to the [R4 Topic-Based Subscription Notification Bundle
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
         The content of the notification will be based on the Bundle provided by the tester.
         )
+      simulation_verification
 
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)

@@ -12,12 +12,13 @@ module SubscriptionsTestKit
       include SubscriptionSimulationUtils
 
       id :subscriptions_r4_client_notification_input_payload_verification
-      title '[USER INPUT VERIFICATION] Notification Bundle Input Conformance Verification for Payload Content'
+      title 'Notification Bundle Input Conformance Verification for Payload Content'
       description %(
         This test verifies that the notification bundle sent by Inferno meets the requirements
         of the payload indicated in the subscription created by the client under test.
         The content of the notification will be based on the Bundle provided by the tester.
       )
+      simulation_verification
 
       run do
         subscription = find_subscription(test_session_id)

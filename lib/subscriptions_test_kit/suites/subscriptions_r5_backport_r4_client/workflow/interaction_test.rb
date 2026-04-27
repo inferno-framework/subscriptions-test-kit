@@ -72,6 +72,8 @@ module SubscriptionsTestKit
               notification to send to the client endpoint, and responses to $status operation requests. The provided
               Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.
             )
+      output :confirmation_url
+      output :fail_url
 
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@23'
 
@@ -80,6 +82,11 @@ module SubscriptionsTestKit
         assert(messages.none? do |m|
                  m[:type] == 'error'
                end, 'Notification Bundle input is invalid for use by Inferno, see error message(s)')
+
+        confirmation_url = "#{resume_pass_url_client}?test_run_identifier=#{access_token}"
+        output(confirmation_url:)
+        fail_url = "#{resume_fail_url_client}?test_run_identifier=#{access_token}"
+        output(fail_url:)
 
         wait(
           identifier: access_token,
@@ -102,10 +109,10 @@ module SubscriptionsTestKit
             At any point while this test is waiting, Inferno will respond to Subscription GET and $status requests.
 
             Once the client has received an event notification and has made any additional requests,
-            [click here to complete the test](#{resume_pass_url_client}?test_run_identifier=#{access_token})
+            [click here to complete the test](#{confirmation_url})
 
             If at any point something has gone wrong and the client is unable to continue,
-            [click here to fail the test](#{resume_fail_url_client}?test_run_identifier=#{access_token})
+            [click here to fail the test](#{fail_url})
 
             NOTE: The test must be completed or failed using the links above within 10 minutes. After that,
             attempts to send requests or to complete or fail the tests using the links above

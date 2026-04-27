@@ -1,3 +1,10 @@
+# 0.12.1
+* FI-3815: Update Test Kit with new RSpec features by @Shaumik-Ashraf in https://github.com/inferno-framework/subscriptions-test-kit/pull/36
+* Add notice file by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/37
+* Fix Docker session creation by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/38
+* Simulation flag added to tests by @ljtucker in https://github.com/inferno-framework/subscriptions-test-kit/pull/40
+* ID-45: Support execution scripts by adding outputs for wait dialog links by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/39
+
 # 0.12.0
 * FI-4182 Remove inferno@groups.mitre.org email from gemspec by @arscan in https://github.com/inferno-framework/subscriptions-test-kit/pull/34
 

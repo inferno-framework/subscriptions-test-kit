@@ -1,3 +1,6 @@
+# 0.12.2
+* ID-145 inferno-core and jwt gem updates by @FlexonyoPizza in: https://github.com/inferno-framework/subscriptions-test-kit/pull/46
+
 # 0.12.1
 * FI-3815: Update Test Kit with new RSpec features by @Shaumik-Ashraf in https://github.com/inferno-framework/subscriptions-test-kit/pull/36
 * Add notice file by @karlnaden in https://github.com/inferno-framework/subscriptions-test-kit/pull/37

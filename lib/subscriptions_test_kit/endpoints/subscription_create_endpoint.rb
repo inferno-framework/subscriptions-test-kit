@@ -6,6 +6,8 @@ module SubscriptionsTestKit
   class SubscriptionCreateEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
 
+    error_response_format :operation_outcome
+
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
     end
@@ -59,36 +61,6 @@ module SubscriptionsTestKit
 
     def tags
       [SUBSCRIPTION_CREATE_TAG]
-    end
-
-    def verify_subscription(subscription)
-      unless subscription.is_a? FHIR::Subscription
-        return operation_outcome('error', 'invalid', 'No recognized R4 Subscription in request body')
-      end
-
-      unless subscription.channel&.type == 'rest-hook'
-        return operation_outcome('error', 'business-rule', 'channel.type must be rest-hook')
-      end
-
-      unless valid_url?(subscription.channel&.endpoint)
-        return operation_outcome('error', 'value', 'channel.endpoint is not recognized as a conformant URL')
-      end
-
-      heartbeat_period = find_heartbeat_period(subscription)
-      operation_outcome('error', 'not-supported', 'heartbeatPeriod is not supported') unless heartbeat_period.nil?
-    end
-
-    def find_heartbeat_period(subscription)
-      subscription.channel&.extension&.find do |e|
-        e.url == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period'
-      end
-    end
-
-    def valid_url?(url)
-      uri = URI.parse(url)
-      %w[http https].include?(uri.scheme)
-    rescue URI::InvalidURIError
-      false
     end
   end
 end

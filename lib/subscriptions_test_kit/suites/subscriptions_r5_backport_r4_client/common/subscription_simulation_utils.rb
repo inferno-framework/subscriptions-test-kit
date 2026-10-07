@@ -7,9 +7,16 @@ module SubscriptionsTestKit
       # application/json, so we'll allow that. Disallow XML for now.
       DEFAULT_MIME_TYPE = 'application/fhir+json'
       ALLOWED_MIME_TYPES = [DEFAULT_MIME_TYPE, 'application/json'].freeze
+      JSON_PATCH_MIME_TYPE = 'application/json-patch+json'
 
       def notification_bundle_input(test_result)
-        JSON.parse(test_result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
+        input = JSON.parse(test_result.input_json).find { |i| i['name'] == 'notification_bundle' }
+        return input['value'] if input.present?
+
+        # Tests that wait after the Subscription workflow (e.g., update and delete) do not take the notification
+        # bundle as an input, so fall back to the value stored for the session.
+        Inferno::Repositories::SessionData.new.load(test_session_id: test_result.test_session_id,
+                                                    name: 'notification_bundle')
       end
 
       def client_access_token_input(test_result)
@@ -69,16 +76,33 @@ module SubscriptionsTestKit
         end
         return unless request
 
-        begin
-          if as_json
-            # needed to access primitive extensions
-            JSON.parse(request.response_body)
-          else
-            FHIR.from_contents(request.response_body)
-          end
-        rescue StandardError
-          nil
+        parse_subscription(request.response_body, as_json:)
+      end
+
+      # The created Subscription as modified by any subsequent successful updates, or nil if it has been deleted.
+      def find_current_subscription(test_session_id)
+        subscription = find_subscription(test_session_id)
+        return if subscription.nil? || subscription_deleted?(test_session_id, subscription.id)
+
+        update_request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_UPDATE_TAG, subscription.id])
+          .reverse.find { |r| r.status == 200 }
+        return subscription unless update_request
+
+        parse_subscription(update_request.response_body)
+      end
+
+      def subscription_deleted?(test_session_id, subscription_id)
+        requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_DELETE_TAG, subscription_id]).any? do |r|
+          r.status.between?(200, 299)
         end
+      end
+
+      # Inferno does not act on status changes requested by the client, except to honor requests to turn
+      # the Subscription off
+      def current_subscription_status_code(subscription)
+        return 'off' if subscription.status == 'off'
+
+        determine_subscription_status_code(subscription.id)
       end
 
       def determine_subscription_status_code(subscription_id)
@@ -106,7 +130,50 @@ module SubscriptionsTestKit
         end
       end
 
+      # Checks that Inferno is able to simulate the requested Subscription.
+      # Returns an OperationOutcome describing the problem, or nil if the Subscription is supported.
+      def verify_subscription(subscription)
+        unless subscription.is_a? FHIR::Subscription
+          return operation_outcome('error', 'invalid', 'No recognized R4 Subscription in request body')
+        end
+
+        unless subscription.channel&.type == 'rest-hook'
+          return operation_outcome('error', 'business-rule', 'channel.type must be rest-hook')
+        end
+
+        unless valid_channel_endpoint?(subscription.channel&.endpoint)
+          return operation_outcome('error', 'value', 'channel.endpoint is not recognized as a conformant URL')
+        end
+
+        heartbeat_period = find_heartbeat_period(subscription)
+        operation_outcome('error', 'not-supported', 'heartbeatPeriod is not supported') unless heartbeat_period.nil?
+      end
+
       private
+
+      def parse_subscription(subscription_json, as_json: false)
+        if as_json
+          # needed to access primitive extensions
+          JSON.parse(subscription_json)
+        else
+          FHIR.from_contents(subscription_json)
+        end
+      rescue StandardError
+        nil
+      end
+
+      def find_heartbeat_period(subscription)
+        subscription.channel&.extension&.find do |e|
+          e.url == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period'
+        end
+      end
+
+      def valid_channel_endpoint?(url)
+        uri = URI.parse(url)
+        %w[http https].include?(uri.scheme)
+      rescue URI::InvalidURIError
+        false
+      end
 
       def requests_repo
         @requests_repo ||= Inferno::Repositories::Requests.new

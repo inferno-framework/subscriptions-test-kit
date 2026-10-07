@@ -20,6 +20,9 @@ Using the interactions between Inferno and the client under test, Inferno will v
 the client meets the obligations from the implementation guide both on individual interactions
 and in aggregate.
 
+After the notification workflow, Inferno will wait for the client under test to update
+and then delete the Subscription that it created and will verify that those requests are conformant.
+
 Inferno does not implement a real data repository that recognizes resource-level changes
 and so relies on the tester to provide an event notification that Inferno will send back
 to the client under test. Inferno will manipulate this provided notification to generate other
@@ -81,8 +84,10 @@ To run the client tests against the server tests:
 1. Wait 10-15 seconds while the client session makes requests, 
    then click the "Click here" link in the wait dialog to evaluate the notifications.
 1. Back in the client session, click the "click here to complete the test" link
-   and respond to the attestation based on the results in the server session and review
-   the results.
+   and respond to the attestation based on the results in the server session.
+1. The client session will then wait for the Subscription to be updated and deleted. The server
+   session's *Subscription Update and Deletion Verification* tests have already made these requests,
+   so click the "click here to complete the test" link and review the results.
 
 NOTE: Inferno uses the `Bearer` token sent in the `Authorization` HTTP header 
 to associate requests with sessions. If multiple concurrent sessions are configured
@@ -112,6 +117,8 @@ Coverage](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/
 CSV document.
 
 Specific limitations to highlight include
+- Inferno supports Subscription `PATCH` requests only when they use JSON Patch. XML Patch and FHIRPath Patch
+  are not supported.
 - Inferno supports only the `rest-hook` channel type. Support for other channels may be added in the future.
   If there is a channel type that you would like to see verified, please 
   [provide feedback](https://github.com/inferno-framework/subscriptions-test-kit/issues) to that effect.

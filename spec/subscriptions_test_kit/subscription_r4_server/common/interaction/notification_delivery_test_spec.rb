@@ -135,7 +135,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       post_json(subscription_channel, heartbeat_bundle)
       post_json(subscription_channel, notification_bundle)
       expect(last_response).to be_server_error
-      expect(last_response.body).to eq("Unable to find test run with identifier 'notification WRONG_TOKEN'.")
+      expect(last_response.body)
+        .to include("identifier 'notification WRONG_TOKEN' is not associated with a waiting session")
 
       get(resume_pass_url)
 

@@ -4,6 +4,7 @@ require_relative 'subscriptions_r5_backport_r4_server/event_notification_group'
 require_relative 'subscriptions_r5_backport_r4_server/handshake_heartbeat_group'
 require_relative 'subscriptions_r5_backport_r4_server/status_operation_group'
 require_relative 'subscriptions_r5_backport_r4_server/subscription_rejection_group'
+require_relative 'subscriptions_r5_backport_r4_server/update_delete_group'
 require_relative '../endpoints/subscription_rest_hook_endpoint'
 require_relative '../urls'
 
@@ -92,6 +93,7 @@ module SubscriptionsTestKit
       group from: :subscriptions_r4_server_handshake_heartbeat
       group from: :subscriptions_r4_server_status_operation
       group from: :subscriptions_r4_server_subscription_rejection
+      group from: :subscriptions_r4_server_update_delete
     end
   end
 end

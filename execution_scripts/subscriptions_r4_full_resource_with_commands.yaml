@@ -75,6 +75,18 @@ steps:
     action_description: Attest that event notification was processed correctly
 
   - session: client
+    status: waiting
+    last_completed: 2.1.01
+    state_description: >
+      Step 6: Client is waiting at the update and delete interaction (2.1.01). The server suite's
+      update and deletion tests already updated (PUT and JSON Patch) and deleted the Subscription
+      during Step 2, so advance the client wait so the client suite can continue with update and
+      delete conformance verification.
+    command: bundle exec ruby execution_scripts/advance_wait.rb '{client.wait_outputs.confirmation_url}'
+    next_poll_session: client
+    action_description: Advance client update and delete wait
+
+  - session: client
     status: done
     last_completed: suite
     action: END_SCRIPT

@@ -31,6 +31,10 @@ must themselves be conformant and consistent with the notifications subsequently
 but no other requirements are placed on them, 
 except those related to Inferno limitations (see the Current Limitations section below).
 
+At the end of the session, Inferno will update the Subscription created during the Subscription
+workflow tests using `PUT` and JSON Patch `PATCH` requests and then delete it, verifying that the
+server supports these optional interactions.
+
 The content of all interactions sent by the server (responses and notifications), 
 as well as tester-provided requests, will be checked 
 for conformance to the Subscriptions IG requirements individually and used in 
@@ -166,6 +170,8 @@ Specific limitations to highlight include
 - Inferno supports only the `rest-hook` channel type. Support for other channels may be added in the future.
   If there is a channel type that you would like to see verified, please 
   [provide feedback](https://github.com/inferno-framework/subscriptions-test-kit/issues) to that effect.
+- When verifying Subscription modification using `PATCH`, Inferno only uses JSON Patch. XML Patch and
+  FHIRPath Patch are not tested.
 - Inferno does not test delivery error handling and recovery scenarios, including
   the optional `$events` API and event numbering details.
 - Inferno does not verify that the shape and content of notifications are appropriate for the triggering

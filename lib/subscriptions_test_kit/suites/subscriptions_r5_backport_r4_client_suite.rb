@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'subscriptions_r5_backport_r4_client/workflow_group'
+require_relative 'subscriptions_r5_backport_r4_client/update_delete_workflow_group'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
+require_relative '../endpoints/subscription_update_endpoint'
+require_relative '../endpoints/subscription_patch_endpoint'
+require_relative '../endpoints/subscription_delete_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
 
 module SubscriptionsTestKit
@@ -61,6 +65,9 @@ module SubscriptionsTestKit
 
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :put, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionUpdateEndpoint
+      suite_endpoint :patch, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionPatchEndpoint
+      suite_endpoint :delete, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionDeleteEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
@@ -74,6 +81,7 @@ module SubscriptionsTestKit
       end
 
       group from: :subscriptions_r4_client_workflow
+      group from: :subscriptions_r4_client_update_delete_workflow
     end
   end
 end

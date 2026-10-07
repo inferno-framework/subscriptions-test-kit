@@ -5,13 +5,15 @@ module SubscriptionsTestKit
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
 
+    error_response_format :operation_outcome
+
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
     def make_response
       response.format = :json
-      subscription = find_subscription(test_run.test_session_id)
+      subscription = find_current_subscription(test_run.test_session_id)
 
       unless subscription.present?
         not_found

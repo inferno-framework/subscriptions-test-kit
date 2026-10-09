@@ -11,8 +11,8 @@ module SubscriptionsTestKit
       title 'Client Subscription Delete Conformance Verification'
       description %(
         This test verifies that the client under test sent a conformant
-        [delete](https://hl7.org/fhir/R4/http.html#delete) request for the Subscription it created,
-        i.e., a `DELETE` to `[base]/Subscription/[id]` for the created Subscription.
+        [delete](https://hl7.org/fhir/R4/http.html#delete) request for the Subscription it created
+        in this session to Inferno's simulated FHIR server.
       )
 
       run do

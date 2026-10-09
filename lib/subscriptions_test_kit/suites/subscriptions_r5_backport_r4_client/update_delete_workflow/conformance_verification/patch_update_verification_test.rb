@@ -13,7 +13,7 @@ module SubscriptionsTestKit
       title 'Client Subscription PATCH Update Conformance Verification'
       description %(
         This test verifies that any [patch](https://hl7.org/fhir/R4/http.html#patch) (`PATCH`) requests
-        that the client under test sent to `[base]/Subscription/[id]` for the Subscription it created
+        that the client under test sent for the Subscription it created in this session
         are conformant. Specifically, that
         - the request is a [JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902) that Inferno was able to
           apply to the Subscription, and

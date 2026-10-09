@@ -13,23 +13,26 @@ requirements and may change the test verification logic.
 
 ## Test Methodology
 
-For these tests Inferno simulates a Subscriptions server application. Inferno will wait for
-the client under test to request a Subscription and then will send notifications
-back to the client based on that Subscription using additional information provided by the tester.
-Using the interactions between Inferno and the client under test, Inferno will verify that
+For these tests Inferno simulates a Subscriptions server application. The client contains
+two groups:
+- *Demonstrate the Rest-Hook Subscription Workflow*, which tests the client's ability to
+  create a Subscription using the rest-hook channel and receive notifications based on it.
+- *Demonstrate Subscription Update and Deletion*, which tests the client's ability to
+  update and delete the Subscription created during the first group.
+
+During each group, Inferno will wait for the client system to make requests against Inferno.
+Inferno will react to those requests, triggering handshakes and notifications. 
+Using the interactions between Inferno and the client system, Inferno will verify that
 the client meets the obligations from the implementation guide both on individual interactions
 and in aggregate.
 
-After the notification workflow, Inferno will wait for the client under test to update
-and then delete the Subscription that it created and will verify that those requests are conformant.
-
-Inferno does not implement a real data repository that recognizes resource-level changes
-and so relies on the tester to provide an event notification that Inferno will send back
-to the client under test. Inferno will manipulate this provided notification to generate other
-notifications, such as handshakes and `$status` operation responses, to send
-and respond with as directed by the IG. Inferno will verify that the provided event
-notification is conformant and that it matches the requirements for the Subscription
-sent by the client under test.
+Inferno does not implement a real data repository that recognizes resource-level changes.
+So, for the first group, Inferno relies on the tester to provide an event notification that
+Inferno will send back to the client system. Inferno will manipulate this provided
+notification to generate other notifications, such as handshakes and `$status` operation
+responses, to send and respond with as directed by the IG. Inferno will verify that the
+provided event notification is conformant and that it matches the requirements for the
+Subscription sent by the client system.
 
 The content of all Subscription interactions sent by the client, 
 as well as tester-provided notifications, will be checked 
@@ -44,7 +47,7 @@ HL7® FHIR® resources are checked for conformance using the Java validator with
 
 The following inputs must be provided by the tester at a minimum to execute
 any tests in this suite:
-1. *Access Token*: A `Bearer` token that the client under test will send in the 
+1. *Access Token*: A `Bearer` token that the client system will send in the 
    `Authorization` header of HTTP requests made against Inferno. Inferno uses the
    value to identify incoming requests that belong to the testing session.
 1. *Notification Bundle*: an `event-notification` conforming to the [R4 Topic-Based
@@ -52,7 +55,7 @@ any tests in this suite:
    Inferno uses this as the basis for responses and notifications that it will send
    to the client.
 
-All other details needed to interact with the client under test, such as where to send notifications,
+All other details needed to interact with the client system, such as where to send notifications,
 will be determined from the subscription that the client will create. Once the testing start,
 Inferno will wait for a Subscription creation request and then send the relevant handshakes
 and notification requests to the client and verify the interaction.
@@ -104,7 +107,7 @@ that appears when initiating a test run.
 
 ### Client Notification Access Token
 
-If the client under test needs Inferno to send a specific `Bearer` token in the HTTP `Authorization` header
+If the client system needs Inferno to send a specific `Bearer` token in the HTTP `Authorization` header
 when sending notifications and it cannot be specified in the `channel.header` element of the Subscription
 instance that the client sends to Inferno, then a value can be provided here.
 
@@ -116,9 +119,7 @@ that the test kit covers and does not cover in the [Requirements
 Coverage](https://github.com/inferno-framework/subscriptions-test-kit/blob/main/lib/subscriptions_test_kit/requirements/generated/subscriptions-test-kit_requirements_coverage.csv)
 CSV document.
 
-Specific limitations to highlight include
-- Inferno supports Subscription `PATCH` requests only when they use JSON Patch. XML Patch and FHIRPath Patch
-  are not supported.
+Specific limitations to highlight include:
 - Inferno supports only the `rest-hook` channel type. Support for other channels may be added in the future.
   If there is a channel type that you would like to see verified, please 
   [provide feedback](https://github.com/inferno-framework/subscriptions-test-kit/issues) to that effect.
@@ -131,3 +132,5 @@ Specific limitations to highlight include
 - When sending notifications, Inferno supports only JSON payloads and will always use `application/fhir+json`
   as the value of the `content-type` HTTP header, unless the client system explicitly asks for
   `application/json` using the `Subscription.channel.payload` element.
+- Inferno supports Subscription `PATCH` requests only when they use JSON Patch. XML Patch and FHIRPath Patch
+  are not supported.

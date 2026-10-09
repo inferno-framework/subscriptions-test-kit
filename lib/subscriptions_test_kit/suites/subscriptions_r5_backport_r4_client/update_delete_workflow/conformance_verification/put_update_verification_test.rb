@@ -13,7 +13,7 @@ module SubscriptionsTestKit
       title 'Client Subscription PUT Update Conformance Verification'
       description %(
         This test verifies that any [update](https://hl7.org/fhir/R4/http.html#update) (`PUT`) requests
-        that the client under test sent to `[base]/Subscription/[id]` for the Subscription it created
+        that the client under test sent to Inferno for the Subscription it created during this session
         are conformant. Specifically, that
         - the `id` of the Subscription in the request body matches the `id` in the request URL, and
         - the Subscription in the request body is conformant to the [R4/B Topic-Based Subscription

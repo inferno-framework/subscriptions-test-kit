@@ -11,24 +11,14 @@ module SubscriptionsTestKit
       id :subscriptions_r4_client_update_delete_interaction
       title 'Subscription Update and Delete Interaction'
       description %(
-        During this test, the client under test will update and then delete the Subscription
+        During this test, Inferno will wait while the client system changes the Subscription
         that it created during the *Demonstrate the Rest-Hook Subscription Workflow* tests.
-        This includes the following steps
-        1. The client under test sends a Subscription update (`PUT`) or patch (`PATCH`) request to Inferno
-           for the previously created Subscription.
-        2. The client under test sends a Subscription delete (`DELETE`) request to Inferno
-           for the previously created Subscription.
-
-        While these steps are taking place and after, Inferno will be waiting for the user to indicate that
-        the interaction has completed successfully or failed for some reason. Additionally, the client
-        system may make additional requests, such as Subscription reads or `$status` checks, while the
-        test is waiting. Afterwards, Inferno will no longer respond to requests.
+        Inferno accepts the FHIR [update](https://hl7.org/fhir/R4/http.html#update),
+        [patch](https://hl7.org/fhir/R4/http.html#patch) (JSON only), and [delete](https://hl7.org/fhir/R4/http.html#delete)
+        interactions and testers can demonstrate system support for any or all of them.
 
         Additional notes:
         - Inferno will not send additional notifications based on the updated Subscription.
-        - Inferno only supports `PATCH` requests that use
-          [JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902) with a `Content-Type` of
-          `application/json-patch+json`.
         - Inferno will modify the `Subscription.channel.payload` value on the updated Subscription to
           `application/fhir+json` unless it is `application/json`.
         - Inferno manages the `Subscription.status` value and will ignore requested changes to it, unless
@@ -62,17 +52,20 @@ module SubscriptionsTestKit
         wait(
           identifier: access_token,
           timeout: 600,
-          message: %(
-            Inferno will wait until the client has updated and deleted the Subscription. The steps are:
+          message: <<~MESSAGE
+            Inferno will wait while the client updates and/or deletes the Subscription created earlier
+            in the session. Inferno accepts the FHIR [update](https://hl7.org/fhir/R4/http.html#update),
+            [patch](https://hl7.org/fhir/R4/http.html#patch) (JSON only), and [delete](https://hl7.org/fhir/R4/http.html#delete)
+            interactions and testers can demonstrate system support for any or all of them by making
+            a request using the corresponding HTTP verb against `#{subscription_url}`:
 
-            1. Inferno expects either a Subscription PUT request containing the updated Subscription or a
-            Subscription PATCH request containing a JSON Patch (`Content-Type: application/json-patch+json`) at:
-
-              `#{subscription_url}`
-
-            2. Inferno then expects a Subscription DELETE request at:
-
-              `#{subscription_url}`
+            - **PUT**: Change the Subscription with the update interaction by sending
+              a PUT request containing an updated Subscription resource in the request body.
+            - **PATCH**: Change the Subscription with a patch interaction by sending
+              a PATCH request containing a JSON Patch (`Content-Type: application/json-patch+json`)
+              in the request body
+            - **DELETE**: Remove the Subscription with a delete interaction by sending a
+              DELETE request with no body.
 
             All requests must have the Authorization header set to:
 
@@ -81,16 +74,12 @@ module SubscriptionsTestKit
             At any point while this test is waiting, Inferno will respond to Subscription GET and $status requests
             for the Subscription until it has been deleted.
 
-            Once the client has updated and deleted the Subscription and has made any additional requests,
+            Once the client has demonstrated the Subscription interactions it supports,
             [click here to complete the test](#{confirmation_url})
 
             If at any point something has gone wrong and the client is unable to continue,
             [click here to fail the test](#{fail_url})
-
-            NOTE: The test must be completed or failed using the links above within 10 minutes. After that,
-            attempts to send requests or to complete or fail the tests using the links above
-            will result in a *"session not found"* error.
-          )
+          MESSAGE
         )
       end
     end

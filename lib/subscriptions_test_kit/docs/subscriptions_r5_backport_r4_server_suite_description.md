@@ -24,7 +24,7 @@ Over the course of a test session, Inferno may request multiple Subscriptions to
 different features of the IG, e.g., different notification content types. Because the
 choice of what topics and specific features to implement is left to individual servers,
 Inferno does not dictate specific Subscription features or topics. Instead, the
-tester will provide Subsription instances that Inferno will submit, modified lightly if needed, 
+tester will provide Subscription instances that Inferno will submit, modified lightly if needed, 
 e.g., to point to Inferno's notification endpoint, to the server
 as a part of the tests. In order for the tests to pass, the provided Subscription instances
 must themselves be conformant and consistent with the notifications subsequently sent,
@@ -170,8 +170,6 @@ Specific limitations to highlight include
 - Inferno supports only the `rest-hook` channel type. Support for other channels may be added in the future.
   If there is a channel type that you would like to see verified, please 
   [provide feedback](https://github.com/inferno-framework/subscriptions-test-kit/issues) to that effect.
-- When verifying Subscription modification using `PATCH`, Inferno only uses JSON Patch. XML Patch and
-  FHIRPath Patch are not tested.
 - Inferno does not test delivery error handling and recovery scenarios, including
   the optional `$events` API and event numbering details.
 - Inferno does not verify that the shape and content of notifications are appropriate for the triggering
@@ -184,3 +182,5 @@ Specific limitations to highlight include
   Inferno to request that `application/json` be used instead by placing it in the
   `Subscription.channel.payload` element of the Subscription they provide for Inferno
   to use.
+- When verifying Subscription modification using `PATCH`, Inferno only uses JSON Patch. XML Patch and
+  FHIRPath Patch are not tested.

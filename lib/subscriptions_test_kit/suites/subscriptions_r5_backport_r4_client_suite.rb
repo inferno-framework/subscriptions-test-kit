@@ -54,6 +54,19 @@ module SubscriptionsTestKit
         end
       end
 
+      # Used to validate tester-provided content so that it cannot rely on extensions not defined in the IG
+      fhir_resource_validator :no_custom_extensions do
+        igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'
+
+        validation_context do
+          extensions [] # no extensions not in the spec
+        end
+
+        exclude_message do |message|
+          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+        end
+      end
+
       capability_statement = File.read(File.join(__dir__, 'subscriptions_r5_backport_r4_client', 'fixtures',
                                                  'capability_statement.json'))
       if Inferno::Application['base_url'].start_with? 'https://inferno-qa.healthit.gov'

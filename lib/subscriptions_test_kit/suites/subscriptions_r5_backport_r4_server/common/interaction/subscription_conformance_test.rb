@@ -11,7 +11,8 @@ module SubscriptionsTestKit
         This test accepts a Subscription resource as an input and verifies that it is conformant to the
         [R4/B Topic-Based Subscription profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
         and that it is constructed to make supported notifications to Inferno's simulated
-        Subscriptions client.
+        Subscriptions client. To ensure that the subscriptions server is driving its behavior only based on
+        standard information, custom extensions are not allowed within the provided Subscription.
 
         For the server to successfuly deliver notifications recognized by this test session, the Subscription `channel`
         element should have it's subelements populated with the following information:
@@ -65,7 +66,7 @@ module SubscriptionsTestKit
         updated_subscription = subscription.to_json
         output(updated_subscription:)
 
-        subscription_verification(updated_subscription)
+        subscription_verification(updated_subscription, validator: :no_custom_extensions)
         no_error_verification('Subscription resource is not conformant.')
       end
     end

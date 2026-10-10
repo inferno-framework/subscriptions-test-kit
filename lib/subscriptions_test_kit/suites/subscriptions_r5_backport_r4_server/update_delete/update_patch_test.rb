@@ -8,14 +8,11 @@ module SubscriptionsTestKit
       id :subscriptions_r4_server_update_patch
       title 'Server supports updating a Subscription using JSON Patch'
       description %(
-        A server SHOULD be capable of modifying a Subscription resource using either
-        `PUT [base]/Subscription/[id]` or `PATCH [base]/Subscription/[id]`.
-
-        This test sends a [patch](https://hl7.org/fhir/R4/http.html#patch) (`PATCH`) request using
-        [JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902) to change the `reason` of the
-        Subscription created during the Subscription Workflow tests. Inferno verifies that the server
-        responds with a `200` status and that a subsequent read of the Subscription reflects the change.
-        Inferno does not test XML Patch or FHIRPath Patch.
+        During this test, Inferno will send a [patch](https://hl7.org/fhir/R4/http.html#patch) (`PATCH`)
+        request using [JSON Patch](https://datatracker.ietf.org/doc/html/rfc6902) to change the `reason`
+        of the Subscription created during the "Demonstrate the Subscription Workflow" group. Inferno
+        will verify that the server responds with a `200` status and that a subsequent read of the Subscription
+        reflects the change. Inferno does not test XML Patch or FHIRPath Patch.
       )
       optional
 

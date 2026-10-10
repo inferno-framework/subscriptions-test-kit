@@ -4,8 +4,8 @@ module SubscriptionsTestKit
       def created_subscription_id
         creation_requests = load_tagged_requests('subscription_creation').select { |r| r.status == 201 }
         skip_if creation_requests.empty?, %(
-          No successful Subscription creation requests were made in previous tests. Must run Subscription Workflow tests
-          first in order to run this test.
+          No successful Subscription creation requests were made in previous tests. Run the "Demonstrate the
+          Subscription Workflow" group first.
         )
 
         JSON.parse(creation_requests.first.response_body)['id']

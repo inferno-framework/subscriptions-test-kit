@@ -5,7 +5,7 @@ module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class WorkflowGroup < Inferno::TestGroup
       id :subscriptions_r4_server_workflow
-      title 'Demonstrate the subscription workflow'
+      title 'Demonstrate the Subscription Workflow'
       description %(
         Demonstrate the ability of the server to accept a request for the
         creation of a FHIR Subscription instance and deliver an event notification

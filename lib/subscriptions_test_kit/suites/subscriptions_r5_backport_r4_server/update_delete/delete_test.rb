@@ -10,9 +10,8 @@ module SubscriptionsTestKit
       description %(
         During this test, Inferno will send a FHIR [delete](https://hl7.org/fhir/R4/http.html#delete) request
         for the Subscription created during the "Demonstrate the Subscription Workflow" group. Inferno will
-        verify that the server responds with a `200`, `202`, or `204` status. Unless the server indicates
-        that the deletion has been accepted but not yet completed (`202`), Inferno also verifies that a
-        subsequent read of the Subscription returns a `404` or `410` status.
+        verify that the server responds with a `200`, `202`, or `204` status and that a subsequent read of
+        the Subscription returns a `404` or `410` status.
       )
       optional
       verifies_requirements 'hl7.fhir.uv.subscriptions_1.1.0@127'
@@ -22,7 +21,6 @@ module SubscriptionsTestKit
 
         fhir_delete(:subscription, subscription_id)
         assert_response_status([200, 202, 204])
-        pass_if(request.status == 202, 'Server accepted the deletion request but has not yet completed it.')
 
         fhir_read(:subscription, subscription_id)
         assert_response_status([404, 410])

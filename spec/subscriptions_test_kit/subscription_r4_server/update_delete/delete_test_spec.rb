@@ -19,12 +19,19 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::DeleteTest
       expect(read_request).to have_been_made
     end
 
-    it 'passes without a read when the server accepts the deletion for later processing' do
+    it 'passes when the server accepts the deletion and the Subscription is deleted' do
       stub_request(:delete, subscription_url).to_return(status: 202)
-      read_request = stub_request(:get, subscription_url)
+      read_request = stub_request(:get, subscription_url).to_return(status: 404)
 
       expect(run(test, url:).result).to eq('pass')
-      expect(read_request).to_not have_been_made
+      expect(read_request).to have_been_made
+    end
+
+    it 'fails when the server accepts the deletion but the Subscription can still be read' do
+      stub_request(:delete, subscription_url).to_return(status: 202)
+      stub_request(:get, subscription_url).to_return(status: 200, body: subscription.to_json)
+
+      expect(run(test, url:).result).to eq('fail')
     end
 
     it 'fails when the server rejects the deletion' do

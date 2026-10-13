@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'Apache-2.0'
   spec.add_dependency 'faraday', '~> 1.10.5'
   spec.add_dependency 'hana', '~> 1.3'
-  spec.add_dependency 'inferno_core', '~> 1.4', '>= 1.4.5'
+  spec.add_dependency 'inferno_core', '~> 1.4', '>= 1.4.6'
   spec.required_ruby_version = Gem::Requirement.new('>= 3.3.6')
   spec.metadata['inferno_test_kit'] = 'true'
   spec.metadata['homepage_uri'] = spec.homepage

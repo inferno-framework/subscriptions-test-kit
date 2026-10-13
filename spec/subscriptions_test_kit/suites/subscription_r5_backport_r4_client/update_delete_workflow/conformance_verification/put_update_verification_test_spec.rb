@@ -9,6 +9,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PutUpdateV
 
   it 'skips when the created Subscription was not updated' do
     create_subscription
+    expect(run(test).result).to eq('skip')
+  end
+
+  it 'skips when only a different Subscription id was updated' do
+    create_subscription
     put_subscription(subscription.merge('id' => 'other'), id: 'other')
     expect(run(test).result).to eq('skip')
   end
@@ -29,12 +34,34 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PutUpdateV
     expect(validation_request).to have_been_made
   end
 
-  it 'fails when the id in the PUT body does not match the url' do
-    stub_request(:post, validation_url).to_return(status: 200, body: validation_success.to_json)
+  it 'fails when Inferno rejected the PUT update' do
     create_subscription
-    put_subscription(subscription.merge('id' => 'other'))
+    put_subscription(subscription.merge('id' => 'other'), status: 400,
+                                                          response_body: error_outcome('id does not match'))
 
     expect(run(test).result).to eq('fail')
+    expect(entity_result_message).to match(/status 400.*id does not match/m)
+  end
+
+  it 'ignores PUT updates to a different Subscription id' do
+    stub_request(:post, validation_url).to_return(status: 200, body: validation_success.to_json)
+    create_subscription
+    put_subscription(subscription.merge('id' => 'other'), id: 'other')
+    put_subscription(subscription)
+
+    expect(run(test).result).to eq('pass')
+    expect(entity_result_message).to be_empty
+  end
+
+  it 'fails when any PUT update is not conformant, identifying the request' do
+    stub_request(:post, validation_url).to_return(status: 200, body: validation_success.to_json)
+    create_subscription
+    put_subscription(subscription)
+    put_subscription(subscription.merge('id' => 'other'), status: 400,
+                                                          response_body: error_outcome('id does not match'))
+
+    expect(run(test).result).to eq('fail')
+    expect(entity_result_message).to match(/Request 2: .*status 400.*id does not match/m)
   end
 
   {

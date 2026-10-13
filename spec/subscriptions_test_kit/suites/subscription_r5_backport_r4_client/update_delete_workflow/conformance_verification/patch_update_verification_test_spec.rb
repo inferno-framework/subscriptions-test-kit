@@ -28,6 +28,22 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PatchUpdat
     expect(validation_request).to have_been_made
   end
 
+  it 'skips when only a different Subscription id was patched' do
+    create_subscription
+    patch_subscription(status: 404, response_body: error_outcome('not found'), id: 'other')
+    expect(run(test).result).to eq('skip')
+  end
+
+  it 'fails when any patch is not conformant, identifying the request' do
+    stub_request(:post, validation_url).to_return(status: 200, body: validation_success.to_json)
+    create_subscription
+    patch_subscription(status: 200, response_body: subscription.merge('reason' => 'patched'))
+    patch_subscription(status: 422, response_body: error_outcome('Unable to apply'))
+
+    expect(run(test).result).to eq('fail')
+    expect(entity_result_message).to match(/Request 2: .*Unable to apply/m)
+  end
+
   it 'fails when Inferno could not apply a patch' do
     create_subscription
     patch_subscription(status: 422, response_body: {

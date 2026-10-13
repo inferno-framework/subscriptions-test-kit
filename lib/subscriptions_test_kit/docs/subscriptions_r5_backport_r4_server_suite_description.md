@@ -95,8 +95,14 @@ To run the server tests against the client tests:
 1. Wait 10-15 seconds while the client session makes requests, 
    then click the "Click here" link in the wait dialog to evaluate the notifications.
 1. Back in the client session, click the "click here to complete the test" link
-   and respond to the attestation
-1. Meanwhile, the server tests will have completed and will be ready for review.
+   and respond to the attestation based on the results in the server session.
+1. The client session will then wait for the Subscription to be updated and deleted. The server
+   session's *Subscription Update and Deletion Verification* tests have already made these requests,
+   but they will have failed as Inferno only accepts these interactions when made during this test.
+   Return to the server session and re-run the *Subscription Update and Deletion Verification*
+   group.
+1. Once the server run has completed, return to the client session and click the "click here to
+   complete the test" link. Return to the server session to review the results.
 
 NOTE: Inferno uses the `Bearer` token sent in the `Authorization` HTTP header 
 to associate requests with sessions. If multiple concurrent sessions are configured

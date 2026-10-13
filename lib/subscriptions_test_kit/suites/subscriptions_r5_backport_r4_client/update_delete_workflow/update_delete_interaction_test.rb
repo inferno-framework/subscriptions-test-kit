@@ -35,6 +35,9 @@ module SubscriptionsTestKit
               The bearer token that the client under test will use when making Subscription update, delete, and other
               requests to Inferno's simulated Subscriptions server.
             )
+      # Inferno's Subscription update and delete endpoints only accept requests while this test is waiting
+      config options: { accepts_subscription_changes: true }
+
       output :confirmation_url
       output :fail_url
       output :subscription_url

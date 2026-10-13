@@ -90,7 +90,11 @@ To run the client tests against the server tests:
    and respond to the attestation based on the results in the server session.
 1. The client session will then wait for the Subscription to be updated and deleted. The server
    session's *Subscription Update and Deletion Verification* tests have already made these requests,
-   so click the "click here to complete the test" link and review the results.
+   but they will have failed as Inferno only accepts these interactions when made during this test.
+   Return to the server session and re-run the *Subscription Update and Deletion Verification*
+   group.
+1. Once the server run has completed, return to the client session and click the "click here to
+   complete the test" link and review the results.
 
 NOTE: Inferno uses the `Bearer` token sent in the `Authorization` HTTP header 
 to associate requests with sessions. If multiple concurrent sessions are configured
@@ -134,3 +138,7 @@ Specific limitations to highlight include:
   `application/json` using the `Subscription.channel.payload` element.
 - Inferno supports Subscription `PATCH` requests only when they use JSON Patch. XML Patch and FHIRPath Patch
   are not supported.
+- Inferno records each request it receives just after responding to it, and its simulated Subscription reflects
+  only the requests it has recorded. As a result, a request sent immediately after an update or delete, for
+  example in parallel or over a separate connection, may be answered as if that change had not happened yet.
+  If Inferno's responses appear inconsistent with earlier changes, pause briefly between requests.

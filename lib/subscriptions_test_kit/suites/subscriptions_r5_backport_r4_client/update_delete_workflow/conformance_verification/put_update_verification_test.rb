@@ -12,40 +12,25 @@ module SubscriptionsTestKit
       id :subscriptions_r4_client_put_update_verification
       title 'Client Subscription PUT Update Conformance Verification'
       description %(
-        This test verifies that any [update](https://hl7.org/fhir/R4/http.html#update) (`PUT`) requests
+        This test verifies that the [update](https://hl7.org/fhir/R4/http.html#update) (`PUT`) requests
         that the client under test sent to Inferno for the Subscription it created during this session
-        are conformant. Specifically, that
-        - the `id` of the Subscription in the request body matches the `id` in the request URL, and
-        - the Subscription in the request body is conformant to the [R4/B Topic-Based Subscription
+        are conformant. Specifically, that each request
+        - was accepted by Inferno, which requires, for example, that the `id` of the Subscription in the request
+          body matches the `id` in the request URL, and
+        - contained a Subscription in the request body that is conformant to the [R4/B Topic-Based Subscription
           profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
           and meets other requirements placed on it by the IG.
 
-        Clients may update the Subscription using either `PUT` or `PATCH`, so this test is omitted if the
-        client only used `PATCH`.
+        Requests sent for other Subscription ids are not considered. Clients may update the Subscription using
+        either `PUT` or `PATCH`, so this test is omitted if the client only used `PATCH`.
       )
 
       run do
-        subscription = load_update_requests('put')
+        load_update_requests('put')
 
-        requests.each do |update_request|
-          body_id = request_body_id(update_request.request_body)
-          unless body_id == subscription.id
-            add_message('error', %(
-              The Subscription `id` in the update request body (`#{body_id}`) does not match the `id` in the
-              request URL (`#{subscription.id}`).
-            ))
-          end
+        verify_update_requests do |update_request|
           subscription_verification(update_request.request_body)
         end
-
-        no_error_verification('Subscription PUT update request is not conformant.')
-      end
-
-      def request_body_id(request_body)
-        body = JSON.parse(request_body)
-        body['id'] if body.is_a?(Hash)
-      rescue JSON::ParserError, TypeError
-        nil
       end
     end
   end

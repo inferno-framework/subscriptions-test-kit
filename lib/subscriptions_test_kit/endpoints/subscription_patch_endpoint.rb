@@ -29,7 +29,8 @@ module SubscriptionsTestKit
 
       fhir_error_response(422, 'processing', 'Applying the JSON Patch did not produce a JSON object')
       nil
-    rescue Hana::Patch::Exception, Hana::Pointer::Exception => e
+    # Hana raises a plain IndexError for a copy from an array index that does not exist
+    rescue Hana::Patch::Exception, Hana::Pointer::Exception, IndexError => e
       fhir_error_response(422, 'processing', "Unable to apply JSON Patch: #{e.message}")
       nil
     end

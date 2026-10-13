@@ -264,6 +264,13 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
         expect(last_response.status).to eq(422)
       end
 
+      it 'rejects a patch that copies from an array index that does not exist' do
+        json_patch(subscription_url, [{ op: 'copy', from: '/channel/header/99', path: '/reason' }])
+        expect(last_response.status).to eq(422)
+        expect(JSON.parse(last_response.body).dig('issue', 0, 'details', 'text'))
+          .to start_with('Unable to apply JSON Patch')
+      end
+
       [nil, 'not a subscription', []].each do |value|
         it "rejects a patch that replaces the Subscription with #{value.inspect}" do
           json_patch(subscription_url, [{ op: 'replace', path: '', value: }])

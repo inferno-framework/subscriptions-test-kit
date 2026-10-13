@@ -10,6 +10,11 @@ RSpec.shared_context('with client Subscription update requests') do
   end
   let(:validation_success) { { outcomes: [{ issues: [] }], sessionId: test_session.id } }
 
+  def entity_result_message
+    Inferno::Repositories::Results.new.current_results_for_test_session_and_runnables(test_session.id, [test])
+      .first.messages.map(&:message).join(' ')
+  end
+
   def create_request(verb:, url:, status:, tags:, request_body: nil, response_body: nil)
     repo_create(:request, verb:, url:, direction: 'incoming', status:, request_body:, response_body:,
                           result:, test_session_id: test_session.id, tags:)
@@ -20,14 +25,19 @@ RSpec.shared_context('with client Subscription update requests') do
                    tags: [SubscriptionsTestKit::SUBSCRIPTION_CREATE_TAG], response_body: subscription.to_json)
   end
 
-  def put_subscription(body, id: subscription_id)
-    create_request(verb: 'PUT', url: "#{subscription_base_url}/#{id}", status: 200,
-                   tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, id], request_body: body.to_json)
+  def put_subscription(body, id: subscription_id, status: 200, response_body: body)
+    create_request(verb: 'PUT', url: "#{subscription_base_url}/#{id}", status:,
+                   tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, id], request_body: body.to_json,
+                   response_body: response_body.to_json)
   end
 
-  def patch_subscription(status:, response_body:)
-    create_request(verb: 'PATCH', url: "#{subscription_base_url}/#{subscription_id}", status:,
-                   tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id],
+  def error_outcome(text)
+    { resourceType: 'OperationOutcome', issue: [{ severity: 'error', code: 'invalid', details: { text: } }] }
+  end
+
+  def patch_subscription(status:, response_body:, id: subscription_id)
+    create_request(verb: 'PATCH', url: "#{subscription_base_url}/#{id}", status:,
+                   tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, id],
                    request_body: [{ op: 'replace', path: '/reason', value: 'patched' }].to_json,
                    response_body: response_body.to_json)
   end

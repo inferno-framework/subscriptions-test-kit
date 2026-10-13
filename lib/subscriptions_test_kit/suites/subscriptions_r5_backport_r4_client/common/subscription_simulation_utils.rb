@@ -97,9 +97,10 @@ module SubscriptionsTestKit
         parse_subscription(update_request.response_body)
       end
 
-      # For endpoints: whether the waiting test accepts changes (updates and deletes) to the Subscription
+      # For endpoints: whether the waiting test accepts changes (updates and deletes) to the Subscription, which
+      # a test indicates with the accepts_subscription_changes config option
       def subscription_change_allowed?
-        test <= UpdateDeleteInteractionTest
+        test.config.options[:accepts_subscription_changes] == true
       end
 
       # For endpoints: reject a change to the Subscription requested while a different test is waiting

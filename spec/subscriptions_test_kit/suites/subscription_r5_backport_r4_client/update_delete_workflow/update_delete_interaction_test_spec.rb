@@ -264,11 +264,29 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
         expect(last_response.status).to eq(422)
       end
 
-      it 'rejects a patch that copies from an array index that does not exist' do
-        json_patch(subscription_url, [{ op: 'copy', from: '/channel/header/99', path: '/reason' }])
-        expect(last_response.status).to eq(422)
-        expect(JSON.parse(last_response.body).dig('issue', 0, 'details', 'text'))
-          .to start_with('Unable to apply JSON Patch')
+      {
+        'copies from an array index that does not exist' => [
+          { op: 'copy', from: '/channel/header/99', path: '/reason' }
+        ],
+        'has a path through a number' => [
+          { op: 'add', path: '/count', value: 1 }, { op: 'add', path: '/count/a/b', value: 1 }
+        ],
+        'has a path through a boolean' => [
+          { op: 'add', path: '/flag', value: true }, { op: 'test', path: '/flag/a/b', value: 1 }
+        ]
+      }.each do |description, operations|
+        it "rejects a patch that #{description}" do
+          json_patch(subscription_url, operations)
+          expect(last_response.status).to eq(422)
+          expect(JSON.parse(last_response.body).dig('issue', 0, 'details', 'text'))
+            .to start_with('Unable to apply JSON Patch')
+        end
+      end
+
+      it 'accepts a JSON Patch Content-Type in any case' do
+        json_patch(subscription_url, [{ op: 'replace', path: '/reason', value: 'patched reason' }],
+                   content_type: 'Application/JSON-Patch+json')
+        expect(last_response.status).to eq(200)
       end
 
       [nil, 'not a subscription', []].each do |value|

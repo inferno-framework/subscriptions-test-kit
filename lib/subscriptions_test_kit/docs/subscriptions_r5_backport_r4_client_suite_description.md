@@ -138,6 +138,9 @@ Specific limitations to highlight include:
   `application/json` using the `Subscription.channel.payload` element.
 - Inferno supports Subscription `PATCH` requests only when they use JSON Patch. XML Patch and FHIRPath Patch
   are not supported.
+- Inferno does not support re-creating a deleted Subscription with a `PUT` request. Once the client deletes the
+  Subscription, Inferno responds to `PUT` and `PATCH` requests for it with `404 Not Found`, and the update
+  conformance verification tests will report those requests as failures.
 - Inferno records each request it receives just after responding to it, and its simulated Subscription reflects
   only the requests it has recorded. As a result, a request sent immediately after an update or delete, for
   example in parallel or over a separate connection, may be answered as if that change had not happened yet.

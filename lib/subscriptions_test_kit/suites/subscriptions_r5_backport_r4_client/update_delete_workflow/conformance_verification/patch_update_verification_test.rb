@@ -27,8 +27,7 @@ module SubscriptionsTestKit
         *Subscription Update and Delete Interaction* test), so the values that the patch gives those elements
         are not verified and not used by Inferno.
 
-        Inferno does not support XML Patch or FHIRPath Patch requests. Clients may update the Subscription
-        using either `PUT` or `PATCH`, so this test is omitted if the client only used `PUT`.
+        Inferno does not support XML Patch or FHIRPath Patch requests.
       )
 
       run do

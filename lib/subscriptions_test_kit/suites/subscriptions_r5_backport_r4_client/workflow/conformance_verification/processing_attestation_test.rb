@@ -16,6 +16,7 @@ module SubscriptionsTestKit
         of what should happen when the client receives an event notification for the requested
         Subscription.
       )
+      attestation
 
       output :attest_true_url
       output :attest_false_url

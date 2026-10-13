@@ -21,8 +21,7 @@ module SubscriptionsTestKit
           profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
           and meets other requirements placed on it by the IG.
 
-        Requests sent for other Subscription ids are not considered. Clients may update the Subscription using
-        either `PUT` or `PATCH`, so this test is omitted if the client only used `PATCH`.
+        Requests sent for other Subscription ids are not considered.
       )
 
       run do

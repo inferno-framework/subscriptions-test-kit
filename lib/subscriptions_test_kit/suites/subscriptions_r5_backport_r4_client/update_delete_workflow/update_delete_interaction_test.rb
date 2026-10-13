@@ -18,7 +18,7 @@ module SubscriptionsTestKit
         interactions and testers can demonstrate system support for any or all of them.
 
         Additional notes:
-        - Inferno will not send additional notifications based on the updated Subscription.
+        - Inferno will not send additional notifications or handshakes based on the updated Subscription.
         - Inferno will modify the `Subscription.channel.payload` value on the updated Subscription to
           `application/fhir+json` unless it is `application/json`.
         - Inferno manages the `Subscription.status` value and will ignore requested changes to it, unless

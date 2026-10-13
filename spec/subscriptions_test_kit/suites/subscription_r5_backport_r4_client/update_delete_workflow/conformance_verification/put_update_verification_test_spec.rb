@@ -18,10 +18,13 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PutUpdateV
     expect(run(test).result).to eq('skip')
   end
 
-  it 'omits when the Subscription was only updated using PATCH' do
+  it 'skips when the Subscription was only updated using PATCH' do
     create_subscription
     patch_subscription(status: 200, response_body: subscription)
-    expect(run(test).result).to eq('omit')
+
+    result = run(test)
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/did not receive a PUT request/)
   end
 
   it 'passes when the PUT update is conformant' do

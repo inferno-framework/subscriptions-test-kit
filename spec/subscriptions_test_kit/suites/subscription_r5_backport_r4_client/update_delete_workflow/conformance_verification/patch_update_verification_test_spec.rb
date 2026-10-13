@@ -12,10 +12,13 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PatchUpdat
     expect(run(test).result).to eq('skip')
   end
 
-  it 'omits when the Subscription was only updated using PUT' do
+  it 'skips when the Subscription was only updated using PUT' do
     create_subscription
     put_subscription(subscription)
-    expect(run(test).result).to eq('omit')
+
+    result = run(test)
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/did not receive a PATCH request/)
   end
 
   it 'passes when a JSON Patch results in a conformant Subscription' do

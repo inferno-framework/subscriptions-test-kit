@@ -7,6 +7,12 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::UpdatePutT
     expect(run(test, url:).result).to eq('skip')
   end
 
+  it 'skips if a Subscription was only created outside of the workflow group' do
+    create_subscription_request(tags: ['subscription_creation', 'empty'])
+
+    expect(run(test, url:).result).to eq('skip')
+  end
+
   describe 'when a Subscription was created' do
     before { create_subscription_request }
 

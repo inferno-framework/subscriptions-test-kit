@@ -8,9 +8,9 @@ RSpec.shared_context('with a created server Subscription') do
     JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'subscription_resource_example.json')))
   end
 
-  def create_subscription_request
+  def create_subscription_request(tags: ['subscription_creation', 'workflow'])
     repo_create(:request, direction: 'outgoing', url: "#{url}/Subscription", result:,
                           test_session_id: test_session.id, status: 201, response_body: subscription.to_json,
-                          tags: ['subscription_creation'])
+                          tags:)
   end
 end

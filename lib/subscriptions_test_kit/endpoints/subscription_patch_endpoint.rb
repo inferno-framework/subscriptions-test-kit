@@ -32,11 +32,26 @@ module SubscriptionsTestKit
 
     def parse_json_patch(body)
       patch = JSON.parse(body)
-      return unless patch.is_a?(Array) && patch.all? { |op| op.is_a?(Hash) && op['op'].is_a?(String) }
+      return unless patch.is_a?(Array) && patch.all? { |operation| valid_json_patch_operation?(operation) }
 
       patch
     rescue JSON::ParserError
       nil
+    end
+
+    # Checks the members each operation requires (https://datatracker.ietf.org/doc/html/rfc6902#section-4)
+    # so that malformed operations are rejected here rather than raising non-patch errors when applied
+    def valid_json_patch_operation?(operation)
+      return false unless operation.is_a?(Hash) && operation['path'].is_a?(String)
+
+      case operation['op']
+      when 'add', 'replace', 'test'
+        operation.key?('value')
+      when 'move', 'copy'
+        operation['from'].is_a?(String)
+      else
+        operation['op'] == 'remove'
+      end
     end
   end
 end

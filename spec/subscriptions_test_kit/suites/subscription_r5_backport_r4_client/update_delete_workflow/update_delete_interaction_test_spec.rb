@@ -145,6 +145,27 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
         expect(last_response.status).to eq(400)
       end
 
+      {
+        'an unknown op' => { op: 'frob', path: '/reason' },
+        'a missing path' => { op: 'remove' },
+        'a path that is not a string' => { op: 'replace', path: 5, value: 'patched reason' },
+        'a missing value' => { op: 'replace', path: '/reason' },
+        'a missing from' => { op: 'copy', path: '/reason' },
+        'a from that is not a string' => { op: 'move', from: 5, path: '/reason' }
+      }.each do |description, operation|
+        it "rejects a JSON Patch operation with #{description}" do
+          json_patch(subscription_url, [operation])
+          expect(last_response.status).to eq(400)
+          expect(JSON.parse(last_response.body).dig('issue', 0, 'details', 'text'))
+            .to eq('Request body is not a valid JSON Patch document')
+        end
+      end
+
+      it 'accepts a JSON Patch operation with a null value' do
+        json_patch(subscription_url, [{ op: 'add', path: '/error', value: nil }])
+        expect(last_response.status).to eq(200)
+      end
+
       it 'rejects a patch that cannot be applied' do
         json_patch(subscription_url, [{ op: 'test', path: '/reason', value: 'something else' }])
         expect(last_response.status).to eq(422)

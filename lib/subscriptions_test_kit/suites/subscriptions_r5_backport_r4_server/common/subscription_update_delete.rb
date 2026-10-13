@@ -2,10 +2,10 @@ module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     module SubscriptionUpdateDelete
       def created_subscription_id
-        creation_requests = load_tagged_requests('subscription_creation').select { |r| r.status == 201 }
+        creation_requests = load_tagged_requests('subscription_creation', 'workflow').select { |r| r.status == 201 }
         skip_if creation_requests.empty?, %(
-          No successful Subscription creation requests were made in previous tests. Run the "Demonstrate the
-          Subscription Workflow" group first.
+          No successful Subscription creation request has been made during the "Demonstrate the Subscription Workflow"
+          group. Run that group successfully before re-running this one.
         )
 
         JSON.parse(creation_requests.first.response_body)['id']

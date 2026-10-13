@@ -36,4 +36,17 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::PutUpdateV
 
     expect(run(test).result).to eq('fail')
   end
+
+  {
+    'not a JSON object' => [],
+    'null' => nil,
+    'missing a channel' => { 'resourceType' => 'Subscription', 'id' => 'abc-123' }
+  }.each do |description, body|
+    it "fails when the PUT body is #{description}" do
+      create_subscription
+      put_subscription(body)
+
+      expect(run(test).result).to eq('fail')
+    end
+  end
 end

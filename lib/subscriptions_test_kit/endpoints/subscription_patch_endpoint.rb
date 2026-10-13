@@ -24,7 +24,11 @@ module SubscriptionsTestKit
       # Apply the patch to the Subscription as the client would see it on a read
       current_status = current_subscription_status_code(current_subscription)
       current_hash = current_subscription.source_hash.deep_dup.merge('status' => current_status)
-      Hana::Patch.new(patch).apply(current_hash)
+      patched_hash = Hana::Patch.new(patch).apply(current_hash)
+      return patched_hash if patched_hash.is_a?(Hash)
+
+      fhir_error_response(422, 'processing', 'Applying the JSON Patch did not produce a JSON object')
+      nil
     rescue Hana::Patch::Exception, Hana::Pointer::Exception => e
       fhir_error_response(422, 'processing', "Unable to apply JSON Patch: #{e.message}")
       nil

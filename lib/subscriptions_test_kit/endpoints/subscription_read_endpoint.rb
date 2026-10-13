@@ -21,9 +21,7 @@ module SubscriptionsTestKit
         status_code = current_subscription_status_code(subscription)
         response.body = subscription.source_hash.merge('status' => status_code).to_json
       else
-        response.status = 404
-        response.body = operation_outcome('error', 'not-found',
-                                          "No subscription exists with ID #{subscription_id}").to_json
+        fhir_error_response(404, 'not-found', "No subscription exists with ID #{subscription_id}")
       end
     end
 

@@ -14,17 +14,17 @@ module SubscriptionsTestKit
 
     def make_response
       response.format = :json
-      response.status = 400
 
       begin
         subscription = FHIR.from_contents(request.body.string)
       rescue StandardError
-        response.body = operation_outcome('error', 'invalid', 'No recognized R4 Subscription in request body').to_json
+        fhir_error_response(400, 'invalid', 'No recognized R4 Subscription in request body')
         return
       end
 
       verification_outcome = verify_subscription(subscription)
       if verification_outcome.present?
+        response.status = 400
         response.body = verification_outcome.to_json
         return
       end
@@ -36,7 +36,7 @@ module SubscriptionsTestKit
         subscription_hash = JSON.parse(existing_subscription_request.response_body)
         error_text = 'Inferno only supports one subscription per test run. Subscription already created with ' \
                      "ID #{subscription_hash['id']}"
-        response.body = operation_outcome('error', 'business-rule', error_text).to_json
+        fhir_error_response(400, 'business-rule', error_text)
         return
       end
 

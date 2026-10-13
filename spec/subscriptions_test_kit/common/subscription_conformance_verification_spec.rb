@@ -86,6 +86,21 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       expect(result.result_message).to eq('Invalid JSON. ')
     end
 
+    it 'fails if subscription is not a JSON object' do
+      result = run(test, subscription_resource: '[]')
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('The Subscription must be a JSON object.')
+    end
+
+    it 'fails if subscription does not contain a channel' do
+      subscription_resource.delete('channel')
+      result = run(test, subscription_resource: subscription_resource.to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('The Subscription must include a `channel` element.')
+    end
+
     it 'fails if subscription channel type is not set to `rest-hook`' do
       subscription_resource['channel']['type'] = 'email'
       result = run(test, subscription_resource: subscription_resource.to_json)

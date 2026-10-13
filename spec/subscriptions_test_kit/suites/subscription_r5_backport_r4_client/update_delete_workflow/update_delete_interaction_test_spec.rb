@@ -83,6 +83,63 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
       expect(results_repo.find(result.id).result).to eq('pass')
     end
 
+    it 'starts from the created Subscription when an earlier run deleted it' do
+      run(test, access_token:)
+      authorize
+      delete(subscription_url)
+      expect(last_response.status).to eq(204)
+      get("#{resume_pass_url}?test_run_identifier=#{access_token}")
+
+      expect(run(test, access_token:).result).to eq('wait')
+      get(subscription_url)
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'starts from the created Subscription when an earlier run updated it' do
+      run(test, access_token:)
+      authorize
+      put(subscription_url, subscription.merge('reason' => 'updated reason').to_json)
+      get("#{resume_pass_url}?test_run_identifier=#{access_token}")
+
+      expect(run(test, access_token:).result).to eq('wait')
+      get(subscription_url)
+      expect(JSON.parse(last_response.body)['reason']).to eq(subscription['reason'])
+    end
+
+    describe 'while a different test is waiting' do
+      let(:workflow_test) { find_test suite, SubscriptionsTestKit::SubscriptionsR5BackportR4Client::InteractionTest.id }
+
+      before do
+        run(workflow_test, access_token:, notification_bundle: notification_json)
+        authorize
+      end
+
+      it 'rejects updates and deletes of the Subscription' do
+        put(subscription_url, subscription.merge('reason' => 'updated reason').to_json)
+        expect(last_response.status).to eq(422)
+
+        header 'Content-Type', 'application/json-patch+json'
+        patch(subscription_url, [{ op: 'replace', path: '/reason', value: 'patched reason' }].to_json)
+        expect(last_response.status).to eq(422)
+
+        delete(subscription_url)
+        expect(last_response.status).to eq(422)
+
+        get(subscription_url)
+        expect(last_response.status).to eq(200)
+        expect(JSON.parse(last_response.body)['reason']).to eq(subscription['reason'])
+      end
+
+      it 'does not apply rejected changes during a later run of the update and delete tests' do
+        delete(subscription_url)
+        get("#{resume_pass_url}?test_run_identifier=#{access_token}")
+
+        run(test, access_token:)
+        get(subscription_url)
+        expect(last_response.status).to eq(200)
+      end
+    end
+
     it 'responds to $status requests while waiting' do
       session_data_repo.save(test_session_id: test_session.id, name: 'notification_bundle',
                              value: notification_json, type: 'textarea')
@@ -94,12 +151,48 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
       expect(FHIR.from_contents(last_response.body)).to be_a(FHIR::Bundle)
     end
 
+    it 'reports a client-requested off status from $status' do
+      session_data_repo.save(test_session_id: test_session.id, name: 'notification_bundle',
+                             value: notification_json, type: 'textarea')
+      run(test, access_token:)
+
+      authorize
+      put(subscription_url, subscription.merge('status' => 'off').to_json)
+
+      get("#{subscription_url}/$status")
+      expect(last_response.status).to eq(200)
+      status_param = FHIR.from_contents(last_response.body).entry.first.resource
+        .parameter.find { |p| p.name == 'status' }
+      expect(status_param.valueCode).to eq('off')
+    end
+
+    it 'rejects a $status request for a Subscription that does not exist' do
+      session_data_repo.save(test_session_id: test_session.id, name: 'notification_bundle',
+                             value: notification_json, type: 'textarea')
+      run(test, access_token:)
+
+      authorize
+      get("/custom/#{suite_id}/fhir/Subscription/other/$status")
+      expect(last_response.status).to eq(404)
+    end
+
     it 'rejects an update when the id in the body does not match the url' do
       run(test, access_token:)
 
       authorize
       put(subscription_url, subscription.merge('id' => 'other').to_json)
       expect(last_response.status).to eq(400)
+    end
+
+    it 'rejects an update whose body is not a JSON object' do
+      run(test, access_token:)
+
+      authorize
+      put(subscription_url, 'null')
+      expect(last_response.status).to eq(400)
+
+      get(subscription_url)
+      expect(last_response.status).to eq(200)
     end
 
     it 'rejects an update of a Subscription that does not exist' do
@@ -169,6 +262,16 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDele
       it 'rejects a patch that cannot be applied' do
         json_patch(subscription_url, [{ op: 'test', path: '/reason', value: 'something else' }])
         expect(last_response.status).to eq(422)
+      end
+
+      [nil, 'not a subscription', []].each do |value|
+        it "rejects a patch that replaces the Subscription with #{value.inspect}" do
+          json_patch(subscription_url, [{ op: 'replace', path: '', value: }])
+          expect(last_response.status).to eq(422)
+
+          get(subscription_url)
+          expect(last_response.status).to eq(200)
+        end
       end
 
       it 'rejects a patch that results in a Subscription Inferno does not support' do

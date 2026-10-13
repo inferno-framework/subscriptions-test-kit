@@ -28,7 +28,7 @@ module SubscriptionsTestKit
         subscription = load_update_requests('put')
 
         requests.each do |update_request|
-          body_id = JSON.parse(update_request.request_body)['id'] if valid_json?(update_request.request_body)
+          body_id = request_body_id(update_request.request_body)
           unless body_id == subscription.id
             add_message('error', %(
               The Subscription `id` in the update request body (`#{body_id}`) does not match the `id` in the
@@ -41,11 +41,11 @@ module SubscriptionsTestKit
         no_error_verification('Subscription PUT update request is not conformant.')
       end
 
-      def valid_json?(json)
-        JSON.parse(json)
-        true
+      def request_body_id(request_body)
+        body = JSON.parse(request_body)
+        body['id'] if body.is_a?(Hash)
       rescue JSON::ParserError, TypeError
-        false
+        nil
       end
     end
   end

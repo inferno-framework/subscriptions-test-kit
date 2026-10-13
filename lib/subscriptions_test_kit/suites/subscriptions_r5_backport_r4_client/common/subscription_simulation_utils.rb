@@ -80,21 +80,41 @@ module SubscriptionsTestKit
       end
 
       # The created Subscription as modified by any subsequent successful updates, or nil if it has been deleted.
+      # Updates and deletes are only accepted during the update and delete interaction test (see
+      # subscription_change_allowed?), so each run of that test starts again from the created Subscription.
       def find_current_subscription(test_session_id)
         subscription = find_subscription(test_session_id)
-        return if subscription.nil? || subscription_deleted?(test_session_id, subscription.id)
+        return if subscription.nil?
 
-        update_request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_UPDATE_TAG, subscription.id])
-          .reverse.find { |r| r.status == 200 }
+        # Only updates and deletes are tagged with the Subscription id, so load them together
+        delete_requests, update_requests = requests_repo.tagged_requests(test_session_id, [subscription.id])
+          .partition { |r| r.tags.include?(SUBSCRIPTION_DELETE_TAG) }
+        return if delete_requests.any? { |r| r.status.between?(200, 299) }
+
+        update_request = update_requests.reverse.find { |r| r.status == 200 }
         return subscription unless update_request
 
         parse_subscription(update_request.response_body)
       end
 
-      def subscription_deleted?(test_session_id, subscription_id)
-        requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_DELETE_TAG, subscription_id]).any? do |r|
-          r.status.between?(200, 299)
-        end
+      # For endpoints: whether the waiting test accepts changes (updates and deletes) to the Subscription
+      def subscription_change_allowed?
+        test <= UpdateDeleteInteractionTest
+      end
+
+      # For endpoints: reject a change to the Subscription requested while a different test is waiting
+      def reject_subscription_change
+        fhir_error_response(422, 'business-rule', %(
+          Inferno only accepts Subscription updates and deletes during the Demonstrate Subscription Update and
+          Deletion tests.
+        ).squish)
+      end
+
+      # For endpoints: respond with an error status and an OperationOutcome describing the error
+      def fhir_error_response(status, code, text = nil)
+        response.format = :json
+        response.status = status
+        response.body = operation_outcome('error', code, text).to_json
       end
 
       # Inferno does not act on status changes requested by the client, except to honor requests to turn
@@ -105,7 +125,13 @@ module SubscriptionsTestKit
         determine_subscription_status_code(subscription.id)
       end
 
+      # Memoized because the handshakes do not change while an endpoint responds to a request
       def determine_subscription_status_code(subscription_id)
+        @subscription_status_codes ||= {}
+        @subscription_status_codes[subscription_id] ||= handshake_status_code(subscription_id)
+      end
+
+      def handshake_status_code(subscription_id)
         handshakes = requests_repo.tagged_requests(test_run.test_session_id, [REST_HOOK_HANDSHAKE_NOTIFICATION_TAG])
         handshake = handshakes.filter { |h| notification_subscription_id(h.request_body) == subscription_id }.last
 

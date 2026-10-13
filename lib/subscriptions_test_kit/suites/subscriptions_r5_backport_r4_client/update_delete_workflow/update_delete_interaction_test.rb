@@ -23,6 +23,10 @@ module SubscriptionsTestKit
           `application/fhir+json` unless it is `application/json`.
         - Inferno manages the `Subscription.status` value and will ignore requested changes to it, unless
           the requested status is `off`.
+        - Inferno only accepts updates and deletes of the Subscription while this test is waiting.
+        - Each run of this test starts from the Subscription as created during the *Demonstrate the Rest-Hook
+          Subscription Workflow* tests. Changes made during earlier runs of this test, including deletion,
+          are not carried over.
       )
 
       input :access_token,
@@ -54,7 +58,8 @@ module SubscriptionsTestKit
           timeout: 600,
           message: <<~MESSAGE
             Inferno will wait while the client updates and/or deletes the Subscription created earlier
-            in the session. Inferno accepts the FHIR [update](https://hl7.org/fhir/R4/http.html#update),
+            in the session. The Subscription is in the state it was created in: changes made during
+            earlier runs of these tests, including deletion, have not been kept. Inferno accepts the FHIR [update](https://hl7.org/fhir/R4/http.html#update),
             [patch](https://hl7.org/fhir/R4/http.html#patch) (JSON only), and [delete](https://hl7.org/fhir/R4/http.html#delete)
             interactions and testers can demonstrate system support for any or all of them by making
             a request using the corresponding HTTP verb against `#{subscription_url}`:

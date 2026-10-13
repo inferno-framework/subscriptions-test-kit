@@ -21,6 +21,10 @@ module SubscriptionsTestKit
           profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription.html)
           and meets other requirements placed on it by the IG.
 
+        Inferno manages the `Subscription.status` and `Subscription.channel.payload` values itself (see the
+        *Subscription Update and Delete Interaction* test), so the values that the patch gives those elements
+        are not verified and not used by Inferno.
+
         Inferno does not support XML Patch or FHIRPath Patch requests. Clients may update the Subscription
         using either `PUT` or `PATCH`, so this test is omitted if the client only used `PUT`.
       )
@@ -30,7 +34,8 @@ module SubscriptionsTestKit
 
         requests.each do |patch_request|
           if patch_request.status == 200
-            # The response contains the Subscription with the patch applied
+            # The response contains the Subscription with the patch applied, except for the status and
+            # payload values that Inferno manages
             subscription_verification(patch_request.response_body)
           else
             add_message('error', %(

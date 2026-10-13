@@ -12,6 +12,14 @@ module SubscriptionsTestKit
     end
 
     def make_response
+      if subscription_change_allowed?
+        update_subscription
+      else
+        reject_subscription_change
+      end
+    end
+
+    def update_subscription
       response.format = :json
       subscription_id = request.params[:id]
 
@@ -52,18 +60,21 @@ module SubscriptionsTestKit
 
     # The requested state of the Subscription as a raw hash, or nil if an error response has been set
     def requested_subscription_hash(_current_subscription)
-      JSON.parse(request.body.string)
-    rescue JSON::ParserError
+      subscription_hash = begin
+        JSON.parse(request.body.string)
+      rescue JSON::ParserError
+        nil
+      end
+      return subscription_hash if subscription_hash.is_a?(Hash)
+
       fhir_error_response(400, 'invalid', 'No recognized R4 Subscription in request body')
       nil
     end
 
-    def fhir_error_response(status, code, text)
-      response.status = status
-      response.body = operation_outcome('error', code, text).to_json
-    end
-
+    # Rejected changes are left untagged so that they are not treated as part of the update and delete tests
     def tags
+      return [] unless subscription_change_allowed?
+
       [SUBSCRIPTION_UPDATE_TAG, request.params[:id]]
     end
   end

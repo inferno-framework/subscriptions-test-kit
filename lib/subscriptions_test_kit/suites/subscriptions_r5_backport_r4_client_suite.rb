@@ -2,6 +2,7 @@
 
 require_relative 'subscriptions_r5_backport_r4_client/workflow_group'
 require_relative 'subscriptions_r5_backport_r4_client/update_delete_workflow_group'
+require_relative '../fhir_validation'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_update_endpoint'
@@ -47,23 +48,23 @@ module SubscriptionsTestKit
 
       # All FHIR validation requests will use this FHIR validator
       fhir_resource_validator do
-        igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'
+        igs SUBSCRIPTIONS_BACKPORT_IG
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
         end
       end
 
       # Used to validate tester-provided content so that it cannot rely on extensions not defined in the IG
       fhir_resource_validator :no_custom_extensions do
-        igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'
+        igs SUBSCRIPTIONS_BACKPORT_IG
 
         validation_context do
           extensions [] # no extensions not in the spec
         end
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
         end
       end
 

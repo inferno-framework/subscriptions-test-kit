@@ -79,9 +79,20 @@ steps:
     last_completed: 2.1.01
     state_description: >
       Step 6: Client is waiting at the update and delete interaction (2.1.01). The server suite's
-      update and deletion tests already updated (PUT and JSON Patch) and deleted the Subscription
-      during Step 2, so advance the client wait so the client suite can continue with update and
-      delete conformance verification.
+      update and deletion tests already updated (PUT and JSON Patch) but they will have failed,
+      so re-run the last server group.
+    start_run:
+      session: server
+      runnable: 7
+    next_poll_session: server
+    action_description: Start server group 7 "Subscription Update and Deletion Verification"
+
+  - session: server
+    status: done
+    last_completed: 7
+    state_description: >
+      Step 7: Server Update / Delete group re-run is done. Advance the client wait so the client
+      suite can continue with update and delete conformance verification.
     command: bundle exec ruby execution_scripts/advance_wait.rb '{client.wait_outputs.confirmation_url}'
     next_poll_session: client
     action_description: Advance client update and delete wait

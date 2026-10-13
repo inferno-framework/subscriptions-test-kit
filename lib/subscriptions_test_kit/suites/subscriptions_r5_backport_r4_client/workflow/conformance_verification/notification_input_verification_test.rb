@@ -14,13 +14,15 @@ module SubscriptionsTestKit
         to the [R4 Topic-Based Subscription Notification Bundle
         profile](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/StructureDefinition-backport-subscription-notification-r4.html).
         The content of the notification will be based on the Bundle provided by the tester.
+        To ensure that the subscriptions client is driving its behavior only based on
+        standard information, custom extensions are not allowed within the notifcation Bundle.
         )
       simulation_verification
 
       run do
         load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
         skip_if(requests.none?, 'Inferno did not send an event notification')
-        notification_verification(request.request_body, 'event-notification')
+        notification_verification(request.request_body, 'event-notification', validator: :no_custom_extensions)
         no_error_verification('Notification bundle was not conformant, see error messages')
       end
     end

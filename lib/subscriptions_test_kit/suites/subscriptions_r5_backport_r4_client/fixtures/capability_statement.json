@@ -9,6 +9,9 @@
   "format": [
     "json"
   ],
+  "patchFormat": [
+    "application/json-patch+json"
+  ],
   "software": {
     "name": "Inferno Subscriptions Test Kit Client Suite"
   },
@@ -42,6 +45,15 @@
             },
             {
               "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "patch"
+            },
+            {
+              "code": "delete"
             }
           ],
           "operation": [

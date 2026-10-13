@@ -135,13 +135,50 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Notificati
       post_json(subscription_channel, heartbeat_bundle)
       post_json(subscription_channel, notification_bundle)
       expect(last_response).to be_server_error
-      expect(last_response.body).to eq("Unable to find test run with identifier 'notification WRONG_TOKEN'.")
+      expect(last_response.body)
+        .to include("identifier 'notification WRONG_TOKEN' is not associated with a waiting session")
 
       get(resume_pass_url)
 
       result = results_repo.find(result.id)
       expect(result.result).to eq('pass')
       expect(subscription_creation_request).to have_been_made
+    end
+  end
+
+  describe 'Subscription creation request tags' do
+    let(:requests_repo) { Inferno::Repositories::Requests.new }
+
+    def delivery_test_in(group_id)
+      group = suite.groups.find { |g| g.id.end_with?(group_id) } ||
+              suite.groups.flat_map(&:groups).find { |g| g.id.end_with?(group_id) }
+      group.groups.first.tests.find { |t| t.id.end_with?('notification_delivery') }
+    end
+
+    def creation_request_tags(runnable)
+      stub_request(:post, "#{server_endpoint}/Subscription").to_return(status: 201, body: subscription_resource.to_json)
+      result = run(runnable, updated_subscription: subscription_resource.to_json, access_token:, url: server_endpoint)
+      requests_repo.tagged_requests(test_session.id, ['subscription_creation'])
+        .find { |request| request.result_id == result.id }.tags
+    end
+
+    it 'tags the creation request from the workflow group as a workflow creation' do
+      expect(creation_request_tags(delivery_test_in('workflow'))).to include('workflow')
+    end
+
+    it 'does not tag creation requests from the event notification groups as workflow creations' do
+      expect(creation_request_tags(delivery_test_in('empty_content'))).to_not include('workflow')
+    end
+
+    it 'tags creation requests from exactly one test, which is in the workflow group' do
+      all_tests = lambda do |group|
+        group.tests + group.groups.flat_map { |child| all_tests.call(child) }
+      end
+      workflow_creation_tests = suite.groups.flat_map { |group| all_tests.call(group) }.select do |runnable|
+        runnable.id.end_with?('notification_delivery') && runnable.config.options[:workflow_subscription]
+      end
+
+      expect(workflow_creation_tests.map(&:id)).to eq([delivery_test_in('workflow').id])
     end
   end
 end

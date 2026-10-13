@@ -5,7 +5,7 @@ module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Server
     class WorkflowGroup < Inferno::TestGroup
       id :subscriptions_r4_server_workflow
-      title 'Demonstrate the subscription workflow'
+      title 'Demonstrate the Subscription Workflow'
       description %(
         Demonstrate the ability of the server to accept a request for the
         creation of a FHIR Subscription instance and deliver an event notification
@@ -20,7 +20,11 @@ module SubscriptionsTestKit
 
       input_order :url, :smart_auth_info, :access_token, :subscription_resource
 
-      group from: :subscriptions_r4_server_interaction
+      group from: :subscriptions_r4_server_interaction do
+        # tags the Subscription creation request so that later groups, such as update and delete,
+        # can find the Subscription created by this group rather than one created in another group
+        config(options: { workflow_subscription: true })
+      end
       group from: :subscriptions_r4_server_interaction_verification
     end
   end

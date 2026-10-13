@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 require_relative 'subscriptions_r5_backport_r4_client/workflow_group'
+require_relative 'subscriptions_r5_backport_r4_client/update_delete_workflow_group'
+require_relative '../fhir_validation'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
+require_relative '../endpoints/subscription_update_endpoint'
+require_relative '../endpoints/subscription_patch_endpoint'
+require_relative '../endpoints/subscription_delete_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
 
 module SubscriptionsTestKit
@@ -43,10 +48,23 @@ module SubscriptionsTestKit
 
       # All FHIR validation requests will use this FHIR validator
       fhir_resource_validator do
-        igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'
+        igs SUBSCRIPTIONS_BACKPORT_IG
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
+        end
+      end
+
+      # Used to validate tester-provided content so that it cannot rely on extensions not defined in the IG
+      fhir_resource_validator :no_custom_extensions do
+        igs SUBSCRIPTIONS_BACKPORT_IG
+
+        validation_context do
+          extensions [] # no extensions not in the spec
+        end
+
+        exclude_message do |message|
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
         end
       end
 
@@ -61,6 +79,9 @@ module SubscriptionsTestKit
 
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :put, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionUpdateEndpoint
+      suite_endpoint :patch, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionPatchEndpoint
+      suite_endpoint :delete, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionDeleteEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
@@ -74,6 +95,7 @@ module SubscriptionsTestKit
       end
 
       group from: :subscriptions_r4_client_workflow
+      group from: :subscriptions_r4_client_update_delete_workflow
     end
   end
 end

@@ -24,12 +24,16 @@ Over the course of a test session, Inferno may request multiple Subscriptions to
 different features of the IG, e.g., different notification content types. Because the
 choice of what topics and specific features to implement is left to individual servers,
 Inferno does not dictate specific Subscription features or topics. Instead, the
-tester will provide Subsription instances that Inferno will submit, modified lightly if needed, 
+tester will provide Subscription instances that Inferno will submit, modified lightly if needed, 
 e.g., to point to Inferno's notification endpoint, to the server
 as a part of the tests. In order for the tests to pass, the provided Subscription instances
 must themselves be conformant and consistent with the notifications subsequently sent,
 but no other requirements are placed on them, 
 except those related to Inferno limitations (see the Current Limitations section below).
+
+At the end of the session, Inferno will update the Subscription created during the Subscription
+workflow tests using `PUT` and JSON Patch `PATCH` requests and then delete it, verifying that the
+server supports these optional interactions.
 
 The content of all interactions sent by the server (responses and notifications), 
 as well as tester-provided requests, will be checked 
@@ -91,8 +95,14 @@ To run the server tests against the client tests:
 1. Wait 10-15 seconds while the client session makes requests, 
    then click the "Click here" link in the wait dialog to evaluate the notifications.
 1. Back in the client session, click the "click here to complete the test" link
-   and respond to the attestation
-1. Meanwhile, the server tests will have completed and will be ready for review.
+   and respond to the attestation based on the results in the server session.
+1. The client session will then wait for the Subscription to be updated and deleted. The server
+   session's *Subscription Update and Deletion Verification* tests have already made these requests,
+   but they will have failed as Inferno only accepts these interactions when made during this test.
+   Return to the server session and re-run the *Subscription Update and Deletion Verification*
+   group.
+1. Once the server run has completed, return to the client session and click the "click here to
+   complete the test" link. Return to the server session to review the results.
 
 NOTE: Inferno uses the `Bearer` token sent in the `Authorization` HTTP header 
 to associate requests with sessions. If multiple concurrent sessions are configured
@@ -178,3 +188,5 @@ Specific limitations to highlight include
   Inferno to request that `application/json` be used instead by placing it in the
   `Subscription.channel.payload` element of the Subscription they provide for Inferno
   to use.
+- When verifying Subscription modification using `PATCH`, Inferno only uses JSON Patch. XML Patch and
+  FHIRPath Patch are not tested.

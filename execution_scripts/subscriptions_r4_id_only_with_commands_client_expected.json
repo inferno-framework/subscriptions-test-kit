@@ -1,1 +1,586 @@
-[{"id":"66e2ced9-cfaa-4020-acc0-a464672948be","created_at":"2026-05-27T16:44:26.972+00:00","inputs":[{"name":"access_token","value":"SAMPLE_TOKEN","type":"text"},{"name":"client_endpoint_access_token","value":null,"type":"text"},{"name":"notification_bundle","value":"{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}","type":"textarea"}],"optional":false,"outputs":[{"name":"confirmation_url","type":"text","value":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_pass?test_run_identifier=SAMPLE_TOKEN"},{"name":"fail_url","type":"text","value":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_fail?test_run_identifier=SAMPLE_TOKEN"}],"requests":[],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-Group01-subscriptions_r4_client_interaction","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:16.743+00:00"},{"id":"46ee302a-960f-48ff-bf96-3289700616f8","created_at":"2026-05-27T16:45:16.764+00:00","inputs":[],"optional":false,"outputs":[],"requests":[{"id":"40d05c87-ee1d-4d0c-843f-4830ac8795b9","direction":"outgoing","index":4,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":200,"timestamp":"2026-05-27T16:44:56.089+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification-subscriptions_r4_client_handshake_notification_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:16.764+00:00"},{"id":"c9492030-e417-47e2-a591-5b28defe219c","created_at":"2026-05-27T16:45:16.770+00:00","inputs":[],"optional":false,"outputs":[],"requests":[{"id":"1cc726dc-5d4f-41a6-98ff-62c8d2f9f95d","direction":"outgoing","index":6,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":200,"timestamp":"2026-05-27T16:45:02.123+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification-subscriptions_r4_client_event_notification_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:16.770+00:00"},{"id":"473cfb84-4e76-4034-be34-c8866d4b83ec","created_at":"2026-05-27T16:45:17.966+00:00","inputs":[],"messages":[{"message":"Subscription: Subscription.status: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0' not found","type":"warning"},{"message":"Subscription: Subscription.criteria.extension[0]: Unknown extension http://hl7.org/fhir/5.0/subscriptions-backport/StructureDefinition/backport-filter-criteria","type":"info"},{"message":"Subscription: Subscription.criteria.extension[0]: This element does not match any known slice defined in the profile http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription|1.1.0 (this may not be a problem, but you should check that it's not intended to match a slice)","type":"info"},{"message":"Subscription: Subscription.channel.type: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-channel-type|4.3.0' not found","type":"warning"},{"message":"Subscription: Subscription.channel.payload: ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0' not found","type":"warning"},{"message":"Subscription: Subscription: Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation)","type":"warning"}],"optional":false,"outputs":[],"requests":[{"id":"53876bc4-05b3-495c-aeaf-3b382ace9bf7","direction":"incoming","index":1,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":201,"timestamp":"2026-05-27T16:44:54.576+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription","verb":"POST"},{"id":"004f87ef-57fd-4b6b-af2a-969178842755","direction":"incoming","index":11,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":400,"timestamp":"2026-05-27T16:45:14.915+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_subscription_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:17.966+00:00"},{"id":"76164d01-4195-49c2-b20e-c033e741a04f","created_at":"2026-05-27T16:45:18.152+00:00","inputs":[],"messages":[{"message":"Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[1].value.ofType(canonical): A definition could not be found for Canonical URL 'https://inferno.healthit.gov/suites/custom/subscriptions_r5_backport_r4_client/topics/patient-admission'","type":"info"},{"message":"Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[3].value.ofType(code): ValueSet 'http://hl7.org/fhir/ValueSet/subscription-notification-type' not found","type":"warning"},{"message":"Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[0]: If the parameter 'subscription' is an instance of the parameter defined in the base FHIR standard, then the type should be string, but found Reference","type":"warning"},{"message":"Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[1]: If the parameter 'topic' is an instance of the parameter defined in the base FHIR standard, then the type should be string, but found canonical","type":"warning"}],"optional":false,"outputs":[],"requests":[{"id":"1cc726dc-5d4f-41a6-98ff-62c8d2f9f95d","direction":"outgoing","index":6,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":200,"timestamp":"2026-05-27T16:45:02.123+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_notification_input_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:18.152+00:00"},{"id":"9cd63b69-cfc4-44ba-97cf-fa8113fc00ca","created_at":"2026-05-27T16:45:18.166+00:00","inputs":[],"messages":[{"message":"\nParameters.parameter:topic.value[x] is populated in `id-only` Notification.\nThis value MAY be present when using id-only payloads","type":"info"}],"optional":false,"outputs":[],"requests":[{"id":"1cc726dc-5d4f-41a6-98ff-62c8d2f9f95d","direction":"outgoing","index":6,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":200,"timestamp":"2026-05-27T16:45:02.123+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_notification_input_payload_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:18.166+00:00"},{"id":"da263908-7adf-4eb2-bc68-6b5d4dbac0da","created_at":"2026-05-27T16:45:18.175+00:00","inputs":[],"optional":false,"outputs":[{"name":"attest_true_url","type":"text","value":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_pass?test_run_identifier=43T48wLvDhd"},{"name":"attest_false_url","type":"text","value":"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_fail?test_run_identifier=43T48wLvDhd"}],"requests":[{"id":"1cc726dc-5d4f-41a6-98ff-62c8d2f9f95d","direction":"outgoing","index":6,"result_id":"66e2ced9-cfaa-4020-acc0-a464672948be","status":200,"timestamp":"2026-05-27T16:45:02.123+00:00","url":"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener","verb":"POST"}],"result":"pass","test_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_processing_attestation","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:19.782+00:00"},{"id":"c28ca861-76b9-4190-a17c-7311a9afb482","created_at":"2026-05-27T16:45:19.796+00:00","inputs":[{"name":"access_token","label":"Access Token","description":"\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ","value":"SAMPLE_TOKEN","type":"text"},{"name":"client_endpoint_access_token","label":"Client Notification Access Token","description":"\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ","value":null,"type":"text"},{"name":"notification_bundle","label":"Event Notification Bundle","description":"\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ","value":"{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}","type":"textarea"}],"optional":false,"outputs":[],"requests":[],"result":"pass","test_group_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-Group01","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:19.796+00:00"},{"id":"942a53c1-757b-4cd0-8006-ab5640f0da3e","created_at":"2026-05-27T16:45:19.802+00:00","inputs":[],"optional":false,"outputs":[],"requests":[],"result":"pass","test_group_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:19.802+00:00"},{"id":"cd397386-9482-4633-b732-468ca21166ab","created_at":"2026-05-27T16:45:19.807+00:00","inputs":[],"optional":false,"outputs":[],"requests":[],"result":"pass","test_group_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:19.807+00:00"},{"id":"890e04f4-6f81-4853-b38c-b874a653bfa9","created_at":"2026-05-27T16:45:19.815+00:00","inputs":[{"name":"access_token","label":"Access Token","description":"\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ","value":"SAMPLE_TOKEN","type":"text"},{"name":"client_endpoint_access_token","label":"Client Notification Access Token","description":"\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ","value":null,"type":"text"},{"name":"notification_bundle","label":"Event Notification Bundle","description":"\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ","value":"{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}","type":"textarea"}],"optional":false,"outputs":[],"requests":[],"result":"pass","test_group_id":"subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","updated_at":"2026-05-27T16:45:19.815+00:00"},{"id":"512a1a3e-ba4e-4a4f-b6be-fbed593e2f39","created_at":"2026-05-27T16:45:19.819+00:00","inputs":[{"name":"access_token","label":"Access Token","description":"\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ","value":"SAMPLE_TOKEN","type":"text"},{"name":"client_endpoint_access_token","label":"Client Notification Access Token","description":"\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ","value":null,"type":"text"},{"name":"notification_bundle","label":"Event Notification Bundle","description":"\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ","value":"{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}","type":"textarea"}],"optional":false,"outputs":[],"requests":[],"result":"pass","test_run_id":"ff57ba96-3f4e-4f30-ac0a-329a1267c398","test_session_id":"43T48wLvDhd","test_suite_id":"subscriptions_r5_backport_r4_client","updated_at":"2026-05-27T16:45:19.819+00:00"}]
+[
+  {
+    "id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+    "created_at": "2026-10-06T14:02:34.718-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      },
+      {
+        "name": "client_endpoint_access_token",
+        "value": null,
+        "type": "text"
+      },
+      {
+        "name": "notification_bundle",
+        "value": "{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}",
+        "type": "textarea"
+      }
+    ],
+    "optional": false,
+    "outputs": [
+      {
+        "name": "confirmation_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_pass?test_run_identifier=SAMPLE_TOKEN"
+      },
+      {
+        "name": "fail_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_fail?test_run_identifier=SAMPLE_TOKEN"
+      }
+    ],
+    "requests": [],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-Group01-subscriptions_r4_client_interaction",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.672-04:00"
+  },
+  {
+    "id": "f2f97679-70e2-42a1-8f25-30b5e728e453",
+    "created_at": "2026-10-06T14:02:59.679-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "439caa1f-19d3-4ced-a3d8-560bde1063f7",
+        "direction": "outgoing",
+        "index": 361,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:39.320-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification-subscriptions_r4_client_handshake_notification_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.679-04:00"
+  },
+  {
+    "id": "c8291bf8-394c-496f-bc37-84f0f45fde44",
+    "created_at": "2026-10-06T14:02:59.680-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "357448ed-eab3-4f51-8195-6bda312fc164",
+        "direction": "outgoing",
+        "index": 363,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:46.342-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification-subscriptions_r4_client_event_notification_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.680-04:00"
+  },
+  {
+    "id": "1b2225a4-59d1-481f-ab51-f1c877383349",
+    "created_at": "2026-10-06T14:02:59.719-04:00",
+    "inputs": [],
+    "messages": [
+      {
+        "message": "Subscription: Subscription.status: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Subscription: Subscription.criteria.extension[0]: Unknown extension http://hl7.org/fhir/5.0/subscriptions-backport/StructureDefinition/backport-filter-criteria",
+        "type": "info"
+      },
+      {
+        "message": "Subscription: Subscription.criteria.extension[0]: This element does not match any known slice defined in the profile http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription|1.1.0 (this may not be a problem, but you should check that it's not intended to match a slice)",
+        "type": "info"
+      },
+      {
+        "message": "Subscription: Subscription.channel.type: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-channel-type|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Subscription: Subscription.channel.payload: ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Subscription: Subscription: Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation)",
+        "type": "warning"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "64e4da0c-8dee-49f6-b4a0-058544e5fa82",
+        "direction": "incoming",
+        "index": 358,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 201,
+        "timestamp": "2026-10-06T14:02:37.793-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription",
+        "verb": "POST"
+      },
+      {
+        "id": "6fa53746-b581-435d-a131-1203fca5fb50",
+        "direction": "incoming",
+        "index": 368,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 400,
+        "timestamp": "2026-10-06T14:02:56.377-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_subscription_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.719-04:00"
+  },
+  {
+    "id": "1e2c6ef6-1821-4977-baed-c0225fa34a3a",
+    "created_at": "2026-10-06T14:02:59.756-04:00",
+    "inputs": [],
+    "messages": [
+      {
+        "message": "Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[1].value.ofType(canonical): A definition could not be found for Canonical URL 'https://inferno.healthit.gov/suites/custom/subscriptions_r5_backport_r4_client/topics/patient-admission'",
+        "type": "info"
+      },
+      {
+        "message": "Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[3].value.ofType(code): ValueSet 'http://hl7.org/fhir/ValueSet/subscription-notification-type' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[0]: The parameter 'subscription' has the same name as a parameter for at least one operation in the core specification. In the base specification, the parameter has a type of string, but this parameter instead has a value of type Reference. Check that this is correct",
+        "type": "info"
+      },
+      {
+        "message": "Parameters/292d3c72-edc1-4d8a-afaa-d85e19c7f563: Parameters.parameter[1]: The parameter 'topic' has the same name as a parameter for at least one operation in the core specification. In the base specification, the parameter has a type of string, but this parameter instead has a value of type canonical. Check that this is correct",
+        "type": "info"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "357448ed-eab3-4f51-8195-6bda312fc164",
+        "direction": "outgoing",
+        "index": 363,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:46.342-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_notification_input_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.756-04:00"
+  },
+  {
+    "id": "220d9e09-b4a5-4004-9c8c-db33e53dfed1",
+    "created_at": "2026-10-06T14:02:59.759-04:00",
+    "inputs": [],
+    "messages": [
+      {
+        "message": "\nParameters.parameter:topic.value[x] is populated in `id-only` Notification.\nThis value MAY be present when using id-only payloads",
+        "type": "info"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "357448ed-eab3-4f51-8195-6bda312fc164",
+        "direction": "outgoing",
+        "index": 363,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:46.342-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_notification_input_payload_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:02:59.759-04:00"
+  },
+  {
+    "id": "db58967d-7250-4663-b48a-50c860a882e0",
+    "created_at": "2026-10-06T14:02:59.761-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [
+      {
+        "name": "attest_true_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_pass?test_run_identifier=diuXLijDN1n"
+      },
+      {
+        "name": "attest_false_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_fail?test_run_identifier=diuXLijDN1n"
+      }
+    ],
+    "requests": [
+      {
+        "id": "357448ed-eab3-4f51-8195-6bda312fc164",
+        "direction": "outgoing",
+        "index": 363,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:46.342-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+        "verb": "POST"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification-subscriptions_r4_client_processing_attestation",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:02.726-04:00"
+  },
+  {
+    "id": "5b2e386b-9b2b-47d0-af97-2e024559ea8c",
+    "created_at": "2026-10-06T14:03:02.741-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      }
+    ],
+    "optional": false,
+    "outputs": [
+      {
+        "name": "subscription_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/a3978009-cb2d-4069-a39e-3bad639c6293"
+      },
+      {
+        "name": "confirmation_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_pass?test_run_identifier=SAMPLE_TOKEN"
+      },
+      {
+        "name": "fail_url",
+        "type": "text",
+        "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/resume_fail?test_run_identifier=SAMPLE_TOKEN"
+      }
+    ],
+    "requests": [],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_workflow_interaction-subscriptions_r4_client_update_delete_interaction",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.150-04:00"
+  },
+  {
+    "id": "029dcd30-66cd-4f08-81f8-5e4f59e57652",
+    "created_at": "2026-10-06T14:03:06.155-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "label": "Access Token",
+        "description": "\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      },
+      {
+        "name": "client_endpoint_access_token",
+        "label": "Client Notification Access Token",
+        "description": "\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ",
+        "value": null,
+        "type": "text"
+      },
+      {
+        "name": "notification_bundle",
+        "label": "Event Notification Bundle",
+        "description": "\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ",
+        "value": "{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}",
+        "type": "textarea"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-Group01",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.155-04:00"
+  },
+  {
+    "id": "717a121a-d9a9-47f9-a041-4313e3956516",
+    "created_at": "2026-10-06T14:03:06.156-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_interaction_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.156-04:00"
+  },
+  {
+    "id": "c9d0edce-5d1f-4e39-940a-e46999c65791",
+    "created_at": "2026-10-06T14:03:06.157-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow-subscriptions_r4_client_conformance_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.157-04:00"
+  },
+  {
+    "id": "22d1b07f-c27f-4348-90ea-989fde7d2672",
+    "created_at": "2026-10-06T14:03:06.158-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "label": "Access Token",
+        "description": "\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      },
+      {
+        "name": "client_endpoint_access_token",
+        "label": "Client Notification Access Token",
+        "description": "\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ",
+        "value": null,
+        "type": "text"
+      },
+      {
+        "name": "notification_bundle",
+        "label": "Event Notification Bundle",
+        "description": "\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ",
+        "value": "{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}",
+        "type": "textarea"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_workflow",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.158-04:00"
+  },
+  {
+    "id": "3d9df4ac-ca53-446d-9981-2c6f7cafd608",
+    "created_at": "2026-10-06T14:03:06.159-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "label": "Access Token",
+        "description": "\n              The bearer token that the client under test will use when making Subscription update, delete, and other\n              requests to Inferno's simulated Subscriptions server.\n            ",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_workflow_interaction",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.159-04:00"
+  },
+  {
+    "id": "629914d0-5600-487d-981c-ba3af6453a22",
+    "created_at": "2026-10-06T14:03:06.308-04:00",
+    "inputs": [],
+    "messages": [
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.status: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.channel.type: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-channel-type|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.channel.payload: ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription: Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation)",
+        "type": "warning"
+      }
+    ],
+    "optional": true,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "4b30f785-5198-4ff4-9a8c-084392ea82e7",
+        "direction": "incoming",
+        "index": 371,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:56.393-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/a3978009-cb2d-4069-a39e-3bad639c6293",
+        "verb": "PUT"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_conformance_verification-subscriptions_r4_client_put_update_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.308-04:00"
+  },
+  {
+    "id": "41ce874d-0735-429d-9e32-54f6cd34ab12",
+    "created_at": "2026-10-06T14:03:06.326-04:00",
+    "inputs": [],
+    "messages": [
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.status: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-status|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.channel.type: ValueSet 'http://hl7.org/fhir/ValueSet/subscription-channel-type|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription.channel.payload: ValueSet 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0' not found",
+        "type": "warning"
+      },
+      {
+        "message": "Request 1: Subscription/a3978009-cb2d-4069-a39e-3bad639c6293: Subscription: Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation)",
+        "type": "warning"
+      }
+    ],
+    "optional": true,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "d44aa42f-ad25-4cbc-b930-99ddef8ebe11",
+        "direction": "incoming",
+        "index": 377,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 200,
+        "timestamp": "2026-10-06T14:02:56.411-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/a3978009-cb2d-4069-a39e-3bad639c6293",
+        "verb": "PATCH"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_conformance_verification-subscriptions_r4_client_patch_update_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.326-04:00"
+  },
+  {
+    "id": "49d07751-b56c-4464-b040-16600e84d474",
+    "created_at": "2026-10-06T14:03:06.329-04:00",
+    "inputs": [],
+    "optional": true,
+    "outputs": [],
+    "requests": [
+      {
+        "id": "3fd39d70-be03-499b-891c-5fe0d90726e0",
+        "direction": "incoming",
+        "index": 382,
+        "result_id": "580d1e9f-a67b-4efb-a6a8-472069bb6299",
+        "status": 204,
+        "timestamp": "2026-10-06T14:02:56.425-04:00",
+        "url": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/a3978009-cb2d-4069-a39e-3bad639c6293",
+        "verb": "DELETE"
+      }
+    ],
+    "result": "pass",
+    "test_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_conformance_verification-subscriptions_r4_client_delete_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.329-04:00"
+  },
+  {
+    "id": "8529f277-098a-48b5-a5e8-0e7e50842242",
+    "created_at": "2026-10-06T14:03:06.329-04:00",
+    "inputs": [],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow-subscriptions_r4_client_update_delete_conformance_verification",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.329-04:00"
+  },
+  {
+    "id": "d767d299-d9ec-43c4-9027-fd089261d892",
+    "created_at": "2026-10-06T14:03:06.331-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "label": "Access Token",
+        "description": "\n              The bearer token that the client under test will use when making Subscription update, delete, and other\n              requests to Inferno's simulated Subscriptions server.\n            ",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      }
+    ],
+    "optional": true,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_group_id": "subscriptions_r5_backport_r4_client-subscriptions_r4_client_update_delete_workflow",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "updated_at": "2026-10-06T14:03:06.331-04:00"
+  },
+  {
+    "id": "4e493968-4f80-40ab-a7cf-0ae09b8a44d1",
+    "created_at": "2026-10-06T14:03:06.331-04:00",
+    "inputs": [
+      {
+        "name": "access_token",
+        "label": "Access Token",
+        "description": "\n              The bearer token that the client under test will use when making Subscription creation, $status, and other\n              requests to Inferno's simulated Subscriptions server.\n            ",
+        "value": "SAMPLE_TOKEN",
+        "type": "text"
+      },
+      {
+        "name": "client_endpoint_access_token",
+        "label": "Client Notification Access Token",
+        "description": "\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ",
+        "value": null,
+        "type": "text"
+      },
+      {
+        "name": "notification_bundle",
+        "label": "Event Notification Bundle",
+        "description": "\n              The event notification bundle from which Inferno will derive a handshake notification, an event\n              notification to send to the client endpoint, and responses to $status operation requests. The provided\n              Bundle must conform to the R4 Topic-Based Subscription Notification Bundle profile.\n            ",
+        "value": "{\n  \"resourceType\" : \"Bundle\",\n  \"id\" : \"r4-notification-id-only\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"]\n  },\n  \"type\" : \"history\",\n  \"timestamp\" : \"2020-05-29T11:44:13.1882432-05:00\",\n  \"entry\" : [{\n    \"fullUrl\" : \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n    \"resource\" : {\n      \"resourceType\" : \"Parameters\",\n      \"id\" : \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"meta\" : {\n        \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"]\n      },\n      \"parameter\" : [{\n        \"name\" : \"subscription\",\n        \"valueReference\" : {\n          \"reference\" : \"https://example.org/fhir/Subscription/admission\"\n        }\n      },\n      {\n        \"name\" : \"topic\",\n        \"valueCanonical\" : \"http://hl7.org/SubscriptionTopic/admission\"\n      },\n      {\n        \"name\" : \"status\",\n        \"valueCode\" : \"active\"\n      },\n      {\n        \"name\" : \"type\",\n        \"valueCode\" : \"event-notification\"\n      },\n      {\n        \"name\" : \"events-since-subscription-start\",\n        \"valueString\" : \"1\"\n      },\n      {\n        \"name\" : \"notification-event\",\n        \"part\" : [{\n          \"name\" : \"event-number\",\n          \"valueString\" : \"1\"\n        },\n        {\n          \"name\" : \"timestamp\",\n          \"valueInstant\" : \"2020-05-29T11:44:13.1882432-05:00\"\n        },\n        {\n          \"name\" : \"focus\",\n          \"valueReference\" : {\n            \"reference\" : \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n          }\n        }]\n      }]\n    },\n    \"request\" : {\n      \"method\" : \"GET\",\n      \"url\" : \"https://example.org/fhir/Subscription/admission/$status\"\n    },\n    \"response\" : {\n      \"status\" : \"200\"\n    }\n  }]\n}",
+        "type": "textarea"
+      }
+    ],
+    "optional": false,
+    "outputs": [],
+    "requests": [],
+    "result": "pass",
+    "test_run_id": "ab462d1a-7179-47a7-ae4b-9c83b4ac3638",
+    "test_session_id": "diuXLijDN1n",
+    "test_suite_id": "subscriptions_r5_backport_r4_client",
+    "updated_at": "2026-10-06T14:03:06.331-04:00"
+  }
+]

@@ -48,17 +48,19 @@ module SubscriptionsTestKit
       end
     end
 
-    def parameters_verification(subscription_status)
+    def parameters_verification(subscription_status, validator: :default)
       resource_type = subscription_status.resourceType
       if resource_type == 'Parameters'
-        resource_is_valid?(resource: subscription_status, profile_url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4')
+        resource_is_valid?(resource: subscription_status, validator:,
+                           profile_url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4')
       else
         add_message('error',
                     "Unexpected resource type: Expected `Parameters`. Got `#{resource_type}`")
       end
     end
 
-    def notification_verification(notification_bundle, notification_type, subscription_id: nil, status: nil)
+    def notification_verification(notification_bundle, notification_type, subscription_id: nil, status: nil,
+                                  validator: :default)
       assert_valid_json(notification_bundle)
       bundle = FHIR.from_contents(notification_bundle)
       assert bundle.present?, 'Not a FHIR resource'
@@ -76,7 +78,7 @@ module SubscriptionsTestKit
       check_history_bundle_request_response(bundle, subscription_status_entry, subscription_id)
 
       subscription_status = subscription_status_entry.resource
-      parameters_verification(subscription_status)
+      parameters_verification(subscription_status, validator:)
 
       return unless subscription_status.respond_to?(:parameter)
 

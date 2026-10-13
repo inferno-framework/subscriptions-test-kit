@@ -4,7 +4,9 @@ require_relative 'subscriptions_r5_backport_r4_server/event_notification_group'
 require_relative 'subscriptions_r5_backport_r4_server/handshake_heartbeat_group'
 require_relative 'subscriptions_r5_backport_r4_server/status_operation_group'
 require_relative 'subscriptions_r5_backport_r4_server/subscription_rejection_group'
+require_relative 'subscriptions_r5_backport_r4_server/update_delete_group'
 require_relative '../endpoints/subscription_rest_hook_endpoint'
+require_relative '../fhir_validation'
 require_relative '../urls'
 
 module SubscriptionsTestKit
@@ -69,10 +71,23 @@ module SubscriptionsTestKit
 
       # All FHIR validation requests will use this FHIR validator
       fhir_resource_validator do
-        igs 'hl7.fhir.uv.subscriptions-backport#1.1.0'
+        igs SUBSCRIPTIONS_BACKPORT_IG
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
+        end
+      end
+
+      # Used to validate tester-provided content so that it cannot rely on extensions not defined in the IG
+      fhir_resource_validator :no_custom_extensions do
+        igs SUBSCRIPTIONS_BACKPORT_IG
+
+        validation_context do
+          extensions [] # no extensions not in the spec
+        end
+
+        exclude_message do |message|
+          message.message.match?(UNRESOLVED_URL_VALIDATION_MESSAGE)
         end
       end
 
@@ -92,6 +107,7 @@ module SubscriptionsTestKit
       group from: :subscriptions_r4_server_handshake_heartbeat
       group from: :subscriptions_r4_server_status_operation
       group from: :subscriptions_r4_server_subscription_rejection
+      group from: :subscriptions_r4_server_update_delete
     end
   end
 end

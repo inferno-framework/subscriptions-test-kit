@@ -49,19 +49,53 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Subscripti
 
           igs('hl7.fhir.uv.subscriptions-backport#1.1.0')
         end
+
+        fhir_resource_validator :no_custom_extensions do
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
+
+          cli_context do
+            txServer nil
+            displayWarnings true
+            disableDefaultResourceFetcher true
+            extensions []
+          end
+
+          igs('hl7.fhir.uv.subscriptions-backport#1.1.0')
+        end
       end
+    end
+
+    def no_custom_extensions_request?(request)
+      body = JSON.parse(request.body)
+      context = body['validationContext'] || body['cliContext']
+      context['extensions'] == []
     end
 
     it 'passes if conformant subscription passed in' do
       allow(test).to receive(:suite).and_return(suite)
 
       verification_request = stub_request(:post, validation_url)
+        .with { |request| no_custom_extensions_request?(request) }
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
 
       expect(result.result).to eq('pass')
+      expect(verification_request).to have_been_made
+    end
+
+    it 'fails if the validator reports an error, such as for a custom extension' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, validation_url)
+        .with { |request| no_custom_extensions_request?(request) }
+        .to_return(status: 200, body: operation_outcome_failure.to_json)
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+
+      expect(result.result).to eq('fail')
       expect(verification_request).to have_been_made
     end
   end

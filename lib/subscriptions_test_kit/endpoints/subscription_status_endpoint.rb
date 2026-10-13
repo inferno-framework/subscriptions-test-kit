@@ -5,33 +5,35 @@ module SubscriptionsTestKit
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
 
+    error_response_format :operation_outcome
+
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
     def make_response
       response.format = :json
-      subscription = find_subscription(test_run.test_session_id)
+      subscription = find_current_subscription(test_run.test_session_id)
 
-      unless subscription.present?
-        not_found
+      subscription_id = request.params[:id]
+      if subscription.blank? || (subscription_id.present? && subscription_id != subscription.id)
+        fhir_error_response(404, 'not-found')
         return
       end
 
-      subscription_id = request.params[:id]
+      status_code = current_subscription_status_code(subscription)
 
       # Handle resource-level status params
       unless subscription_id.present?
         begin
           params = FHIR.from_contents(request.body.string)
         rescue StandardError
-          response.status = 400
-          response.body = operation_outcome('error', 'invalid', 'Invalid Parameters in request body').to_json
+          fhir_error_response(400, 'invalid', 'Invalid Parameters in request body')
           return
         end
 
-        unless subscription_params_match?(params, subscription)
-          not_found
+        unless subscription_params_match?(params, subscription, status_code)
+          fhir_error_response(404, 'not-found')
           return
         end
       end
@@ -39,30 +41,23 @@ module SubscriptionsTestKit
       notification_json = notification_bundle_input(result)
       subscription_url = "#{base_subscription_url}/#{subscription.id}"
       subscription_topic = subscription.criteria
-      status_code = determine_subscription_status_code(subscription_id)
       event_count = determine_event_count(test_run.test_session_id)
       response.status = 200
       response.body = derive_status_bundle(notification_json, subscription_url, subscription_topic, status_code,
                                            event_count, request.url).to_json
     end
 
-    def subscription_params_match?(params, subscription)
+    def subscription_params_match?(params, subscription, status_code)
       id_params = find_params(params, 'id')
 
       return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
 
       status_params = find_params(params, 'status')
-      subscription_status = determine_subscription_status_code(subscription.id)
-      status_params.blank? || status_params.any? { |p| p.valueString == subscription_status }
+      status_params.blank? || status_params.any? { |p| p.valueString == status_code }
     end
 
     def tags
       [SUBSCRIPTION_STATUS_TAG]
-    end
-
-    def not_found
-      response.status = 404
-      response.body = operation_outcome('error', 'not-found').to_json
     end
 
     def find_params(params, name)

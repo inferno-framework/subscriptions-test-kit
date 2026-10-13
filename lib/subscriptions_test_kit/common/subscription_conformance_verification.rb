@@ -44,11 +44,13 @@ module SubscriptionsTestKit
       false
     end
 
-    def subscription_verification(subscription_resource)
+    def subscription_verification(subscription_resource, validator: :default)
       assert_valid_json(subscription_resource)
       subscription = JSON.parse(subscription_resource)
+      assert(subscription.is_a?(Hash), 'The Subscription must be a JSON object.')
 
       subscription_channel = subscription['channel']
+      assert(subscription_channel.is_a?(Hash), 'The Subscription must include a `channel` element.')
       assert(channel_field_matches?(subscription_channel, 'type', 'rest-hook'), %(
         The `type` element on the Subscription resource must be set to `rest-hook`,
         the `#{subscription_channel['type']}` channel type is unsupported.))
@@ -62,7 +64,7 @@ module SubscriptionsTestKit
       end
       subscription_resource = FHIR.from_contents(subscription.to_json)
       assert_resource_type('Subscription', resource: subscription_resource)
-      assert_valid_resource(resource: subscription_resource,
+      assert_valid_resource(resource: subscription_resource, validator:,
                             profile_url: 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription')
 
       cross_version_extension_check(subscription)

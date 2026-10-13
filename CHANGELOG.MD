@@ -1,3 +1,23 @@
+# 0.13.0
+### Breaking Change
+This release validates tester-provided content that Inferno uses (the notification Bundle input in the
+client suite and the Subscription input in the server suite) using a new validator named
+`:no_custom_extensions`, which treats extensions not defined in the loaded IGs as errors. Test kits that
+reuse the following tests must define a `fhir_resource_validator :no_custom_extensions` in their suite
+(e.g., the same as their default validator with `extensions []` in the `validation_context`). Otherwise
+these tests will result in an error with the message `No 'no_custom_extensions' validator found`.
+* `subscriptions_r4_client_notification_input_verification` (also included in the
+  `subscriptions_r4_client_workflow` group)
+* `subscriptions_r4_server_subscription_conformance` (also included in the `subscriptions_r4_server_interaction`
+  group and the groups that include it, such as `subscriptions_r4_server_workflow` and the event notification
+  content groups)
+
+Test kits that only use the `SubscriptionConformanceVerification` and `NotificationConformanceVerification`
+modules are not affected, as the default validator is still used unless another is specified via the new
+`validator:` argument.
+
+* ID-240: Subscription update and delete tests, and validation of tester-provided content without custom extensions
+
 # 0.12.2
 * ID-145 inferno-core and jwt gem updates by @FlexonyoPizza in: https://github.com/inferno-framework/subscriptions-test-kit/pull/46
 

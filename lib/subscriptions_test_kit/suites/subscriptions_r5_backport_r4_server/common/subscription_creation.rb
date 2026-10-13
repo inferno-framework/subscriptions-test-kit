@@ -63,6 +63,7 @@ module SubscriptionsTestKit
         tags = ['subscription_creation']
         payload_type = subscription_payload_type(subscription)
         tags.append(payload_type) if payload_type.present?
+        tags.append('workflow') if config.options[:workflow_subscription]
 
         fhir_operation('/Subscription', body: subscription, tags:)
         assert_response_status(201)

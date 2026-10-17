@@ -197,9 +197,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
         end
 
         input :subscription_resource, :access_token
+        output :checked_subscription
 
         run do
-          server_check_channel(JSON.parse(subscription_resource), access_token)
+          checked_subscription = server_check_channel(JSON.parse(subscription_resource), access_token)
+          output(checked_subscription: checked_subscription.to_json)
           no_error_verification('There were verification errors')
         end
       end
@@ -207,6 +209,11 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
 
     before do
       Inferno::Repositories::Tests.new.insert(test)
+    end
+
+    def checked_headers(result)
+      checked_subscription = JSON.parse(result.output_json).find { |o| o['name'] == 'checked_subscription' }['value']
+      JSON.parse(checked_subscription)['channel']['header']
     end
 
     it 'warns if subscription does not contain the correct channel endpoint' do
@@ -254,7 +261,43 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       )
     end
 
-    it 'warns if subscription does not contain the correct channel header' do
+    it 'does not warn or change the header if it already has the correct Authorization header' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'accepts a correct Authorization header whose name has different casing' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['authorization: Bearer SAMPLE_TOKEN']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(checked_headers(result)).to eq(['authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'warns and adds the Authorization header if the subscription has no header' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel'].delete('header')
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(
+        /Added the Authorization header field with a Bearer token set to `SAMPLE_TOKEN` in the `header` field/
+      )
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'warns and replaces an Authorization header with a different token' do
       allow(test).to receive(:suite).and_return(suite)
 
       subscription_resource['channel']['header'] = ['Authorization: Bearer INCORRECT_TOKEN']
@@ -263,8 +306,130 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
                          access_token:)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
-        /Added the Authorization header field with a Bearer token set to SAMPLE_TOKEN to the `header` field/
+        /Replaced the Authorization header field with a Bearer token set to `SAMPLE_TOKEN` in the `header` field/
       )
+      expect(entity_result_message(test)).to_not include('INCORRECT_TOKEN')
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'replaces an Authorization header regardless of the casing of its name' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['AUTHORIZATION : Bearer INCORRECT_TOKEN']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'replaces every Authorization header and keeps other headers' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = [
+        'Authorization: Bearer SAMPLE_TOKEN',
+        'X-Custom-Header: value',
+        'authorization: Bearer INCORRECT_TOKEN'
+      ]
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(checked_headers(result)).to eq(['X-Custom-Header: value', 'Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    [
+      'Authorization:Bearer SAMPLE_TOKEN',
+      'Authorization: Bearer SAMPLE_TOKEN ',
+      'Authorization : Bearer SAMPLE_TOKEN',
+      ' Authorization: Bearer SAMPLE_TOKEN'
+    ].each do |malformed_header|
+      it "replaces a malformed Authorization header with the correct token: '#{malformed_header}'" do
+        allow(test).to receive(:suite).and_return(suite)
+
+        subscription_resource['channel']['header'] = [malformed_header]
+
+        result = run(test, subscription_resource: subscription_resource.to_json,
+                           access_token:)
+        expect(result.result).to eq('pass')
+        expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+        expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+      end
+    end
+
+    it 'replaces duplicate correct Authorization headers with a single entry' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['Authorization: Bearer SAMPLE_TOKEN'] * 2
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'replaces an Authorization header whose scheme Inferno does not recognize' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['Authorization: bearer SAMPLE_TOKEN']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'ignores header entries that are not strings when looking for the Authorization header' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['', 42, 'Authorization: Bearer SAMPLE_TOKEN']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(checked_headers(result)).to eq(['', 42, 'Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'adds the Authorization header if the header field is not a list' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = 'Authorization: Bearer INCORRECT_TOKEN'
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'keeps headers whose names only contain Authorization' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['X-Authorization: Bearer SAMPLE_TOKEN', 'Authorization-Info: value']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(checked_headers(result)).to eq(
+        ['X-Authorization: Bearer SAMPLE_TOKEN', 'Authorization-Info: value', 'Authorization: Bearer SAMPLE_TOKEN']
+      )
+    end
+
+    it 'accepts a correct Authorization header whose token contains a colon' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = ['Authorization: Bearer abc:def']
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token: 'abc:def')
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer abc:def'])
     end
   end
 end

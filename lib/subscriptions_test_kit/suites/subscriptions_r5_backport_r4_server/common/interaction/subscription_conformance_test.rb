@@ -27,7 +27,7 @@ module SubscriptionsTestKit
           `content-type` HTTP header on notifications.
         - The `header` element must include the `Authorization` header with a Bearer token set to the inputted Inferno
           access token to direct the server to send that header to identify the notifications are for this session.
-          Inferno will add the entry if it is not present.
+          Inferno will add the entry if it is not present, replacing any other `Authorization` entry.
       )
       simulation_verification
 

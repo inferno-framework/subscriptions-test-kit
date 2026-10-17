@@ -93,17 +93,33 @@ module SubscriptionsTestKit
         ))
       end
 
-      unless subscription_channel['header'].present? &&
-             subscription_channel['header'].include?("Authorization: Bearer #{access_token}")
-        add_message('warning', %(
-          Added the Authorization header field with a Bearer token set to #{access_token} to the `header` field on the
-          Subscription resource in order to connect successfully with the Inferno subscription channel.
-        ))
-        subscription_channel['header'] = [] unless subscription_channel['header'].present?
-        subscription_channel['header'].append("Authorization: Bearer #{access_token}")
-      end
+      server_check_channel_authorization_header(subscription_channel, access_token)
       subscription['channel'] = subscription_channel
       subscription
+    end
+
+    def server_check_channel_authorization_header(subscription_channel, access_token)
+      headers = subscription_channel['header'].is_a?(Array) ? subscription_channel['header'] : []
+      authorization_headers = headers.select { |header| channel_authorization_header?(header) }
+      return if authorization_headers.length == 1 &&
+                channel_authorization_header_matches?(authorization_headers.first, access_token)
+
+      action = authorization_headers.empty? ? 'Added' : 'Replaced'
+      add_message('warning', %(
+        #{action} the Authorization header field with a Bearer token set to `#{access_token}` in the `header` field on
+        the Subscription resource in order to connect successfully with the Inferno subscription channel.
+      ))
+      subscription_channel['header'] = (headers - authorization_headers) + ["Authorization: Bearer #{access_token}"]
+    end
+
+    def channel_authorization_header?(header)
+      header.is_a?(String) && header.split(':', 2).first.to_s.strip.casecmp?('authorization')
+    end
+
+    # Must agree with how notification header verification parses requested headers.
+    def channel_authorization_header_matches?(header, access_token)
+      name, _separator, value = header.partition(': ')
+      name.casecmp?('authorization') && value == "Bearer #{access_token}"
     end
   end
 end

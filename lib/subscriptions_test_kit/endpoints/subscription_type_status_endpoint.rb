@@ -18,10 +18,19 @@ module SubscriptionsTestKit
       false
     end
 
-    # request.params keeps only the last value of a repeated query parameter
+    # request.params keeps only the last value of a repeated query parameter.
+    # Renders an error response and returns nil if any input is given without a value.
     def query_inputs
       query = ::Rack::Utils.parse_query(request.query_string)
-      INPUT_VALUE_TYPES.keys.to_h { |name| [name, Array(query[name])] }
+      inputs = INPUT_VALUE_TYPES.keys.to_h { |name| [name, query.key?(name) ? [query[name]].flatten : []] }
+
+      blank_inputs = inputs.select { |_name, values| values.any?(&:blank?) }.keys
+      return inputs if blank_inputs.empty?
+
+      fhir_error_response(400, 'invalid', blank_inputs.map do |name|
+        "The `#{name}` query parameter must have a value."
+      end.join(' '))
+      nil
     end
 
     # Renders an error response and returns nil if the body is not a Parameters resource with correctly typed inputs
@@ -42,10 +51,16 @@ module SubscriptionsTestKit
 
     def input_type_errors(params)
       INPUT_VALUE_TYPES.filter_map do |name, value_type|
-        next if find_params(params, name).all? { |p| p.public_send(value_type).present? }
+        next if find_params(params, name).all? { |p| valid_input_value?(p, value_type) }
 
-        "The `#{name}` parameter must have a non-empty `#{value_type}`."
+        "The `#{name}` parameter must have a non-empty `#{value_type}` and no other value."
       end
+    end
+
+    def valid_input_value?(param, value_type)
+      value = param.public_send(value_type)
+      value.is_a?(String) && value.present? &&
+        param.to_hash.keys.grep(/\Avalue[A-Z]/) == [value_type]
     end
 
     def parse_parameters_body

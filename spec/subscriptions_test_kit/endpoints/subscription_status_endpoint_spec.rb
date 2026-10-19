@@ -69,8 +69,9 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
         expect_current_subscription_status
       end
 
+      # Matching values come first: request.params would keep only the last, non-matching value
       it 'returns the status when repeated id and status query parameters include a match' do
-        get("#{type_status_url}?id=other&id=#{subscription_id}&status=active&status=requested")
+        get("#{type_status_url}?id=#{subscription_id}&id=other&status=requested&status=active")
 
         expect_current_subscription_status
       end
@@ -85,6 +86,13 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
         get("#{type_status_url}?status=active")
 
         expect_error(404, 'not-found')
+      end
+
+      it 'rejects query parameters without a value' do
+        get("#{type_status_url}?id=#{subscription_id}&id=&status")
+
+        expect_error(400, 'invalid', 'The `id` query parameter must have a value. ' \
+                                     'The `status` query parameter must have a value.')
       end
     end
 
@@ -118,8 +126,8 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
         post_parameters(type_status_url, { name: 'id', valueString: subscription_id },
                         { name: 'status', valueString: 'requested' })
 
-        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`. ' \
-                                     'The `status` parameter must have a non-empty `valueCode`.')
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId` and no other value. ' \
+                                     'The `status` parameter must have a non-empty `valueCode` and no other value.')
       end
 
       it 'names only the mistyped input' do
@@ -127,14 +135,27 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
                         { name: 'id', valueString: 'other' },
                         { name: 'status', valueCode: 'requested' })
 
-        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`.')
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId` and no other value.')
       end
 
       it 'rejects an empty valueId' do
         header 'Content-Type', 'application/fhir+json'
         post(type_status_url, { resourceType: 'Parameters', parameter: [{ name: 'id', valueId: '' }] }.to_json)
 
-        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`.')
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId` and no other value.')
+      end
+
+      it 'rejects a valueId that is not a string' do
+        header 'Content-Type', 'application/fhir+json'
+        post(type_status_url, { resourceType: 'Parameters', parameter: [{ name: 'id', valueId: 123 }] }.to_json)
+
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId` and no other value.')
+      end
+
+      it 'rejects an input with a second value' do
+        post_parameters(type_status_url, { name: 'id', valueId: subscription_id, valueString: 'other' })
+
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId` and no other value.')
       end
 
       it 'rejects a body that is not a Parameters resource' do

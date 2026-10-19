@@ -34,6 +34,11 @@ responses, to send and respond with as directed by the IG. Inferno will verify t
 provided event notification is conformant and that it matches the requirements for the
 Subscription sent by the client system.
 
+Inferno responds to the `$status` operation via GET or POST, both on the Subscription
+instance (`Subscription/[id]/$status`) and on the type (`Subscription/$status`). Any `id` and
+`status` inputs must match the Subscription created by the client system, and inputs sent in a
+`Parameters` body must use `valueId` and `valueCode` respectively.
+
 The content of all Subscription interactions sent by the client, 
 as well as tester-provided notifications, will be checked 
 for conformance to the Subscriptions IG requirements individually and used in 

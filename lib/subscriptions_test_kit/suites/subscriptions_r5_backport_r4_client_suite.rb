@@ -9,6 +9,7 @@ require_relative '../endpoints/subscription_update_endpoint'
 require_relative '../endpoints/subscription_patch_endpoint'
 require_relative '../endpoints/subscription_delete_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
+require_relative '../endpoints/subscription_type_status_endpoint'
 
 module SubscriptionsTestKit
   module SubscriptionsR5BackportR4Client
@@ -84,7 +85,8 @@ module SubscriptionsTestKit
       suite_endpoint :delete, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionDeleteEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
-      suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
+      suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionTypeStatusEndpoint
+      suite_endpoint :get, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionTypeStatusEndpoint
 
       resume_test_route :get, RESUME_PASS_PATH do |request|
         request.query_parameters['test_run_identifier']

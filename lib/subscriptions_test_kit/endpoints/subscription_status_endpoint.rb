@@ -2,8 +2,11 @@ require_relative '../tags'
 require_relative '../suites/subscriptions_r5_backport_r4_client/common/subscription_simulation_utils'
 
 module SubscriptionsTestKit
+  # Handles $status invoked on a Subscription instance; SubscriptionTypeStatusEndpoint handles the type-level invocation
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+
+    INPUT_VALUE_TYPES = { 'id' => 'valueId', 'status' => 'valueCode' }.freeze
 
     error_response_format :operation_outcome
 
@@ -14,28 +17,18 @@ module SubscriptionsTestKit
     def make_response
       response.format = :json
       subscription = find_current_subscription(test_run.test_session_id)
-
-      subscription_id = request.params[:id]
-      if subscription.blank? || (subscription_id.present? && subscription_id != subscription.id)
+      if subscription.blank?
         fhir_error_response(404, 'not-found')
         return
       end
 
+      inputs = request.get? ? query_inputs : body_inputs
+      return if inputs.nil?
+
       status_code = current_subscription_status_code(subscription)
-
-      # Handle resource-level status params
-      unless subscription_id.present?
-        begin
-          params = FHIR.from_contents(request.body.string)
-        rescue StandardError
-          fhir_error_response(400, 'invalid', 'Invalid Parameters in request body')
-          return
-        end
-
-        unless subscription_params_match?(params, subscription, status_code)
-          fhir_error_response(404, 'not-found')
-          return
-        end
+      unless subscription_matches?(inputs, subscription, status_code)
+        fhir_error_response(404, 'not-found')
+        return
       end
 
       notification_json = notification_bundle_input(result)
@@ -47,13 +40,57 @@ module SubscriptionsTestKit
                                            event_count, request.url).to_json
     end
 
-    def subscription_params_match?(params, subscription, status_code)
-      id_params = find_params(params, 'id')
+    def requested_ids(_inputs)
+      [request.params[:id]]
+    end
 
-      return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
+    def subscription_matches?(inputs, subscription, status_code)
+      ids = requested_ids(inputs)
+      (ids.empty? || ids.include?(subscription.id)) &&
+        (inputs['status'].empty? || inputs['status'].include?(status_code))
+    end
 
-      status_params = find_params(params, 'status')
-      status_params.blank? || status_params.any? { |p| p.valueString == status_code }
+    # request.params keeps only the last value of a repeated query parameter
+    def query_inputs
+      query = ::Rack::Utils.parse_query(request.query_string)
+      INPUT_VALUE_TYPES.keys.to_h { |name| [name, Array(query[name])] }
+    end
+
+    # Renders an error response and returns nil if the body is not a Parameters resource with correctly typed inputs
+    def body_inputs
+      params = parse_parameters_body
+      return if params.nil?
+
+      type_errors = input_type_errors(params)
+      if type_errors.any?
+        fhir_error_response(400, 'invalid', type_errors.join(' '))
+        return
+      end
+
+      INPUT_VALUE_TYPES.to_h do |name, value_type|
+        [name, find_params(params, name).map { |p| p.public_send(value_type) }]
+      end
+    end
+
+    def input_type_errors(params)
+      INPUT_VALUE_TYPES.filter_map do |name, value_type|
+        next if find_params(params, name).all? { |p| p.public_send(value_type).present? }
+
+        "The `#{name}` parameter must be sent as `#{value_type}`."
+      end
+    end
+
+    def parse_parameters_body
+      return FHIR::Parameters.new if request.body.string.blank?
+
+      params = FHIR.from_contents(request.body.string)
+      return params if params.is_a?(FHIR::Parameters)
+
+      fhir_error_response(400, 'invalid', 'Invalid Parameters in request body')
+      nil
+    rescue StandardError
+      fhir_error_response(400, 'invalid', 'Invalid Parameters in request body')
+      nil
     end
 
     def tags
@@ -61,7 +98,7 @@ module SubscriptionsTestKit
     end
 
     def find_params(params, name)
-      params&.parameter&.filter { |p| p.name == name }
+      params.parameter.filter { |p| p.name == name }
     end
 
     def base_subscription_url

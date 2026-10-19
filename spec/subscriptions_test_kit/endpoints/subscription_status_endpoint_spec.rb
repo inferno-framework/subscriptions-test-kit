@@ -1,4 +1,4 @@
-RSpec.describe SubscriptionsTestKit::SubscriptionStatusEndpoint, :request, :runnable do
+RSpec.describe 'Subscription $status endpoints', :request, :runnable do # rubocop:disable RSpec/DescribeClass
   let(:suite_id) { 'subscriptions_r5_backport_r4_client' }
   let(:test) do
     find_test suite, SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDeleteInteractionTest.id
@@ -21,12 +21,25 @@ RSpec.describe SubscriptionsTestKit::SubscriptionStatusEndpoint, :request, :runn
     post(url, FHIR::Parameters.new(parameter: parameters.map { |p| FHIR::Parameters::Parameter.new(p) }).to_json)
   end
 
-  def returned_subscription_status
-    FHIR.from_contents(last_response.body).entry.first.resource
+  def response_resource
+    FHIR.from_contents(last_response.body)
   end
 
-  def error_text
-    FHIR.from_contents(last_response.body).issue.first.details.text
+  def expect_current_subscription_status
+    expect(last_response.status).to eq(200)
+    bundle = response_resource
+    expect(bundle.type).to eq('searchset')
+    parameters = bundle.entry.first.resource.parameter
+    expect(parameters.find { |p| p.name == 'status' }.valueCode).to eq('requested')
+    expect(parameters.find { |p| p.name == 'subscription' }.valueReference.reference)
+      .to end_with("Subscription/#{subscription_id}")
+  end
+
+  def expect_error(status, code, text = nil)
+    expect(last_response.status).to eq(status)
+    issue = response_resource.issue.first
+    expect(issue.code).to eq(code)
+    expect(issue.details.text).to eq(text) if text
   end
 
   before do
@@ -48,124 +61,128 @@ RSpec.describe SubscriptionsTestKit::SubscriptionStatusEndpoint, :request, :runn
     header 'Authorization', "Bearer #{access_token}"
   end
 
-  describe 'type-level GET' do
-    it 'returns the status of the current Subscription when no inputs are given' do
-      get(type_status_url)
+  describe SubscriptionsTestKit::SubscriptionTypeStatusEndpoint do
+    describe 'GET' do
+      it 'returns the status of the current Subscription when no inputs are given' do
+        get(type_status_url)
 
-      expect(last_response.status).to eq(200)
-      expect(returned_subscription_status).to be_a(FHIR::Parameters)
+        expect_current_subscription_status
+      end
+
+      it 'returns the status when repeated id and status query parameters include a match' do
+        get("#{type_status_url}?id=other&id=#{subscription_id}&status=active&status=requested")
+
+        expect_current_subscription_status
+      end
+
+      it 'returns not-found when the id query parameter does not match' do
+        get("#{type_status_url}?id=other")
+
+        expect_error(404, 'not-found')
+      end
+
+      it 'returns not-found when the status query parameter does not match' do
+        get("#{type_status_url}?status=active")
+
+        expect_error(404, 'not-found')
+      end
     end
 
-    it 'returns the status when repeated id and status query parameters match' do
-      get("#{type_status_url}?id=other&id=#{subscription_id}&status=requested")
+    describe 'POST' do
+      it 'returns the status when valueId and valueCode inputs match' do
+        post_parameters(type_status_url, { name: 'id', valueId: subscription_id },
+                        { name: 'status', valueCode: 'requested' })
 
-      expect(last_response.status).to eq(200)
-      expect(returned_subscription_status).to be_a(FHIR::Parameters)
-    end
+        expect_current_subscription_status
+      end
 
-    it 'returns not-found when the id query parameter does not match' do
-      get("#{type_status_url}?id=other")
+      it 'returns the status when the body is empty' do
+        post(type_status_url)
 
-      expect(last_response.status).to eq(404)
-    end
+        expect_current_subscription_status
+      end
 
-    it 'returns not-found when the status query parameter does not match' do
-      get("#{type_status_url}?status=active")
+      it 'returns not-found when the valueId input does not match' do
+        post_parameters(type_status_url, { name: 'id', valueId: 'other' })
 
-      expect(last_response.status).to eq(404)
+        expect_error(404, 'not-found')
+      end
+
+      it 'returns not-found when the valueCode input does not match' do
+        post_parameters(type_status_url, { name: 'status', valueCode: 'active' })
+
+        expect_error(404, 'not-found')
+      end
+
+      it 'rejects inputs sent as valueString' do
+        post_parameters(type_status_url, { name: 'id', valueString: subscription_id },
+                        { name: 'status', valueString: 'requested' })
+
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`. ' \
+                                     'The `status` parameter must have a non-empty `valueCode`.')
+      end
+
+      it 'names only the mistyped input' do
+        post_parameters(type_status_url, { name: 'id', valueId: subscription_id },
+                        { name: 'id', valueString: 'other' },
+                        { name: 'status', valueCode: 'requested' })
+
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`.')
+      end
+
+      it 'rejects an empty valueId' do
+        header 'Content-Type', 'application/fhir+json'
+        post(type_status_url, { resourceType: 'Parameters', parameter: [{ name: 'id', valueId: '' }] }.to_json)
+
+        expect_error(400, 'invalid', 'The `id` parameter must have a non-empty `valueId`.')
+      end
+
+      it 'rejects a body that is not a Parameters resource' do
+        header 'Content-Type', 'application/fhir+json'
+        post(type_status_url, FHIR::Bundle.new(type: 'collection').to_json)
+
+        expect_error(400, 'invalid', 'Invalid Parameters in request body')
+      end
     end
   end
 
-  describe 'type-level POST' do
-    it 'returns the status when valueId and valueCode inputs match' do
-      post_parameters(type_status_url, { name: 'id', valueId: subscription_id },
-                      { name: 'status', valueCode: 'requested' })
-
-      expect(last_response.status).to eq(200)
-      expect(returned_subscription_status).to be_a(FHIR::Parameters)
-    end
-
-    it 'returns the status when the body is empty' do
-      post(type_status_url)
-
-      expect(last_response.status).to eq(200)
-    end
-
-    it 'returns not-found when the valueId input does not match' do
-      post_parameters(type_status_url, { name: 'id', valueId: 'other' })
-
-      expect(last_response.status).to eq(404)
-    end
-
-    it 'returns not-found when the valueCode input does not match' do
-      post_parameters(type_status_url, { name: 'status', valueCode: 'active' })
-
-      expect(last_response.status).to eq(404)
-    end
-
-    it 'rejects inputs sent as valueString' do
-      post_parameters(type_status_url, { name: 'id', valueString: subscription_id },
-                      { name: 'status', valueString: 'requested' })
-
-      expect(last_response.status).to eq(400)
-      expect(FHIR.from_contents(last_response.body).issue.first.code).to eq('invalid')
-      expect(error_text).to include('The `id` parameter must be sent as `valueId`.')
-      expect(error_text).to include('The `status` parameter must be sent as `valueCode`.')
-    end
-
-    it 'names only the mistyped input' do
-      post_parameters(type_status_url, { name: 'id', valueId: subscription_id },
-                      { name: 'id', valueString: 'other' },
-                      { name: 'status', valueCode: 'requested' })
-
-      expect(last_response.status).to eq(400)
-      expect(error_text).to eq('The `id` parameter must be sent as `valueId`.')
-    end
-
-    it 'rejects a body that is not a Parameters resource' do
-      header 'Content-Type', 'application/fhir+json'
-      post(type_status_url, FHIR::Bundle.new(type: 'collection').to_json)
-
-      expect(last_response.status).to eq(400)
-    end
-  end
-
-  describe 'instance-level' do
+  describe SubscriptionsTestKit::SubscriptionStatusEndpoint do
     it 'responds to GET' do
       get(instance_status_url)
 
-      expect(last_response.status).to eq(200)
+      expect_current_subscription_status
     end
 
     it 'responds to POST with an empty body' do
       post(instance_status_url)
 
-      expect(last_response.status).to eq(200)
+      expect_current_subscription_status
     end
 
-    it 'uses the id from the url rather than an id query parameter' do
+    it 'returns not-found for a different Subscription id in the url' do
       get("/custom/#{suite_id}/fhir/Subscription/other/$status?id=#{subscription_id}")
 
-      expect(last_response.status).to eq(404)
+      expect_error(404, 'not-found')
     end
 
-    it 'returns not-found when the status query parameter does not match' do
-      get("#{instance_status_url}?status=active")
+    it 'ignores id and status query parameters' do
+      get("#{instance_status_url}?id=other&status=off")
 
-      expect(last_response.status).to eq(404)
+      expect_current_subscription_status
     end
 
-    it 'returns not-found when the valueCode input does not match' do
-      post_parameters(instance_status_url, { name: 'status', valueCode: 'active' })
+    it 'ignores id and status inputs in the body, whatever their type' do
+      post_parameters(instance_status_url, { name: 'id', valueId: 'other' },
+                      { name: 'status', valueString: 'off' })
 
-      expect(last_response.status).to eq(404)
+      expect_current_subscription_status
     end
 
-    it 'rejects inputs sent as valueString' do
-      post_parameters(instance_status_url, { name: 'status', valueString: 'requested' })
+    it 'ignores a body that is not a Parameters resource' do
+      header 'Content-Type', 'application/fhir+json'
+      post(instance_status_url, FHIR::Bundle.new(type: 'collection').to_json)
 
-      expect(last_response.status).to eq(400)
-      expect(error_text).to eq('The `status` parameter must be sent as `valueCode`.')
+      expect_current_subscription_status
     end
   end
 end

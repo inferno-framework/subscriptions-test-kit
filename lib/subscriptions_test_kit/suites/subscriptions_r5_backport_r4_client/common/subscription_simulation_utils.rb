@@ -64,6 +64,15 @@ module SubscriptionsTestKit
         )
       end
 
+      def empty_status_bundle(request_url)
+        FHIR::Bundle.new(
+          link: FHIR::Bundle::Link.new(relation: 'self', url: request_url),
+          total: 0,
+          type: 'searchset',
+          timestamp: Time.now.utc.iso8601
+        )
+      end
+
       def operation_outcome(severity, code, text = nil)
         oo = FHIR::OperationOutcome.new(issue: FHIR::OperationOutcome::Issue.new(severity:, code:))
         oo.issue.first.details = FHIR::CodeableConcept.new(text:) if text.present?

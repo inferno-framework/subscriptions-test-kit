@@ -11,6 +11,7 @@ RSpec.describe 'Simulated FHIR server error responses', :request do # rubocop:di
     [:patch, '/123'],
     [:delete, '/123'],
     [:get, '/123/$status'],
+    [:get, '/$status'],
     [:post, '/123/$status'],
     [:post, '/$status']
   ].each do |verb, path|

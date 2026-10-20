@@ -98,5 +98,35 @@ RSpec.describe SubscriptionsTestKit::SubscriptionsR5BackportR4Server::Subscripti
       expect(result.result).to eq('fail')
       expect(verification_request).to have_been_made
     end
+
+    [nil, 'rest-hook', []].each do |malformed_channel|
+      it "fails if the channel is not an object: #{malformed_channel.inspect}" do
+        allow(test).to receive(:suite).and_return(suite)
+
+        subscription_resource['channel'] = malformed_channel
+        subscription_resource.compact!
+
+        result = run(test, subscription_resource: subscription_resource.to_json,
+                           access_token:)
+
+        expect(result.result).to eq('fail')
+        expect(result.result_message).to eq('The Subscription must include a `channel` element.')
+      end
+    end
+
+    it 'fails if the channel header is neither a list nor a string' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      verification_request = stub_request(:post, validation_url)
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      subscription_resource['channel']['header'] = { 'Authorization' => 'Bearer SAMPLE_TOKEN' }
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('Subscription resource is not conformant.')
+      expect(verification_request).to have_been_made
+    end
   end
 end

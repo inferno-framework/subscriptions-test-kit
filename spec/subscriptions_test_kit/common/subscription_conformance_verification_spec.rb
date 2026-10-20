@@ -229,6 +229,17 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       )
     end
 
+    it 'renders the channel endpoint warning as prose if the endpoint contains a newline' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['endpoint'] = "https://incorrect-url.com\nhttps://other-url.com"
+
+      run(test, subscription_resource: subscription_resource.to_json, access_token:)
+      message = entity_result_message(test)
+      expect(message).to match('The subscription url was changed from https://incorrect-url.com')
+      expect(message.lines.grep(/\A {4,}\S/)).to be_empty
+    end
+
     it 'warns if subscription does not contain the correct channel payload' do
       allow(test).to receive(:suite).and_return(suite)
 
@@ -394,7 +405,22 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       expect(checked_headers(result)).to eq(['', 42, 'Authorization: Bearer SAMPLE_TOKEN'])
     end
 
-    it 'adds the Authorization header if the header field is not a list' do
+    it 'warns and converts a header string with the correct Authorization header into a list' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = 'Authorization: Bearer SAMPLE_TOKEN'
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(
+        /The `header` field on the Subscription resource must be a list of strings. Inferno converted the single/
+      )
+      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'converts a header string into a list and replaces an Authorization header with a different token' do
       allow(test).to receive(:suite).and_return(suite)
 
       subscription_resource['channel']['header'] = 'Authorization: Bearer INCORRECT_TOKEN'
@@ -402,8 +428,54 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Inferno converted the single/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    it 'converts a header string into a list and keeps it when adding the Authorization header' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      subscription_resource['channel']['header'] = 'X-Custom-Header: value'
+
+      result = run(test, subscription_resource: subscription_resource.to_json,
+                         access_token:)
+      expect(result.result).to eq('pass')
+      expect(entity_result_message(test)).to match(/Inferno converted the single/)
+      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(checked_headers(result)).to eq(['X-Custom-Header: value', 'Authorization: Bearer SAMPLE_TOKEN'])
+    end
+
+    [{ 'Authorization' => 'Bearer SAMPLE_TOKEN' }, 42].each do |malformed_header|
+      it "fails and leaves the header unchanged if it is neither a list nor a string: #{malformed_header.inspect}" do
+        allow(test).to receive(:suite).and_return(suite)
+
+        subscription_resource['channel']['header'] = malformed_header
+
+        result = run(test, subscription_resource: subscription_resource.to_json,
+                           access_token:)
+        expect(result.result).to eq('fail')
+        expect(entity_result_message(test)).to match(
+          /The `header` field on the Subscription resource must be a list of strings, so Inferno could not add the/
+        )
+        expect(checked_headers(result)).to eq(malformed_header)
+      end
+    end
+
+    [nil, 'rest-hook', []].each do |malformed_channel|
+      it "returns the subscription unchanged if the channel is not an object: #{malformed_channel.inspect}" do
+        allow(test).to receive(:suite).and_return(suite)
+
+        subscription_resource['channel'] = malformed_channel
+        subscription_resource.compact!
+
+        result = run(test, subscription_resource: subscription_resource.to_json,
+                           access_token:)
+        expect(result.result).to eq('pass')
+        expect(entity_result_message(test)).to be_empty
+        checked_subscription = JSON.parse(result.output_json).find { |o| o['name'] == 'checked_subscription' }['value']
+        expect(JSON.parse(checked_subscription)).to eq(subscription_resource)
+      end
     end
 
     it 'keeps headers whose names only contain Authorization' do

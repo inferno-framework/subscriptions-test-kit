@@ -20,14 +20,16 @@ module SubscriptionsTestKit
           `#{Inferno::Application['base_url']}/custom/subscriptions_r5_backport_r4_server#{SUBSCRIPTION_CHANNEL_PATH}`.
           The test will add the correct url to this field if it is not properly set.
         - The `type` element must be set to `rest-hook`, as the Inferno subscription workflow tests use a `rest-hook`
-          subscription channel to receive incoming notifications. The test will add the correct type to this field if it
-          is not properly set.
+          subscription channel to receive incoming notifications. The test will fail if this field is not set to
+          `rest-hook`.
         - The `payload` element should be `application/fhir+json`. Inferno will update it to that value
           unless the provided value is `application/json`, which Inferno also supports receiving as the
           `content-type` HTTP header on notifications.
         - The `header` element must include the `Authorization` header with a Bearer token set to the inputted Inferno
           access token to direct the server to send that header to identify the notifications are for this session.
-          Inferno will add the entry if it is not present, replacing any other `Authorization` entry.
+          Inferno will add the entry if it is not present, replacing any other `Authorization` entry. The `header`
+          element must be a list of strings: Inferno converts a single string into a list, and the test fails for any
+          other value.
       )
       simulation_verification
 

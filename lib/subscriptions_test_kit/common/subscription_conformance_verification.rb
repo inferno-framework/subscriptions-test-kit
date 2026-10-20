@@ -72,10 +72,13 @@ module SubscriptionsTestKit
 
     def server_check_channel(subscription, access_token)
       subscription_channel = subscription['channel']
+      return subscription unless subscription_channel.is_a?(Hash)
+
       unless channel_field_matches?(subscription_channel, 'endpoint', subscription_channel_url)
-        add_message('warning', %(
-                  The subscription url was changed from #{subscription_channel['endpoint']} to
-                  #{subscription_channel_url}))
+        add_message('warning', <<~MESSAGE)
+          The subscription url was changed from #{subscription_channel['endpoint']} to
+          #{subscription_channel_url}
+        MESSAGE
         subscription_channel['endpoint'] = subscription_channel_url
       end
 
@@ -99,7 +102,9 @@ module SubscriptionsTestKit
     end
 
     def server_check_channel_authorization_header(subscription_channel, access_token)
-      headers = subscription_channel['header'].is_a?(Array) ? subscription_channel['header'] : []
+      headers = server_channel_header_list(subscription_channel, access_token)
+      return if headers.nil?
+
       authorization_headers = headers.select { |header| channel_authorization_header?(header) }
       return if authorization_headers.length == 1 &&
                 channel_authorization_header_matches?(authorization_headers.first, access_token)
@@ -112,11 +117,33 @@ module SubscriptionsTestKit
       subscription_channel['header'] = (headers - authorization_headers) + ["Authorization: Bearer #{access_token}"]
     end
 
+    def server_channel_header_list(subscription_channel, access_token)
+      headers = subscription_channel['header']
+      case headers
+      when nil
+        []
+      when Array
+        headers
+      when String
+        add_message('warning', %(
+          The `header` field on the Subscription resource must be a list of strings. Inferno converted the single
+          string value into a list containing that value.
+        ))
+        subscription_channel['header'] = [headers]
+      else
+        add_message('error', %(
+          The `header` field on the Subscription resource must be a list of strings, so Inferno could not add the
+          Authorization header field with a Bearer token set to `#{access_token}`.
+        ))
+        nil
+      end
+    end
+
     def channel_authorization_header?(header)
       header.is_a?(String) && header.split(':', 2).first.to_s.strip.casecmp?('authorization')
     end
 
-    # Must agree with how notification header verification parses requested headers.
+    # Accepts only the canonical form, which notification header verification parses to the same name and value
     def channel_authorization_header_matches?(header, access_token)
       name, _separator, value = header.partition(': ')
       name.casecmp?('authorization') && value == "Bearer #{access_token}"

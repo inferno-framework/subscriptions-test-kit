@@ -1,4 +1,4 @@
-RSpec.describe 'Subscription $status endpoints', :request, :runnable do # rubocop:disable RSpec/DescribeClass
+RSpec.describe SubscriptionsTestKit::SubscriptionStatusEndpoint, :request, :runnable do
   let(:suite_id) { 'subscriptions_r5_backport_r4_client' }
   let(:test) do
     find_test suite, SubscriptionsTestKit::SubscriptionsR5BackportR4Client::UpdateDeleteInteractionTest.id
@@ -35,6 +35,14 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
       .to end_with("Subscription/#{subscription_id}")
   end
 
+  def expect_empty_status_bundle
+    expect(last_response.status).to eq(200)
+    bundle = response_resource
+    expect(bundle.type).to eq('searchset')
+    expect(bundle.total).to eq(0)
+    expect(bundle.entry).to be_empty
+  end
+
   def expect_error(status, code, text = nil)
     expect(last_response.status).to eq(status)
     issue = response_resource.issue.first
@@ -61,7 +69,7 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
     header 'Authorization', "Bearer #{access_token}"
   end
 
-  describe SubscriptionsTestKit::SubscriptionTypeStatusEndpoint do
+  describe 'on the type' do
     describe 'GET' do
       it 'returns the status of the current Subscription when no inputs are given' do
         get(type_status_url)
@@ -76,16 +84,16 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
         expect_current_subscription_status
       end
 
-      it 'returns not-found when the id query parameter does not match' do
+      it 'returns an empty Bundle when the id query parameter does not match' do
         get("#{type_status_url}?id=other")
 
-        expect_error(404, 'not-found')
+        expect_empty_status_bundle
       end
 
-      it 'returns not-found when the status query parameter does not match' do
+      it 'returns an empty Bundle when the status query parameter does not match' do
         get("#{type_status_url}?status=active")
 
-        expect_error(404, 'not-found')
+        expect_empty_status_bundle
       end
 
       it 'rejects query parameters without a value' do
@@ -110,16 +118,16 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
         expect_current_subscription_status
       end
 
-      it 'returns not-found when the valueId input does not match' do
+      it 'returns an empty Bundle when the valueId input does not match' do
         post_parameters(type_status_url, { name: 'id', valueId: 'other' })
 
-        expect_error(404, 'not-found')
+        expect_empty_status_bundle
       end
 
-      it 'returns not-found when the valueCode input does not match' do
+      it 'returns an empty Bundle when the valueCode input does not match' do
         post_parameters(type_status_url, { name: 'status', valueCode: 'active' })
 
-        expect_error(404, 'not-found')
+        expect_empty_status_bundle
       end
 
       it 'rejects inputs sent as valueString' do
@@ -164,10 +172,33 @@ RSpec.describe 'Subscription $status endpoints', :request, :runnable do # ruboco
 
         expect_error(400, 'invalid', 'Invalid Parameters in request body')
       end
+
+      it 'rejects a body that cannot be parsed' do
+        header 'Content-Type', 'application/fhir+xml'
+        post(type_status_url, '<Parameters')
+
+        expect_error(400, 'invalid', 'Invalid Parameters in request body')
+      end
     end
   end
 
-  describe SubscriptionsTestKit::SubscriptionStatusEndpoint do
+  context 'when the Subscription has been deleted' do
+    before { delete("/custom/#{suite_id}/fhir/Subscription/#{subscription_id}") }
+
+    it 'returns an empty Bundle on the type' do
+      get(type_status_url)
+
+      expect_empty_status_bundle
+    end
+
+    it 'returns not-found on an instance' do
+      get(instance_status_url)
+
+      expect_error(404, 'not-found')
+    end
+  end
+
+  describe 'on an instance' do
     it 'responds to GET' do
       get(instance_status_url)
 

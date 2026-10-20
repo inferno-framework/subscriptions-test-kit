@@ -36,9 +36,10 @@ Subscription sent by the client system.
 
 Inferno responds to the `$status` operation via GET or POST, both on the Subscription
 instance (`Subscription/[id]/$status`) and on the type (`Subscription/$status`). As the
-IG specifies, the `id` and `status` inputs are ignored on the instance. On the type, at
-least one value of each input given must match the Subscription created by the client
-system, and inputs sent in a `Parameters` body must use `valueId` and `valueCode`.
+IG specifies, the `id` and `status` inputs are ignored on the instance. On the type,
+Inferno returns the status of the Subscription created by the client system if at least
+one value of each input given matches it, and an empty Bundle otherwise. Inputs sent in a
+`Parameters` body must use `valueId` and `valueCode`.
 
 The content of all Subscription interactions sent by the client, 
 as well as tester-provided notifications, will be checked 

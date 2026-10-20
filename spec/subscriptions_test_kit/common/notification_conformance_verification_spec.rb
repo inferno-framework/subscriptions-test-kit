@@ -761,6 +761,83 @@ RSpec.describe SubscriptionsTestKit::NotificationConformanceVerification, :runna
                                                 'Expected application/json, received application/fhir+json ' \
                                                 "Requested header not sent: accept: application/json\n")
     end
+
+    it 'matches a requested header written without a space after the colon' do
+      subscription_resource['channel']['header'] = ['Authorization:Bearer SAMPLE_TOKEN']
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'ignores optional whitespace around a requested header value' do
+      subscription_resource['channel']['header'] = ['content-type:  application/fhir+json ']
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'reports the parsed name and value when a requested header written without a space does not match' do
+      subscription_resource['channel']['header'] = ['Authorization:Bearer OTHER_TOKEN']
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq(
+        'Requested value for header authorization does not match the request sent. ' \
+        'Expected Bearer OTHER_TOKEN, received Bearer SAMPLE_TOKEN'
+      )
+    end
+
+    [5, {}, ['application/fhir+json']].each do |malformed_payload|
+      it "does not check the content type when the payload is not a string: #{malformed_payload.inspect}" do
+        subscription_resource['channel']['payload'] = malformed_payload
+        inputs = { subscription: subscription_resource.to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('pass')
+      end
+    end
+
+    it 'skips requested header entries with a blank name' do
+      subscription_resource['channel']['header'] = ['', ': value', 'Authorization: Bearer SAMPLE_TOKEN']
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'passes when the Subscription has no header element' do
+      subscription_resource['channel'].delete('header')
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'checks a header element that is a single string' do
+      subscription_resource['channel']['header'] = 'accept: application/fhir+json'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to eq("Requested header not sent: accept: application/fhir+json\n")
+    end
+
+    it 'ignores header entries that are not strings' do
+      subscription_resource['channel']['header'] = [42, { 'name' => 'value' }, 'Authorization: Bearer SAMPLE_TOKEN']
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'ignores a header element that is neither a list nor a string' do
+      subscription_resource['channel']['header'] = { 'Authorization' => 'Bearer SAMPLE_TOKEN' }
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'does not error when the channel is not an object' do
+      subscription_resource['channel'] = 'rest-hook'
+      inputs = { subscription: subscription_resource.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('pass')
+    end
   end
 
   describe 'Notification Header Verification Error Handling' do

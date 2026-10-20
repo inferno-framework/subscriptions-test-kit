@@ -67,6 +67,8 @@ module SubscriptionsTestKit
 
         assert_valid_json(latest_subscription.response_body)
         subscription = JSON.parse(latest_subscription.response_body)
+        assert(subscription.is_a?(Hash), 'The Subscription the server returned is not a JSON object.')
+        requested_subscription = JSON.parse(latest_subscription.request_body)
 
         requests = load_tagged_requests('event-notification', subscription['id'])
         skip_if requests.empty?, %(
@@ -84,7 +86,8 @@ module SubscriptionsTestKit
           )
           notification_header_verification(
             request.request_headers,
-            subscription
+            subscription,
+            requested_subscription:
           )
         end
 

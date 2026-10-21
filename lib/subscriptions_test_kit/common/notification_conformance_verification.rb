@@ -308,17 +308,32 @@ module SubscriptionsTestKit
       verify_id_only_notification_bundle_entries(bundle_entries)
     end
 
-    def notification_header_verification(request_headers, subscription)
-      mime_type = subscription&.dig('channel', 'payload')
+    # The requested headers come from requested_subscription, the Subscription as the client submitted it.
+    def notification_header_verification(request_headers, subscription, requested_subscription: subscription)
+      mime_type = notification_subscription_channel(subscription)['payload']
       # Verification for hl7.fhir.uv.subscriptions_1.1.0@26
-      if mime_type.present?
+      if mime_type.is_a?(String) && mime_type.present?
         content_type_header = request_headers.find { |header| header.name.downcase == 'content-type' }
         handle_content_type_header_errors(mime_type, content_type_header)
       end
       # Verification for hl7.fhir.uv.subscriptions_1.1.0@27
-      subscription.dig('channel', 'header').each do |requested_header|
+      requested_channel = notification_subscription_channel(requested_subscription)
+      notification_requested_headers(requested_channel).each do |requested_header|
         handle_sent_header_errors(request_headers, requested_header)
       end
+    end
+
+    def notification_subscription_channel(subscription)
+      subscription_channel = subscription['channel'] if subscription.is_a?(Hash)
+      subscription_channel.is_a?(Hash) ? subscription_channel : {}
+    end
+
+    def notification_requested_headers(subscription_channel)
+      headers = subscription_channel['header']
+      headers = [headers] if headers.is_a?(String)
+      return [] unless headers.is_a?(Array)
+
+      headers.grep(String).select { |header| notification_header_name_and_value(header).first.present? }
     end
 
     def handle_content_type_header_errors(mime_type, content_type_header)
@@ -331,9 +346,14 @@ module SubscriptionsTestKit
       end
     end
 
+    # HTTP allows optional whitespace after the colon and around the value
+    def notification_header_name_and_value(header)
+      name, _separator, value = header.partition(':')
+      [name.strip.downcase, value.strip]
+    end
+
     def handle_sent_header_errors(request_headers, requested_header)
-      requested_name = requested_header.partition(': ').first.downcase
-      requested_value = requested_header.partition(': ').last
+      requested_name, requested_value = notification_header_name_and_value(requested_header)
       sent_header = request_headers.find { |header| header.name.downcase == requested_name }
       if sent_header.blank?
         add_message('error', "Requested header not sent: #{requested_header}\n")

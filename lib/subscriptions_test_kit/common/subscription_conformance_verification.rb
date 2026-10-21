@@ -72,10 +72,13 @@ module SubscriptionsTestKit
 
     def server_check_channel(subscription, access_token)
       subscription_channel = subscription['channel']
+      return subscription unless subscription_channel.is_a?(Hash)
+
       unless channel_field_matches?(subscription_channel, 'endpoint', subscription_channel_url)
-        add_message('warning', %(
-                  The subscription url was changed from #{subscription_channel['endpoint']} to
-                  #{subscription_channel_url}))
+        add_message('warning', <<~MESSAGE)
+          The subscription url was changed from #{subscription_channel['endpoint']} to
+          #{subscription_channel_url}
+        MESSAGE
         subscription_channel['endpoint'] = subscription_channel_url
       end
 
@@ -93,17 +96,56 @@ module SubscriptionsTestKit
         ))
       end
 
-      unless subscription_channel['header'].present? &&
-             subscription_channel['header'].include?("Authorization: Bearer #{access_token}")
-        add_message('warning', %(
-          Added the Authorization header field with a Bearer token set to #{access_token} to the `header` field on the
-          Subscription resource in order to connect successfully with the Inferno subscription channel.
-        ))
-        subscription_channel['header'] = [] unless subscription_channel['header'].present?
-        subscription_channel['header'].append("Authorization: Bearer #{access_token}")
-      end
+      server_check_channel_authorization_header(subscription_channel, access_token)
       subscription['channel'] = subscription_channel
       subscription
+    end
+
+    def server_check_channel_authorization_header(subscription_channel, access_token)
+      headers = server_channel_header_list(subscription_channel)
+      return if headers.nil?
+
+      authorization_headers = headers.select { |header| channel_authorization_header?(header) }
+      return if authorization_headers.length == 1 &&
+                channel_authorization_header_matches?(authorization_headers.first, access_token)
+
+      action = authorization_headers.empty? ? 'Added' : 'Replaced'
+      add_message('warning', %(
+        Tester-provided Subscription updated before use: #{action} the Authorization header entry in the `header`
+        field with the Bearer token `#{access_token}` provided in the "Notification Access Token" input.
+      ))
+      subscription_channel['header'] = (headers - authorization_headers) + ["Authorization: Bearer #{access_token}"]
+    end
+
+    def server_channel_header_list(subscription_channel)
+      headers = subscription_channel['header']
+      case headers
+      when nil
+        []
+      when Array
+        headers
+      when String
+        add_message('warning', %(
+          Tester-provided Subscription updated before use: incorrect string value for element `header` converted into
+          a list containing the provided string.
+        ))
+        subscription_channel['header'] = [headers]
+      else
+        add_message('error', %(
+          The `header` element on the tester-provided Subscription must be a list of strings.
+        ))
+        nil
+      end
+    end
+
+    def channel_authorization_header?(header)
+      header.is_a?(String) && header.split(':', 2).first.to_s.strip.casecmp?('authorization')
+    end
+
+    # Accepts only the canonical form, which notification header verification parses to the same name and value
+    def channel_authorization_header_matches?(header, access_token)
+      name, _separator, value = header.partition(': ')
+      name.casecmp?('authorization') && value == "Bearer #{access_token}"
     end
   end
 end

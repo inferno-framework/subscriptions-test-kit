@@ -278,7 +278,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(entity_result_message(test)).to_not match(/Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -290,7 +290,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(entity_result_message(test)).to_not match(/Authorization header entry/)
       expect(checked_headers(result)).to eq(['authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -303,7 +303,10 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
                          access_token:)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
-        /Added the Authorization header field with a Bearer token set to `SAMPLE_TOKEN` in the `header` field/
+        /Tester-provided Subscription updated before use: Added the Authorization header entry in the `header`/
+      )
+      expect(entity_result_message(test)).to match(
+        /field with the Bearer token `SAMPLE_TOKEN` provided in the "Notification Access Token" input/
       )
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
@@ -317,7 +320,10 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
                          access_token:)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
-        /Replaced the Authorization header field with a Bearer token set to `SAMPLE_TOKEN` in the `header` field/
+        /Tester-provided Subscription updated before use: Replaced the Authorization header entry in the `header`/
+      )
+      expect(entity_result_message(test)).to match(
+        /field with the Bearer token `SAMPLE_TOKEN` provided in the "Notification Access Token" input/
       )
       expect(entity_result_message(test)).to_not include('INCORRECT_TOKEN')
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
@@ -331,7 +337,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -347,7 +353,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
       expect(checked_headers(result)).to eq(['X-Custom-Header: value', 'Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -365,7 +371,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
         result = run(test, subscription_resource: subscription_resource.to_json,
                            access_token:)
         expect(result.result).to eq('pass')
-        expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+        expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
         expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
       end
     end
@@ -378,7 +384,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -390,7 +396,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -414,9 +420,9 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
                          access_token:)
       expect(result.result).to eq('pass')
       expect(entity_result_message(test)).to match(
-        /The `header` field on the Subscription resource must be a list of strings. Inferno converted the single/
+        /Tester-provided Subscription updated before use: incorrect string value for element `header` converted into/
       )
-      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(entity_result_message(test)).to_not match(/Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -428,8 +434,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Inferno converted the single/)
-      expect(entity_result_message(test)).to match(/Replaced the Authorization header field/)
+      expect(entity_result_message(test)).to match(/incorrect string value for element `header` converted into/)
+      expect(entity_result_message(test)).to match(/Replaced the Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -441,8 +447,8 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Inferno converted the single/)
-      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(entity_result_message(test)).to match(/incorrect string value for element `header` converted into/)
+      expect(entity_result_message(test)).to match(/Added the Authorization header entry/)
       expect(checked_headers(result)).to eq(['X-Custom-Header: value', 'Authorization: Bearer SAMPLE_TOKEN'])
     end
 
@@ -456,7 +462,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
                            access_token:)
         expect(result.result).to eq('fail')
         expect(entity_result_message(test)).to match(
-          /The `header` field on the Subscription resource must be a list of strings, so Inferno could not add the/
+          /The `header` element on the tester-provided Subscription must be a list of strings\./
         )
         expect(checked_headers(result)).to eq(malformed_header)
       end
@@ -486,7 +492,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token:)
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to match(/Added the Authorization header field/)
+      expect(entity_result_message(test)).to match(/Added the Authorization header entry/)
       expect(checked_headers(result)).to eq(
         ['X-Authorization: Bearer SAMPLE_TOKEN', 'Authorization-Info: value', 'Authorization: Bearer SAMPLE_TOKEN']
       )
@@ -500,7 +506,7 @@ RSpec.describe SubscriptionsTestKit::SubscriptionConformanceVerification, :runna
       result = run(test, subscription_resource: subscription_resource.to_json,
                          access_token: 'abc:def')
       expect(result.result).to eq('pass')
-      expect(entity_result_message(test)).to_not match(/Authorization header field/)
+      expect(entity_result_message(test)).to_not match(/Authorization header entry/)
       expect(checked_headers(result)).to eq(['Authorization: Bearer abc:def'])
     end
   end

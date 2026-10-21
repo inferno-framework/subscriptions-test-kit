@@ -102,7 +102,7 @@ module SubscriptionsTestKit
     end
 
     def server_check_channel_authorization_header(subscription_channel, access_token)
-      headers = server_channel_header_list(subscription_channel, access_token)
+      headers = server_channel_header_list(subscription_channel)
       return if headers.nil?
 
       authorization_headers = headers.select { |header| channel_authorization_header?(header) }
@@ -111,13 +111,13 @@ module SubscriptionsTestKit
 
       action = authorization_headers.empty? ? 'Added' : 'Replaced'
       add_message('warning', %(
-        #{action} the Authorization header field with a Bearer token set to `#{access_token}` in the `header` field on
-        the Subscription resource in order to connect successfully with the Inferno subscription channel.
+        Tester-provided Subscription updated before use: #{action} the Authorization header entry in the `header`
+        field with the Bearer token `#{access_token}` provided in the "Notification Access Token" input.
       ))
       subscription_channel['header'] = (headers - authorization_headers) + ["Authorization: Bearer #{access_token}"]
     end
 
-    def server_channel_header_list(subscription_channel, access_token)
+    def server_channel_header_list(subscription_channel)
       headers = subscription_channel['header']
       case headers
       when nil
@@ -126,14 +126,13 @@ module SubscriptionsTestKit
         headers
       when String
         add_message('warning', %(
-          The `header` field on the Subscription resource must be a list of strings. Inferno converted the single
-          string value into a list containing that value.
+          Tester-provided Subscription updated before use: incorrect string value for element `header` converted into
+          a list containing the provided string.
         ))
         subscription_channel['header'] = [headers]
       else
         add_message('error', %(
-          The `header` field on the Subscription resource must be a list of strings, so Inferno could not add the
-          Authorization header field with a Bearer token set to `#{access_token}`.
+          The `header` element on the tester-provided Subscription must be a list of strings.
         ))
         nil
       end
